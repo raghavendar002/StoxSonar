@@ -1,0 +1,60 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>StoxSonar Daily</title><meta name="description" content="Daily Weinstein stage and graded breakout screen for NSE stocks, with every past signal's outcome.">
+<style>
+:root{--bg:#fbfaf7;--fg:#1d1c1a;--mute:#6b6862;--line:#e4e1da;--card:#fff;--accent:#0f766e;
+--a:#0f766e;--b:#b45309;--c:#6b7280;--w:#b91c1c;--s1:#94a3b8;--s2:#16a34a;--s3:#f59e0b;--s4:#dc2626}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#141413;--fg:#ecebe7;--mute:#a19e97;
+--line:#2c2b29;--card:#1c1c1a;--accent:#2dd4bf;--a:#2dd4bf;--b:#fbbf24;--c:#9ca3af;--w:#f87171}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
+font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:980px;margin:0 auto;padding:24px 16px 64px}
+h1{font-size:26px;margin:0}h2{font-size:18px;margin:36px 0 8px}
+.sub{color:var(--mute);margin:4px 0 20px}
+.pill{display:inline-block;padding:2px 10px;border-radius:99px;font-weight:600;font-size:13px}
+.Healthy{background:color-mix(in srgb,var(--s2) 18%,transparent);color:var(--s2)}
+.Weak{background:color-mix(in srgb,var(--s4) 18%,transparent);color:var(--s4)}
+.bar{display:flex;height:14px;border-radius:7px;overflow:hidden;margin:10px 0 4px}
+.bar span{display:block}.legend{display:flex;flex-wrap:wrap;gap:14px;color:var(--mute);font-size:13px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--card)}
+table{border-collapse:collapse;width:100%;font-size:14px;white-space:nowrap}
+th,td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--line)}
+th{color:var(--mute);font-weight:500;font-size:12px}tr:last-child td{border-bottom:0}
+a{color:var(--accent);text-decoration:none;font-weight:600}
+.g{display:inline-block;min-width:22px;text-align:center;border-radius:5px;font-weight:700;color:#fff;padding:0 6px}
+.gA{background:var(--a)}.gB{background:var(--b)}.gC{background:var(--c)}.gW{background:var(--w)}
+.empty,.note{color:var(--mute)}.foot{margin-top:40px;color:var(--mute);font-size:13px;border-top:1px solid var(--line);padding-top:16px}
+</style></head><body><main>
+<h1>StoxSonar Daily</h1>
+<p class="sub">NSE · close of 2026-10-08 · 1330 liquid stocks · rules v0.1.0</p>
+<p>Market regime <span class="pill Weak">Weak</span>
+ Bullish grades are cut one level in a weak market.</p>
+<div class="bar"><span style="width:12.5%;background:var(--s1)" title="Basing 12.5%"></span><span style="width:48.5%;background:var(--s2)" title="Advancing 48.5%"></span><span style="width:10.8%;background:var(--s3)" title="Topping 10.8%"></span><span style="width:28.3%;background:var(--s4)" title="Declining 28.3%"></span></div><div class="legend"><span><i style="background:var(--s1)"></i>Basing 12.5%</span><span><i style="background:var(--s2)"></i>Advancing 48.5%</span><span><i style="background:var(--s3)"></i>Topping 10.8%</span><span><i style="background:var(--s4)"></i>Declining 28.3%</span></div>
+
+<h2>New breakouts today</h2>
+<p class="empty">No Grade A or B breakouts today.</p>
+
+<h2>New breakdowns today</h2>
+<div class="scroll"><table><tr><th>Stock</th><th>Grade</th><th>Stage at signal</th><th>Template</th><th>RS rank</th><th>Base</th><th>Volume</th></tr><tr><td><a href="https://www.tradingview.com/chart/?symbol=NSE:JSWSTEEL" rel="noopener">JSWSTEEL</a></td><td><span class="g gA">A</span></td><td>Topping</td><td>4/8</td><td>52</td><td>64 sessions, 11.5% deep</td><td>2.4x avg</td></tr></table></div>
+
+<h2>Signals still in play</h2>
+<div class="scroll"><table><tr><th>Stock</th><th>Type</th><th>Grade</th><th>Stage at signal</th><th>Template</th><th>RS rank</th><th>Base</th><th>Volume</th><th>Signal date</th><th>Status</th><th>Move since</th></tr><tr><td><a href="https://www.tradingview.com/chart/?symbol=NSE:GLAND" rel="noopener">GLAND</a></td><td>Breakout</td><td><span class="g gB">B</span></td><td>Advancing</td><td>8/8</td><td>90</td><td>20 sessions, 8.9% deep</td><td>2.0x avg</td><td>2026-10-07</td><td>Active</td><td>-2.3%</td></tr><tr><td><a href="https://www.tradingview.com/chart/?symbol=NSE:PTCIL" rel="noopener">PTCIL</a></td><td>Breakout</td><td><span class="g gB">B</span></td><td>Advancing</td><td>8/8</td><td>88</td><td>21 sessions, 12.2% deep</td><td>3.5x avg</td><td>2026-10-07</td><td>Active</td><td>-0.9%</td></tr><tr><td><a href="https://www.tradingview.com/chart/?symbol=NSE:FINEORG" rel="noopener">FINEORG</a></td><td>Breakout</td><td><span class="g gB">B</span></td><td>Advancing</td><td>8/8</td><td>72</td><td>31 sessions, 8.4% deep</td><td>2.7x avg</td><td>2026-10-06</td><td>Active</td><td>-2.8%</td></tr><tr><td><a href="https://www.tradingview.com/chart/?symbol=NSE:KMEW" rel="noopener">KMEW</a></td><td>Breakout</td><td><span class="g gB">B</span></td><td>Advancing</td><td>8/8</td><td>95</td><td>21 sessions, 27.6% deep</td><td>2.2x avg</td><td>2026-10-06</td><td>Active</td><td>+1.7%</td></tr><tr><td><a href="https://www.tradingview.com/chart/?symbol=NSE:MARINE" rel="noopener">MARINE</a></td><td>Breakout</td><td><span class="g gB">B</span></td><td>Advancing</td><td>8/8</td><td>98</td><td>20 sessions, 27.5% deep</td><td>3.4x avg</td><td>2026-10-05</td><td>Active</td><td>-3.5%</td></tr><tr><td><a href="https://www.tradingview.com/chart/?symbol=NSE:LOKESHMACH" rel="noopener">LOKESHMACH</a></td><td>Breakout</td><td><span class="g gB">B</span></td><td>Advancing</td><td>8/8</td><td>95</td><td>19 sessions, 20.9% deep</td><td>25.4x avg</td><td>2026-10-01</td><td>Extended</td><td>+11.7%</td></tr><tr><td><a href="https://www.tradingview.com/chart/?symbol=NSE:RAMRAT" rel="noopener">RAMRAT</a></td><td>Breakout</td><td><span class="g gB">B</span></td><td>Advancing</td><td>8/8</td><td>95</td><td>23 sessions, 20.5% deep</td><td>2.6x avg</td><td>2026-10-01</td><td>Active</td><td>-0.9%</td></tr><tr><td><a href="https://www.tradingview.com/chart/?symbol=NSE:CUPID" rel="noopener">CUPID</a></td><td>Breakout</td><td><span class="g gB">B</span></td><td>Advancing</td><td>8/8</td><td>99</td><td>32 sessions, 27.2% deep</td><td>2.6x avg</td><td>2026-09-30</td><td>Extended</td><td>+14.4%</td></tr><tr><td><a href="https://www.tradingview.com/chart/?symbol=NSE:BOSCH-HCIL" rel="noopener">BOSCH-HCIL</a></td><td>Breakout</td><td><span class="g gB">B</span></td><td>Advancing</td><td>8/8</td><td>84</td><td>15 sessions, 15.9% deep</td><td>3.9x avg</td><td>2026-09-29</td><td>Active</td><td>+0.5%</td></tr><tr><td><a href="https://www.tradingview.com/chart/?symbol=NSE:YESBANK" rel="noopener">YESBANK</a></td><td>Breakdown</td><td><span class="g gA">A</span></td><td>Topping</td><td>3/8</td><td>44</td><td>17 sessions, 10.4% deep</td><td>1.9x avg</td><td>2026-09-28</td><td>Extended</td><td>-3.4%</td></tr><tr><td><a href="https://www.tradingview.com/chart/?symbol=NSE:BANKINDIA" rel="noopener">BANKINDIA</a></td><td>Breakdown</td><td><span class="g gB">B</span></td><td>Declining</td><td>1/8</td><td>41</td><td>57 sessions, 11.4% deep</td><td>1.7x avg</td><td>2026-09-28</td><td>Active</td><td>+1.8%</td></tr><tr><td><a href="https://www.tradingview.com/chart/?symbol=NSE:SALSTEEL" rel="noopener">SALSTEEL</a></td><td>Breakout</td><td><span class="g gB">B</span></td><td>Advancing</td><td>8/8</td><td>97</td><td>15 sessions, 27.6% deep</td><td>1.9x avg</td><td>2026-09-24</td><td>Active</td><td>-0.4%</td></tr></table></div>
+
+<h2>Track record (live)</h2>
+<p class="note">0 signals recorded live so far. Every signal is logged the evening it fires and never edited; failures stay in.</p><div class="scroll"><table><tr><th>Grade</th><th>Signals</th><th>Confirmed</th><th>Failed</th><th>Measured at 21 sessions</th><th>Avg vs Nifty 500</th><th>Beat Nifty 500</th><th>Avg R</th></tr><tr><td><span class="g gA">A</span></td><td>0</td><td>–</td><td>–</td><td>0</td><td>–</td><td>–</td><td>–</td></tr><tr><td><span class="g gB">B</span></td><td>0</td><td>–</td><td>–</td><td>0</td><td>–</td><td>–</td><td>–</td></tr><tr><td><span class="g gC">C</span></td><td>0</td><td>–</td><td>–</td><td>0</td><td>–</td><td>–</td><td>–</td></tr></table></div>
+
+<h2>Backtest replay</h2>
+<p class="note">The same rules replayed over past data before the live record began. Treat it as a hint, not proof.</p><div class="scroll"><table><tr><th>Grade</th><th>Signals</th><th>Confirmed</th><th>Failed</th><th>Measured at 21 sessions</th><th>Avg vs Nifty 500</th><th>Beat Nifty 500</th><th>Avg R</th></tr><tr><td><span class="g gA">A</span></td><td>119</td><td>40.3%</td><td>33.6%</td><td>119</td><td>2.5%</td><td>52.9%</td><td>0.1R</td></tr><tr><td><span class="g gB">B</span></td><td>235</td><td>41.8%</td><td>43.6%</td><td>202</td><td>0.7%</td><td>48.5%</td><td>-0.05R</td></tr><tr><td><span class="g gC">C</span></td><td>579</td><td>42.9%</td><td>34.7%</td><td>563</td><td>0.7%</td><td>46.9%</td><td>0.11R</td></tr></table></div>
+
+<h2>How it works</h2>
+<p><b>Stage</b> follows Weinstein: the 150-day average and its one-month slope decide Basing, Advancing,
+Topping or Declining, and a change counts only after 5 sessions. <b>Template</b> is Minervini's 8-point
+trend template. <b>Breakout</b> is a close at least 0.5% above a base of 15+ sessions and 8–35% depth,
+on 1.5x average volume, closing in the upper half of the day with a small upper wick.
+<b>Grade A</b> needs Stage 2 with 8/8 (or a Stage 1 base turning into Stage 2) and positive relative
+strength; B is 6–7/8. A signal is <b>Confirmed</b> if it holds above the base for 10 sessions and
+<b>Failed</b> if it closes more than 3% back inside. R measures the 21-session move against the distance
+to that failure level.</p>
+<p class="foot">StoxSonar publishes the output of a fixed, published rule set. It is not investment advice or a recommendation to buy or sell any security, and StoxSonar is not registered with SEBI as a research analyst. Past signals do not predict future results. Charts open on TradingView.</p>
+</main></body></html>
