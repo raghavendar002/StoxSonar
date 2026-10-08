@@ -1,0 +1,56 @@
+name: StoxSonar daily
+
+on:
+  schedule:
+    - cron: "30 13 * * 1-5"   # 19:00 IST, Monday to Friday
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "daily, or replay to bootstrap the ledger"
+        default: daily
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: stoxsonar-daily
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: python -m pytest -q tests
+      - name: Run
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: >
+          python run_daily.py
+          --mode "${{ github.event.inputs.mode || 'daily' }}"
+          --site-url "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
+          ${{ (github.event.inputs.mode || 'daily') == 'daily' && '--telegram' || '' }}
+      # The ledger and page are committed every day, so git history is a public,
+      # timestamped record that no signal was added or changed after the fact.
+      - name: Commit ledger and page
+        run: |
+          git config user.name "stoxsonar-bot"
+          git config user.email "stoxsonar-bot@users.noreply.github.com"
+          git add ledger site
+          git diff --cached --quiet || git commit -m "Signals for $(date -u +%F)"
+          git push
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - uses: actions/deploy-pages@v4
