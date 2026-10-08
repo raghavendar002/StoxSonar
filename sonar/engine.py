@@ -355,7 +355,11 @@ class MarketResult:
     regime: pd.DataFrame          # per session: bench_ok, stage2_share, weak
 
 
-def run_market(prices: Dict[str, pd.DataFrame], bench_close: pd.Series) -> MarketResult:
+def run_market(prices: Dict[str, pd.DataFrame], bench_close: pd.Series,
+               state_sink=None) -> MarketResult:
+    """Replay a whole market. With `state_sink`, each stock's daily states are
+    handed to sink(symbol, states, features) instead of being kept, so long
+    histories fit in memory."""
     feats = {s: compute_features(df, bench_close) for s, df in prices.items() if len(df) >= 60}
     ranks = rs_rank_matrix(feats)
 
@@ -383,7 +387,10 @@ def run_market(prices: Dict[str, pd.DataFrame], bench_close: pd.Series) -> Marke
     for s, f in feats.items():
         st, ev = replay_symbol(s, f, ranks[s], regime["weak"])
         if not st.empty:
-            states.append(st[st["liquid"]])
+            if state_sink is not None:
+                state_sink(s, st[st["liquid"]], f)
+            else:
+                states.append(st[st["liquid"]])
         # Only stocks that pass the liquidity floor on the trigger day count
         liquid_days = set(f.index[f["traded_value"] >= C.LIQUIDITY_MIN_VALUE].strftime("%Y-%m-%d"))
         events.extend(e for e in ev if e.trigger_date in liquid_days)
