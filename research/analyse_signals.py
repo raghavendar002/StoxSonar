@@ -20,7 +20,7 @@ SPLIT_YEAR = 2018
 FEATURES = ["template", "rs_rank", "mansfield", "vol_ratio", "depth", "base_len", "stage_age",
             "ext_pivot", "atr_pct", "fail_dist_atr", "from_hi52", "from_lo52", "dist_sma50",
             "dist_sma200", "slope150", "prior_63", "prior_126", "day_ret", "gap", "tight10",
-            "dry_vol10", "traded_value", "price", "bench_63", "stage2_share"]
+            "dry_vol10", "traded_value", "price", "bench_prior_63", "stage2_share"]
 
 
 def load() -> pd.DataFrame:

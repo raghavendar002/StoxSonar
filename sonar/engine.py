@@ -376,7 +376,7 @@ def _research_features(ev: Event, f: pd.DataFrame) -> None:
     fe["dry_vol10"] = r(np.mean(v[i - 10:i]) / row.vol50) if row.vol50 else None
     fe["traded_value"] = r(row.traded_value)
     fe["price"] = r(c[i])
-    fe["bench_63"] = r(row.bench / f["bench"].iloc[i - 63] - 1) if i >= 63 else None
+    fe["bench_prior_63"] = r(row.bench / f["bench"].iloc[i - 63] - 1) if i >= 63 else None
     # Path after the trigger, for entry and stop research
     if i + 1 < len(f):
         fe["next_open_gap"] = r(o[i + 1] / c[i] - 1)
