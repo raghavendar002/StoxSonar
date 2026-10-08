@@ -65,7 +65,9 @@ def build_snapshot(states: pd.DataFrame, events: pd.DataFrame, regime: pd.DataFr
         breakouts=rows(today[(today["direction"] == "up") & today["grade"].isin(["A", "B"])]),
         breakdowns=rows(today[(today["direction"] == "down") & today["grade"].isin(["A", "B"])]),
         open_signals=rows(events[is_open & events["grade"].isin(["A", "B"])]),
+        # Only signals recorded live: replayed history must never read as a live result
         closed_today=rows(events[(events["status_date"] == as_of) & (events["trigger_date"] != as_of)
+                                 & (events["source"] != "replay")
                                  & events["status"].isin(["Confirmed", "Failed"])
                                  & events["grade"].isin(["A", "B"])]),
         track_record_live=track_record(events, live_sources).to_dict("records"),
