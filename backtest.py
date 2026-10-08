@@ -140,6 +140,7 @@ def main(argv=None) -> int:
     ev["source"] = "replay"
     a.out.mkdir(parents=True, exist_ok=True)
     ev.to_csv(a.out / "backtest_signals.csv.gz", index=False)
+    res.regime.to_csv(a.out / "backtest_regime.csv.gz")
 
     md = [f"# StoxSonar backtest, rules v{C.ENGINE_VERSION}", "",
           f"Data to {as_of.date()}. Benchmark: {'; '.join(bench.attrs.get('sources', []))}. "

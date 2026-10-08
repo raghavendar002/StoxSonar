@@ -219,10 +219,14 @@ class Event:
     status_date: str = ""
     sessions: int = 0
     outcomes: Dict[str, Optional[float]] = field(default_factory=dict)
+    # Research-only measurements (backtest analysis). Not stored in the ledger
+    # and not used for grading.
+    features: Dict[str, Optional[float]] = field(default_factory=dict)
 
     def to_dict(self) -> dict:
         d = asdict(self)
         d.update(d.pop("outcomes"))
+        d.update(d.pop("features"))
         return d
 
 
@@ -304,6 +308,7 @@ def replay_symbol(symbol: str, f: pd.DataFrame, rs_rank: pd.Series,
                                entry=float(Cl[t]), **trig)
                     ev.status = _lifecycle(ev, Cl[t], 0, False)
                     ev.status_date = ev.trigger_date
+                    ev.features["stage_age"] = t - since
                     events.append(ev)
                     open_ev, open_idx, below, new_event = ev, t, False, ev
                     # Shortcut: a Grade A breakout out of a base confirms Stage 2 now
@@ -321,6 +326,7 @@ def replay_symbol(symbol: str, f: pd.DataFrame, rs_rank: pd.Series,
 
     for ev in events:
         _fill_outcomes(ev, f)
+        _research_features(ev, f)
     return pd.DataFrame(rows), events
 
 
@@ -342,6 +348,43 @@ def _fill_outcomes(ev: Event, f: pd.DataFrame) -> None:
             ev.outcomes.setdefault(f"ret_{h}", None)
             ev.outcomes.setdefault(f"bench_{h}", None)
     ev.outcomes.setdefault("r_21", None)
+
+
+def _research_features(ev: Event, f: pd.DataFrame) -> None:
+    """Extra context at the trigger, and how the trade path looked afterwards."""
+    i = f.index.get_loc(pd.Timestamp(ev.trigger_date))
+    c, o, h, l, v = (f[k].to_numpy(float) for k in ("Close", "Open", "High", "Low", "Volume"))
+    row = f.iloc[i]
+
+    def r(x):
+        return None if x is None or not np.isfinite(x) else round(float(x), 4)
+
+    fe = ev.features
+    fe["ext_pivot"] = r(c[i] / ev.pivot - 1)
+    fe["atr_pct"] = r(row.atr_pct)
+    fe["fail_dist_atr"] = r(abs(1 - ev.pivot * (1 - C.FAIL_PCT) / c[i]) / row.atr_pct) if row.atr_pct else None
+    fe["from_hi52"] = r(c[i] / row.hi52 - 1)
+    fe["from_lo52"] = r(c[i] / row.lo52 - 1)
+    fe["dist_sma50"] = r(c[i] / row.sma50 - 1)
+    fe["dist_sma200"] = r(c[i] / row.sma200 - 1)
+    fe["slope150"] = r(row.slope150)
+    fe["prior_63"] = r(c[i] / c[i - 63] - 1) if i >= 63 else None
+    fe["prior_126"] = r(c[i] / c[i - 126] - 1) if i >= 126 else None
+    fe["day_ret"] = r(c[i] / c[i - 1] - 1)
+    fe["gap"] = r(o[i] / c[i - 1] - 1)
+    fe["tight10"] = r(np.std(c[i - 10:i]) / ev.pivot) if i >= 10 else None
+    fe["dry_vol10"] = r(np.mean(v[i - 10:i]) / row.vol50) if row.vol50 else None
+    fe["traded_value"] = r(row.traded_value)
+    fe["price"] = r(c[i])
+    fe["bench_63"] = r(row.bench / f["bench"].iloc[i - 63] - 1) if i >= 63 else None
+    # Path after the trigger, for entry and stop research
+    if i + 1 < len(f):
+        fe["next_open_gap"] = r(o[i + 1] / c[i] - 1)
+    for n in (10, 21):
+        if i + n < len(f):
+            fe[f"mfe_{n}"] = r(h[i + 1:i + n + 1].max() / c[i] - 1)
+            fe[f"mae_{n}"] = r(l[i + 1:i + n + 1].min() / c[i] - 1)
+            fe[f"ret_{n}_from_open"] = r(c[i + n] / o[i + 1] - 1)
 
 
 # ---------------------------------------------------------------------------
