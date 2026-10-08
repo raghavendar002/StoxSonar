@@ -22,16 +22,16 @@ def make_df(closes, vols=None, start="2023-01-02"):
 
 def uptrend_with_base_and_breakout():
     """Steady rise, a 60-session base ~10% deep, then a high-volume breakout and follow-through."""
-    rise = np.linspace(100, 200, 200)
+    rise = np.geomspace(40, 200, 200)
     base = 190 + 9 * np.sin(np.linspace(0, 6 * np.pi, 60))     # 181..199, below the 200.x pivot
-    brk = [207.0]
-    after = np.linspace(208, 235, 40)
+    brk = [212.0]
+    after = np.linspace(213, 240, 40)
     closes = np.r_[rise, base, brk, after]
     vols = np.full(len(closes), 1e6)
     vols[260] = 3e6
     df = make_df(closes, vols)
     # The breakout candle closes at its high: no upper wick
-    df.iloc[260, df.columns.get_loc("High")] = 207.0
+    df.iloc[260, df.columns.get_loc("High")] = 212.0
     df.iloc[260, df.columns.get_loc("Open")] = 199.0
     df.iloc[260, df.columns.get_loc("Low")] = 198.5
     return df
@@ -136,3 +136,37 @@ def test_page_renders_without_prices(tmp_path):
     page = publish.render_html(snap)
     assert "TEST" in page and "207" not in page      # no raw price on the page
     assert "TEST" in publish.telegram_text(snap)
+
+
+def test_score_grades_and_gate():
+    strong = dict(rs_rank=95, prior_126=1.2, dist_sma200=0.6, ext_pivot=0.06)
+    weak = dict(rs_rank=40, prior_126=0.1, dist_sma200=0.05, ext_pivot=0.021)
+    assert engine.grade_event("up", 2, engine.momentum_score(strong), True, False) == "A"
+    assert engine.grade_event("up", 2, engine.momentum_score(weak), True, False) == "C"
+    # Below the 200-day average nothing grades above C, however strong the score
+    assert engine.grade_event("up", 2, engine.momentum_score(strong), False, False) == "C"
+    assert engine.grade_event("up", 2, engine.momentum_score(strong), True, True) == "B"
+
+
+def test_breakout_needs_two_percent_clearance():
+    df = uptrend_with_base_and_breakout()
+    for col in ("Close", "High"):
+        df.iloc[260, df.columns.get_loc(col)] = 202.0      # about 1% above the ~200 pivot
+    res = engine.run_market({"TEST.NS": df}, rising_bench(df.index))
+    assert not [e for e in res.events if e.trigger_date == str(df.index[260].date())]
+
+
+def test_bad_print_blocks_signal_and_outcomes():
+    df = uptrend_with_base_and_breakout()
+    df.iloc[240, df.columns.get_loc("Close")] *= 2           # one-day doubling on normal volume
+    res = engine.run_market({"TEST.NS": df}, rising_bench(df.index))
+    assert not [e for e in res.events if e.trigger_date == str(df.index[260].date())]
+
+
+def test_fail_line_is_atr_based_and_outcomes_start_next_open():
+    df = uptrend_with_base_and_breakout()
+    res = engine.run_market({"TEST.NS": df}, rising_bench(df.index))
+    ev = [e for e in res.events if e.direction == "up"][0]
+    atr = engine.compute_features(df, rising_bench(df.index))["atr_pct"].iloc[260]
+    assert ev.stop == pytest.approx(ev.entry * (1 - C.STOP_ATR * atr))
+    assert ev.outcomes["ret_21"] == pytest.approx(df["Close"].iloc[281] / df["Open"].iloc[261] - 1, abs=1e-4)

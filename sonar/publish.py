@@ -50,6 +50,9 @@ def build_snapshot(states: pd.DataFrame, events: pd.DataFrame, regime: pd.DataFr
                 template=int(r.template), rs_rank=None if pd.isna(r.rs_rank) else int(r.rs_rank),
                 base_len=int(r.base_len), depth_pct=round(r.depth * 100, 1),
                 vol_ratio=round(r.vol_ratio, 1), status=r.status,
+                score=None if pd.isna(getattr(r, "score", None)) else round(float(r.score), 2),
+                stop_pct=None if pd.isna(getattr(r, "stop", None)) or not r.entry
+                else round((r.stop / r.entry - 1) * 100, 1),
                 sessions=int(r.sessions or 0), move_pct=move, source=r.source))
         return out
 
@@ -92,11 +95,15 @@ def _grade(g: str) -> str:
     return f'<span class="g g{_e(g)}">{_e(g)}</span>'
 
 
+def _v(x, suffix="") -> str:
+    return "–" if x is None or x != x else f"{x}{suffix}"
+
+
 def _signal_table(rows, empty: str, show_status=False) -> str:
     if not rows:
         return f'<p class="empty">{_e(empty)}</p>'
-    head = ("<tr><th>Stock</th>" + ("<th>Type</th>" if show_status else "") + "<th>Grade</th><th>Stage at signal</th><th>Template</th>"
-            "<th>RS rank</th><th>Base</th><th>Volume</th>"
+    head = ("<tr><th>Stock</th>" + ("<th>Type</th>" if show_status else "") + "<th>Grade</th><th>Score</th><th>Stage at signal</th><th>Template</th>"
+            "<th>RS rank</th><th>Fail line</th><th>Base</th><th>Volume</th>"
             + ("<th>Signal date</th><th>Status</th><th>Move since</th>" if show_status else "")
             + "</tr>")
     body = []
@@ -105,9 +112,10 @@ def _signal_table(rows, empty: str, show_status=False) -> str:
         body.append(
             f"<tr><td>{_tv(r['symbol'])}</td>"
             + (f"<td>{'Breakout' if r['direction'] == 'up' else 'Breakdown'}</td>" if show_status else "")
-            + f"<td>{_grade(r['grade'])}</td>"
+            + f"<td>{_grade(r['grade'])}</td><td>{_v(r['score'])}</td>"
             f"<td>{_e(C.STAGE_NAMES[r['stage']])}</td><td>{r['template']}/8</td>"
-            f"<td>{_e(r['rs_rank'])}</td><td>{r['base_len']} sessions, {r['depth_pct']}% deep</td>"
+            f"<td>{_e(r['rs_rank'])}</td><td>{_v(r['stop_pct'], '%')}</td>"
+            f"<td>{r['base_len']} sessions, {r['depth_pct']}% deep</td>"
             f"<td>{r['vol_ratio']}x avg</td>"
             + (f"<td>{_e(r['trigger_date'])}</td><td>{_e(r['status'])}</td><td>{mv}</td>" if show_status else "")
             + "</tr>")
@@ -191,12 +199,15 @@ def render_html(s: dict) -> str:
 <h2>How it works</h2>
 <p><b>Stage</b> follows Weinstein: the 150-day average and its one-month slope decide Basing, Advancing,
 Topping or Declining, and a change counts only after 5 sessions. <b>Template</b> is Minervini's 8-point
-trend template. <b>Breakout</b> is a close at least 0.5% above a base of 15+ sessions and 8–35% depth,
-on 1.5x average volume, closing in the upper half of the day with a small upper wick.
-<b>Grade A</b> needs Stage 2 with 8/8 (or a Stage 1 base turning into Stage 2) and positive relative
-strength; B is 6–7/8. A signal is <b>Confirmed</b> if it holds above the base for 10 sessions and
-<b>Failed</b> if it closes more than 3% back inside. R measures the 21-session move against the distance
-to that failure level.</p>
+trend template, shown for context. <b>Breakout</b> is a close at least 2% above a base of 15+ sessions
+and 8–35% depth, on 1.5x average volume, closing in the upper half of the day with a small upper wick.
+<b>Score</b> averages four measures of momentum: RS rank, the 6-month return, distance above the
+200-day average and how far above the base the stock closed. Only breakouts above the 200-day average
+can grade A or B: <b>A</b> is a score in the top fifth of 2006–2018 breakouts, <b>B</b> the top half.
+A signal is <b>Confirmed</b> if it holds above the base for 10 sessions and <b>Failed</b> if it closes
+below its fail line, 2.5 average daily ranges under the breakout close. Results are measured from the
+next day's open, the first price anyone could buy at. R is the 21-session move divided by the distance
+to the fail line.</p>
 <p class="foot">{_e(DISCLAIMER)} Charts open on TradingView.</p>
 </main></body></html>"""
 
@@ -211,9 +222,9 @@ def telegram_text(s: dict) -> str:
     if s["breakouts"]:
         lines.append("New breakouts")
         for r in s["breakouts"]:
-            lines.append(f"{r['grade']} · {r['symbol']} · {C.STAGE_NAMES[r['stage']]} · template "
-                         f"{r['template']}/8" + (f" · RS {r['rs_rank']}" if r['rs_rank'] is not None else "")
-                         + f" · vol {r['vol_ratio']}x")
+            lines.append(f"{r['grade']} · {r['symbol']} · score {_v(r['score'])}"
+                         + (f" · RS {r['rs_rank']}" if r['rs_rank'] is not None else "")
+                         + (f" · fail line {r['stop_pct']}%" if r['stop_pct'] is not None else ""))
     else:
         lines.append("No Grade A or B breakouts today.")
     if s["breakdowns"]:

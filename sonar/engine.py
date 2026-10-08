@@ -39,6 +39,10 @@ def compute_features(df: pd.DataFrame, bench_close: pd.Series) -> pd.DataFrame:
                     (f["Low"] - prev_close).abs()], axis=1).max(axis=1)
     f["atr_pct"] = tr.rolling(14).mean() / c
     f["traded_value"] = (c * f["Volume"]).rolling(20).median()
+    # Bad prints: a huge one-day move without the volume a real move brings
+    f["spike"] = ((c / prev_close - 1).abs() > C.SPIKE_MAX_MOVE) & \
+        ~(f["Volume"] >= C.SPIKE_MAX_VOLUME * f["vol50"])
+    f["prior_126"] = c / c.shift(126) - 1
     f["rs_score"] = (0.4 * (c / c.shift(63) - 1) + 0.2 * (c / c.shift(126) - 1)
                      + 0.2 * (c / c.shift(189) - 1) + 0.2 * (c / c.shift(252) - 1))
     f["mansfield"] = mansfield_rs(c, bench_close)
@@ -135,10 +139,12 @@ def _max_depth(atr_pct: float) -> float:
     return C.BASE_MAX_DEPTH_VOLATILE if atr_pct > C.VOLATILE_ATR_PCT else C.BASE_MAX_DEPTH
 
 
-def detect_trigger(H, L, O, Cl, V, vol50, atr_pct, t) -> Optional[dict]:
+def detect_trigger(H, L, O, Cl, V, vol50, atr_pct, t, spike=None) -> Optional[dict]:
     """A base breakout or breakdown that triggers on session t, if any."""
     s = max(0, t - C.BASE_LOOKBACK)
     if t - s < C.BASE_MIN_LEN:
+        return None
+    if spike is not None and spike[s:t + 1].any():
         return None
     rng = H[t] - L[t]
     if rng <= 0 or not vol50[t] or np.isnan(vol50[t]):
@@ -157,7 +163,7 @@ def detect_trigger(H, L, O, Cl, V, vol50, atr_pct, t) -> Optional[dict]:
         base_low = L[k:t].min()
         depth = pivot / base_low - 1
         upper_wick = (H[t] - max(O[t], Cl[t])) / rng
-        if (C.BASE_MIN_DEPTH <= depth <= max_depth and Cl[t] > pivot * (1 + C.TRIGGER_CLEARANCE)
+        if (C.BASE_MIN_DEPTH <= depth <= max_depth and Cl[t] > pivot * (1 + C.TRIGGER_CLEARANCE_UP)
                 and pos >= 0.5 and upper_wick <= C.MAX_WICK):
             return dict(direction="up", pivot=pivot, base_len=base_len, depth=depth,
                         vol_ratio=vol_ratio)
@@ -170,25 +176,31 @@ def detect_trigger(H, L, O, Cl, V, vol50, atr_pct, t) -> Optional[dict]:
         base_high = H[k:t].max()
         depth = base_high / trough - 1
         lower_wick = (min(O[t], Cl[t]) - L[t]) / rng
-        if (C.BASE_MIN_DEPTH <= depth <= max_depth and Cl[t] < trough * (1 - C.TRIGGER_CLEARANCE)
+        if (C.BASE_MIN_DEPTH <= depth <= max_depth and Cl[t] < trough * (1 - C.TRIGGER_CLEARANCE_DOWN)
                 and pos <= 0.5 and lower_wick <= C.MAX_WICK):
             return dict(direction="down", pivot=trough, base_len=base_len, depth=depth,
                         vol_ratio=vol_ratio)
     return None
 
 
-def grade_event(direction: str, stage: int, stage2_rule_today: bool, template: int,
-                mansfield: float, weak_regime: bool) -> str:
-    """Grade per the spec's stage x event table. Bearish grades carry no regime cut."""
+def momentum_score(values: Dict[str, float]) -> float:
+    """Average z-score of the SCORE_FEATURES, each clipped to its 2006-2018 range."""
+    zs = []
+    for name, (lo, hi, mean, std) in C.SCORE_FEATURES.items():
+        x = values.get(name)
+        x = lo if x is None or x != x else min(max(x, lo), hi)
+        zs.append((x - mean) / std)
+    return float(np.mean(zs))
+
+
+def grade_event(direction: str, stage: int, score: float, above_sma200: bool,
+                weak_regime: bool) -> str:
+    """Bullish: graded by momentum score, only above the 200-day average, cut one
+    level in a weak market. Bearish: the spec's stage table, no regime cut."""
     if direction == "up":
-        if stage == 1:
-            g = "A" if stage2_rule_today else "C"
-        elif stage == 2:
-            g = "A" if template == 8 else "B" if template >= 6 else "C"
-        else:
-            g = "C"
-        if g == "A" and not (mansfield == mansfield and mansfield > 0):
-            g = "B"
+        if not above_sma200:
+            return "C"
+        g = "A" if score >= C.SCORE_A else "B" if score >= C.SCORE_B else "C"
         if weak_regime:
             g = {"A": "B", "B": "C"}.get(g, g)
         return g
@@ -215,6 +227,8 @@ class Event:
     base_len: int
     depth: float
     vol_ratio: float
+    stop: float = 0.0
+    score: Optional[float] = None
     status: str = "Active"
     status_date: str = ""
     sessions: int = 0
@@ -234,7 +248,7 @@ def _lifecycle(ev: Event, close: float, day: int, closed_beyond_pivot: bool) -> 
     """Status after `day` sessions (day 0 = trigger day)."""
     up = ev.direction == "up"
     move = close / ev.pivot - 1 if up else 1 - close / ev.pivot
-    if day > 0 and move < -C.FAIL_PCT:
+    if day > 0 and (close < ev.stop if up else close > ev.stop):
         return "Failed"
     if day >= C.LIFECYCLE_SESSIONS:
         return "Faded" if closed_beyond_pivot else "Confirmed"
@@ -249,6 +263,7 @@ def replay_symbol(symbol: str, f: pd.DataFrame, rs_rank: pd.Series,
             else pd.Series(False, index=f.index))
     H, L, O, Cl, V = (f[k].to_numpy(float) for k in ("High", "Low", "Open", "Close", "Volume"))
     vol50, atr = f["vol50"].to_numpy(float), f["atr_pct"].to_numpy(float)
+    spike = f["spike"].to_numpy(bool)
     dates = f.index
 
     confirmed: Optional[int] = None
@@ -295,11 +310,16 @@ def replay_symbol(symbol: str, f: pd.DataFrame, rs_rank: pd.Series,
                 if open_ev.status in ("Failed", "Confirmed", "Faded"):
                     open_ev = None
             if open_ev is None:
-                trig = detect_trigger(H, L, O, Cl, V, vol50, atr, t)
+                trig = detect_trigger(H, L, O, Cl, V, vol50, atr, t, spike)
                 if trig:
-                    stage2_today = raw == 2 or cand == 2
-                    g = grade_event(trig["direction"], confirmed, stage2_today, template,
-                                    row.mansfield, bool(weak.iloc[t]))
+                    score = momentum_score(dict(
+                        rs_rank=rr, prior_126=row.prior_126, dist_sma200=Cl[t] / row.sma200 - 1,
+                        ext_pivot=Cl[t] / trig["pivot"] - 1))
+                    g = grade_event(trig["direction"], confirmed, score, Cl[t] > row.sma200,
+                                    bool(weak.iloc[t]))
+                    sign = 1 if trig["direction"] == "up" else -1
+                    trig["stop"] = float(Cl[t] * (1 - sign * C.STOP_ATR * atr[t]))
+                    trig["score"] = round(score, 3) if trig["direction"] == "up" else None
                     ev = Event(symbol=symbol, trigger_date=str(dates[t].date()), grade=g,
                                stage=confirmed, template=template,
                                rs_rank=None if pd.isna(rr) else float(rr),
@@ -312,7 +332,7 @@ def replay_symbol(symbol: str, f: pd.DataFrame, rs_rank: pd.Series,
                     events.append(ev)
                     open_ev, open_idx, below, new_event = ev, t, False, ev
                     # Shortcut: a Grade A breakout out of a base confirms Stage 2 now
-                    if ev.direction == "up" and g == "A" and confirmed == 1:
+                    if ev.direction == "up" and g == "A" and confirmed == 1 and (raw == 2 or cand == 2):
                         confirmed, since, cand, cand_days = 2, t, None, 0
 
         rows.append(dict(
@@ -331,14 +351,19 @@ def replay_symbol(symbol: str, f: pd.DataFrame, rs_rank: pd.Series,
 
 
 def _fill_outcomes(ev: Event, f: pd.DataFrame) -> None:
-    """Return after each horizon, the benchmark's return, and R at 21 sessions."""
+    """Return after each horizon, the benchmark's return, and R at 21 sessions.
+
+    Returns run from the next session's open, the first price anyone could act
+    on, to the close h sessions after the trigger. A bad print inside that
+    window leaves the outcome unmeasured rather than wrong."""
     i = f.index.get_loc(pd.Timestamp(ev.trigger_date))
     sign = 1 if ev.direction == "up" else -1
-    risk = abs(1 - ev.pivot * (1 - sign * C.FAIL_PCT) / ev.entry)
+    risk = abs(1 - ev.stop / ev.entry)
+    spike = f["spike"].to_numpy(bool)
     for h in C.HORIZONS:
         j = i + h
-        if j < len(f):
-            r = f["Close"].iloc[j] / ev.entry - 1
+        if j < len(f) and not spike[i + 1:j + 1].any():
+            r = f["Close"].iloc[j] / f["Open"].iloc[i + 1] - 1
             b = f["bench"].iloc[j] / f["bench"].iloc[i] - 1
             ev.outcomes[f"ret_{h}"] = round(float(r), 4)
             ev.outcomes[f"bench_{h}"] = round(float(b), 4)
@@ -362,7 +387,7 @@ def _research_features(ev: Event, f: pd.DataFrame) -> None:
     fe = ev.features
     fe["ext_pivot"] = r(c[i] / ev.pivot - 1)
     fe["atr_pct"] = r(row.atr_pct)
-    fe["fail_dist_atr"] = r(abs(1 - ev.pivot * (1 - C.FAIL_PCT) / c[i]) / row.atr_pct) if row.atr_pct else None
+    fe["fail_dist_atr"] = r(abs(1 - ev.pivot / c[i]) / row.atr_pct) if row.atr_pct else None
     fe["from_hi52"] = r(c[i] / row.hi52 - 1)
     fe["from_lo52"] = r(c[i] / row.lo52 - 1)
     fe["dist_sma50"] = r(c[i] / row.sma50 - 1)
