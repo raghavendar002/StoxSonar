@@ -6,7 +6,7 @@ At about 7:15 pm IST on every trading day, two things update:
 
 1. **A web page** at `https://raghavendar002.github.io/StoxSonar/` showing:
    - **Market mood:** Healthy or Weak, plus a coloured bar showing what share of NSE stocks are in each stage (Basing, Advancing, Topping, Declining).
-   - **New breakouts today:** stocks that just broke out of a base on heavy volume, each graded A or B, with the reasons (stage, trend template score, RS rank, base length and depth, volume).
+   - **New breakouts today:** stocks that just broke out of a base on heavy volume, each graded A or B, with its momentum score, RS rank, fail line, stage, trend template, base and volume.
    - **New breakdowns today:** the bearish mirror image.
    - **Signals still in play:** earlier signals and how they are doing now (Active, Extended, and so on).
    - **Track record:** for every grade, how many signals were confirmed or failed, and how they did against the Nifty 500 after 21 trading days.
@@ -20,15 +20,17 @@ For each of the ~1,300 NSE stocks that trade at least Rs 1 crore a day:
 
 1. **Stage:** is the 150-day average rising, flat or falling, and is the price above or below it? That puts the stock in Stage 1 (Basing), 2 (Advancing), 3 (Topping) or 4 (Declining). A change only counts after it holds for 5 days, so labels don't flicker.
 2. **Trend template:** 8 yes/no checks from Mark Minervini (averages stacked in the right order, near the 52-week high, stronger than 70% of stocks, and so on). The score runs from 0 to 8.
-3. **Breakout:** the stock went sideways for at least 15 days in a range 8–35% deep, then closed above the top of that range on at least 1.5x normal volume.
+3. **Breakout:** the stock went sideways for at least 15 days in a range 8–35% deep, then closed at least 2% above the top of that range on at least 1.5x normal volume.
 4. **Grade:**
-   - **A:** Stage 2 with 8/8, stronger than the market.
-   - **B:** Stage 2 with 6–7/8.
+   - The **score** averages four momentum measures: RS rank, the 6-month return, how far the price is above its 200-day average, and how far above the range it closed. Testing on 2006–2026 showed these, not the shape of the range, decide how breakouts do.
+   - **A:** above the 200-day average with a score in the top fifth of 2006–2018 breakouts.
+   - **B:** above the 200-day average with a score in the top half.
    - **C:** everything else (not posted).
    - In a Weak market, every grade drops one level.
 5. **Follow-up:** each breakout is watched for 10 days.
    - **Confirmed:** it held above the breakout level for those 10 days.
-   - **Failed:** it closed more than 3% back below that level.
+   - **Failed:** it closed below its fail line, 2.5 average daily ranges under the breakout close. A jumpy stock gets a wider line than a calm one.
+   - Results are measured from the next morning's open, the first price you could actually buy at.
 
 ## How it runs on its own
 

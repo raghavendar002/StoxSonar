@@ -39,5 +39,5 @@ Use `--limit 100` for a quick trial and `--use-cache` to rerun without downloadi
 - **Data licence:** yfinance and Yahoo are personal-use sources. That is acceptable for a free beta that shows no prices, but they must be replaced with a licensed vendor inside `fetch_prices` before anyone pays.
 - **Survivorship:** the replay only sees stocks listed today, so it overstates results. Only the live record counts.
 - **Trendline breakouts:** the spec's second breakout type is not included yet. v0.1 has base breakouts only.
-- **Lifecycle gap:** the spec does not say what happens when a signal dips below its pivot but never falls 3% under it within 10 sessions. Those signals close as "Faded", which is neither a success nor a failure.
+- **Lifecycle gap:** the spec does not say what happens when a signal dips below its pivot but never closes below its fail line (entry minus 2.5 ATR) within 10 sessions. Those signals close as "Faded", which is neither a success nor a failure.
 - **Regime:** the regime uses the same day's stage breadth, measured before any breakout shortcut.
