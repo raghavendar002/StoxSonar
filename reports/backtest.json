@@ -15,39 +15,39 @@
    "track_record": [
     {
      "grade": "A",
-     "signals": 1264,
-     "closed": 1264,
-     "confirmed_pct": 47.3,
-     "failed_pct": 33.2,
-     "measured_21": 1264,
-     "avg_excess_21_pct": 2.7,
-     "median_excess_21_pct": -0.0,
-     "win_pct_21": 49.7,
-     "avg_r_21": 0.62
+     "signals": 606,
+     "closed": 606,
+     "confirmed_pct": 61.2,
+     "failed_pct": 14.2,
+     "measured_21": 606,
+     "avg_excess_21_pct": 1.9,
+     "median_excess_21_pct": -1.2,
+     "win_pct_21": 45.2,
+     "avg_r_21": 0.32
     },
     {
      "grade": "B",
-     "signals": 1380,
-     "closed": 1370,
-     "confirmed_pct": 45.3,
-     "failed_pct": 35.3,
-     "measured_21": 1346,
+     "signals": 865,
+     "closed": 857,
+     "confirmed_pct": 56.0,
+     "failed_pct": 15.3,
+     "measured_21": 843,
      "avg_excess_21_pct": 1.1,
-     "median_excess_21_pct": -0.8,
-     "win_pct_21": 47.6,
-     "avg_r_21": 0.44
+     "median_excess_21_pct": -1.1,
+     "win_pct_21": 47.1,
+     "avg_r_21": 0.26
     },
     {
      "grade": "C",
-     "signals": 1859,
-     "closed": 1853,
-     "confirmed_pct": 46.2,
-     "failed_pct": 31.7,
-     "measured_21": 1843,
-     "avg_excess_21_pct": 1.1,
-     "median_excess_21_pct": -0.8,
-     "win_pct_21": 46.9,
-     "avg_r_21": 0.36
+     "signals": 1361,
+     "closed": 1351,
+     "confirmed_pct": 51.6,
+     "failed_pct": 15.9,
+     "measured_21": 1339,
+     "avg_excess_21_pct": 0.3,
+     "median_excess_21_pct": -1.6,
+     "win_pct_21": 44.3,
+     "avg_r_21": 0.18
     }
    ]
   },
@@ -63,39 +63,39 @@
    "track_record": [
     {
      "grade": "A",
-     "signals": 1591,
-     "closed": 1591,
-     "confirmed_pct": 46.2,
-     "failed_pct": 34.4,
-     "measured_21": 1591,
-     "avg_excess_21_pct": 2.6,
-     "median_excess_21_pct": -0.0,
-     "win_pct_21": 49.8,
-     "avg_r_21": 0.59
+     "signals": 757,
+     "closed": 757,
+     "confirmed_pct": 59.8,
+     "failed_pct": 14.4,
+     "measured_21": 757,
+     "avg_excess_21_pct": 2.1,
+     "median_excess_21_pct": -0.9,
+     "win_pct_21": 46.8,
+     "avg_r_21": 0.32
     },
     {
      "grade": "B",
-     "signals": 1777,
-     "closed": 1767,
-     "confirmed_pct": 44.4,
-     "failed_pct": 35.8,
-     "measured_21": 1743,
-     "avg_excess_21_pct": 1.1,
-     "median_excess_21_pct": -0.5,
-     "win_pct_21": 48.7,
-     "avg_r_21": 0.41
+     "signals": 1079,
+     "closed": 1071,
+     "confirmed_pct": 55.0,
+     "failed_pct": 15.9,
+     "measured_21": 1057,
+     "avg_excess_21_pct": 1.2,
+     "median_excess_21_pct": -1.1,
+     "win_pct_21": 46.9,
+     "avg_r_21": 0.24
     },
     {
      "grade": "C",
-     "signals": 2293,
-     "closed": 2287,
-     "confirmed_pct": 46.0,
-     "failed_pct": 31.7,
-     "measured_21": 2277,
-     "avg_excess_21_pct": 1.1,
-     "median_excess_21_pct": -0.9,
-     "win_pct_21": 46.7,
-     "avg_r_21": 0.36
+     "signals": 1672,
+     "closed": 1662,
+     "confirmed_pct": 51.6,
+     "failed_pct": 16.1,
+     "measured_21": 1650,
+     "avg_excess_21_pct": 0.3,
+     "median_excess_21_pct": -1.7,
+     "win_pct_21": 43.9,
+     "avg_r_21": 0.16
     }
    ]
   }
