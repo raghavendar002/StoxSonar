@@ -1,8 +1,14 @@
 name: StoxSonar daily
 
 on:
+  # GitHub often starts scheduled jobs late (Friday 9 Oct ran 5.5 hours late),
+  # so the job is tried four times each weekday evening. The first attempt
+  # that finds a new NSE close publishes it; the others do nothing.
   schedule:
-    - cron: "30 13 * * 1-5"   # 19:00 IST, Monday to Friday
+    - cron: "17 13 * * 1-5"   # 18:47 IST
+    - cron: "47 14 * * 1-5"   # 20:17 IST
+    - cron: "17 16 * * 1-5"   # 21:47 IST
+    - cron: "47 17 * * 1-5"   # 23:17 IST, last attempt
   workflow_dispatch:
     inputs:
       mode:
@@ -33,6 +39,7 @@ jobs:
       - run: pip install -r requirements.txt
       - run: python -m pytest -q tests
       - name: Run
+        id: run
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -44,14 +51,17 @@ jobs:
       # The ledger and page are committed every day, so git history is a public,
       # timestamped record that no signal was added or changed after the fact.
       - name: Commit ledger and page
+        if: steps.run.outputs.published == 'true'
         run: |
           git config user.name "stoxsonar-bot"
           git config user.email "stoxsonar-bot@users.noreply.github.com"
           git add ledger site
-          git diff --cached --quiet || git commit -m "Signals for $(date -u +%F)"
+          git diff --cached --quiet || git commit -m "Signals for ${{ steps.run.outputs.as_of }}"
           git pull --rebase origin main
           git push
       - uses: actions/upload-pages-artifact@v3
+        if: steps.run.outputs.published == 'true'
         with:
           path: site
       - uses: actions/deploy-pages@v4
+        if: steps.run.outputs.published == 'true'

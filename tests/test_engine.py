@@ -136,3 +136,30 @@ def test_page_renders_without_prices(tmp_path):
     page = publish.render_html(snap)
     assert "TEST" in page and "207" not in page      # no raw price on the page
     assert "TEST" in publish.telegram_text(snap)
+
+
+def test_daily_run_never_republishes_the_last_session(tmp_path, monkeypatch):
+    import run_daily
+    from sonar import data as D
+    df = uptrend_with_base_and_breakout()
+    D.save_cache(tmp_path / "c.pkl", {"TEST.NS": df}, rising_bench(df.index))
+    posts = []
+    monkeypatch.setattr(publish, "send_telegram", lambda text: posts.append(text))
+    out = tmp_path / "gh_output"
+    monkeypatch.setenv("GITHUB_OUTPUT", str(out))
+    args = ["--use-cache", "--cache", str(tmp_path / "c.pkl"), "--db", str(tmp_path / "l.db"),
+            "--site", str(tmp_path / "site"), "--telegram"]
+    assert run_daily.main(args + ["--mode", "replay"]) == 0
+    out.write_text("")
+    posts.clear()
+    # Same data again: the newest session is already published, so no post
+    assert run_daily.main(args + ["--mode", "daily"]) == 0
+    assert posts == [] and "published=true" not in out.read_text()
+    # One more session arrives: it is published once
+    nxt = df.iloc[[-1]].copy()
+    nxt.index = nxt.index + pd.offsets.BDay(1)
+    df2 = pd.concat([df, nxt])
+    D.save_cache(tmp_path / "c.pkl", {"TEST.NS": df2}, rising_bench(df2.index))
+    assert run_daily.main(args + ["--mode", "daily"]) == 0
+    assert len(posts) == 1 and str(nxt.index[0].date()) in posts[0]
+    assert "published=true" in out.read_text()
