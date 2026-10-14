@@ -28,6 +28,14 @@ from sonar import data, engine, ledger, publish
 ROOT = Path(__file__).resolve().parent
 log = logging.getLogger("stoxsonar")
 IST = timezone(timedelta(hours=5, minutes=30))
+SESSION_FINAL = (16, 0)      # IST; NSE closes 15:30, a bar dated today is partial before this
+
+
+def last_complete_day(now: datetime) -> str:
+    """The newest date whose session has finished, by the clock in India."""
+    now = now.astimezone(IST)
+    day = now.date() if (now.hour, now.minute) >= SESSION_FINAL else now.date() - timedelta(days=1)
+    return day.isoformat()
 
 
 def _output(**kv) -> None:
@@ -45,11 +53,10 @@ def _log_freshness(prices, bench: pd.Series) -> None:
              bench.index.max().date(), last.value_counts().head(4).to_dict())
 
 
-def latest_session(prices, bench: pd.Series) -> str:
-    """The newest date most stocks have a bar for, and the benchmark too."""
+def latest_session(prices) -> str:
+    """The newest date most stocks have a bar for."""
     last = pd.Series([df.index.max() for df in prices.values() if len(df)])
-    common = last.mode().max() if len(last) else bench.index.max()
-    return str(min(common, bench.index.max()).date())
+    return str(last.mode().max().date())
 
 
 def main(argv=None) -> int:
@@ -69,9 +76,9 @@ def main(argv=None) -> int:
     _output(published="false")
     con = ledger.connect(a.db)
     prev = ledger.last_run(con, "NSE")
-    today = datetime.now(IST).date().isoformat()
-    if a.mode == "daily" and prev == today:
-        log.info("%s already published; nothing to do", today)
+    done = last_complete_day(datetime.now(timezone.utc))
+    if a.mode == "daily" and prev is not None and prev >= done:
+        log.info("%s is the newest finished session and is already published", prev)
         return 0
 
     if a.use_cache:
@@ -90,7 +97,13 @@ def main(argv=None) -> int:
     _log_freshness(prices, bench)
     if a.mode == "check":       # report how fresh the data is, publish nothing
         return 0
-    as_of = latest_session(prices, bench)
+    # A run during market hours sees today's half-finished bar; never use it
+    prices = {s: df.loc[:done] for s, df in prices.items()}
+    bench = bench.loc[:done]
+    as_of = latest_session(prices)
+    if a.mode != "replay" and bench.index.max() < pd.Timestamp(as_of):
+        # The index sometimes updates later than the stocks; don't let it hold the day back
+        bench = data.extend_benchmark(bench, pd.Timestamp(as_of))
     if a.mode == "daily" and prev is not None and as_of <= prev:
         # The data source has not posted a newer close yet (or it is a market
         # holiday). Publishing now would repeat the last session, so wait.
@@ -123,6 +136,9 @@ def main(argv=None) -> int:
     log.info("%s: %d stocks, regime %s, %d new signals, %d breakouts A/B",
              as_of, snap["stocks"], snap["regime"], new, len(snap["breakouts"]))
     if a.telegram:
+        # Posted after the next session opened: say so rather than look current
+        now = datetime.now(IST)
+        snap["delayed"] = now.date().isoformat() > as_of and (now.hour, now.minute) >= (9, 15)
         publish.send_telegram(publish.telegram_text(snap))
     _output(published="true", as_of=as_of)
     return 0

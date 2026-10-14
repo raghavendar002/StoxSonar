@@ -1,14 +1,15 @@
 name: StoxSonar daily
 
 on:
-  # GitHub often starts scheduled jobs late (Friday 9 Oct ran 5.5 hours late),
-  # so the job is tried four times each weekday evening. The first attempt
-  # that finds a new NSE close publishes it; the others do nothing.
+  # GitHub starts scheduled jobs late, often by 6-8 hours, so the job is
+  # tried many times. The first attempt that finds a new, finished NSE close
+  # publishes it; every other attempt exits in seconds. Morning slots catch up
+  # before the 09:15 IST open if every evening attempt was delayed or empty.
+  # An external scheduler can also call workflow_dispatch (docs/GUIDE.md).
   schedule:
-    - cron: "17 13 * * 1-5"   # 18:47 IST
-    - cron: "47 14 * * 1-5"   # 20:17 IST
-    - cron: "17 16 * * 1-5"   # 21:47 IST
-    - cron: "47 17 * * 1-5"   # 23:17 IST, last attempt
+    - cron: "47 10,11,12,13 * * 1-5"   # 16:17, 17:17, 18:17, 19:17 IST
+    - cron: "17 15,17 * * 1-5"         # 20:47, 22:47 IST
+    - cron: "17 0,1,2 * * 2-6"         # 05:47, 06:47, 07:47 IST next morning
   workflow_dispatch:
     inputs:
       mode:

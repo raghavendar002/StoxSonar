@@ -72,18 +72,47 @@ def fetch_prices(tickers: List[str], period: str = C.FETCH_PERIOD,
     return out
 
 
-def fetch_benchmark(period: str = C.FETCH_PERIOD) -> pd.Series:
+def fetch_benchmark_symbol(t: str, period: str = C.FETCH_PERIOD) -> pd.Series:
     import yfinance as yf
+    df = yf.download(t, period=period, interval="1d", auto_adjust=True, progress=False)
+    if not len(df):
+        return pd.Series(dtype=float, name=t)
+    s = df["Close"]
+    if isinstance(s, pd.DataFrame):
+        s = s.iloc[:, 0]
+    s.index = pd.DatetimeIndex(s.index).tz_localize(None)
+    s.name = t
+    return s.dropna()
+
+
+def fetch_benchmark(period: str = C.FETCH_PERIOD) -> pd.Series:
     for t in (C.BENCHMARK, C.BENCHMARK_FALLBACK):
-        df = yf.download(t, period=period, interval="1d", auto_adjust=True, progress=False)
-        if len(df):
-            s = df["Close"]
-            if isinstance(s, pd.DataFrame):
-                s = s.iloc[:, 0]
-            s.index = pd.DatetimeIndex(s.index).tz_localize(None)
-            s.name = t
-            return s.dropna()
+        s = fetch_benchmark_symbol(t, period)
+        if len(s):
+            return s
     raise RuntimeError("Benchmark unavailable")
+
+
+def extend_benchmark(bench: pd.Series, to: pd.Timestamp) -> pd.Series:
+    """Carry the benchmark forward to `to` using the fallback index's daily
+    returns, or flat if that is missing too. Logged, since it is an estimate."""
+    missing_from = bench.index.max()
+    try:
+        alt = fetch_benchmark_symbol(C.BENCHMARK_FALLBACK)
+    except Exception:
+        alt = pd.Series(dtype=float)
+    ext = bench.copy()
+    if len(alt) and missing_from in alt.index and to in alt.index:
+        rel = alt.loc[missing_from:to] / alt.loc[missing_from]
+        ext = pd.concat([bench, rel.iloc[1:] * bench.iloc[-1]])
+        how = C.BENCHMARK_FALLBACK + " returns"
+    else:
+        ext.loc[to] = bench.iloc[-1]
+        how = "the last value"
+    log.warning("benchmark %s ends %s; extended to %s with %s", bench.name,
+                missing_from.date(), to.date(), how)
+    ext.name = bench.name
+    return ext
 
 
 def save_cache(path: Path, prices: Dict[str, pd.DataFrame], bench: pd.Series) -> None:

@@ -163,3 +163,21 @@ def test_daily_run_never_republishes_the_last_session(tmp_path, monkeypatch):
     assert run_daily.main(args + ["--mode", "daily"]) == 0
     assert len(posts) == 1 and str(nxt.index[0].date()) in posts[0]
     assert "published=true" in out.read_text()
+
+
+def test_intraday_bar_is_never_a_completed_session():
+    import run_daily
+    from datetime import datetime, timezone
+    # 13:27 IST on a Wednesday: today's bar is partial, so the last complete day is Tuesday
+    assert run_daily.last_complete_day(datetime(2026, 10, 14, 7, 57, tzinfo=timezone.utc)) == "2026-10-13"
+    # 19:00 IST: today's session is done
+    assert run_daily.last_complete_day(datetime(2026, 10, 14, 13, 30, tzinfo=timezone.utc)) == "2026-10-14"
+
+
+def test_lagging_benchmark_is_carried_forward(monkeypatch):
+    from sonar import data as D
+    bench = rising_bench(pd.bdate_range("2026-01-01", periods=10))
+    monkeypatch.setattr(D, "fetch_benchmark_symbol", lambda t, period=None: pd.Series(dtype=float))
+    to = bench.index[-1] + pd.offsets.BDay(1)
+    ext = D.extend_benchmark(bench, to)
+    assert ext.index.max() == to and ext.iloc[-1] == bench.iloc[-1]

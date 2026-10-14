@@ -33,9 +33,21 @@ For each of the ~1,300 NSE stocks that trade at least Rs 1 crore a day:
 ## How it runs on its own
 
 - The code lives in a GitHub repository. GitHub gives every public repository free computers that can run a job on a schedule (GitHub Actions).
-- At 7:00 pm IST, Monday to Friday, GitHub starts a fresh computer. It downloads 3 years of prices, runs the steps above, saves new signals to the ledger file, rebuilds the page and posts to Telegram. It takes about 5–10 minutes and costs nothing.
+- From 4:17 pm IST, Monday to Friday, GitHub tries the job several times through the evening, plus early-morning catch-up tries before the market opens. Only the first try that finds the day's finished close publishes; the rest stop in seconds. Each try runs on a fresh GitHub computer that downloads 3 years of prices, runs the steps above, saves new signals to the ledger file, rebuilds the page and posts to Telegram. It takes about 5–10 minutes and costs nothing.
 - Every evening's ledger is saved into the repository's history with a date stamp. Anyone can check that no signal was added or changed afterwards. That public proof is what will make people trust the track record later.
 - You don't need your laptop on. If a run fails, GitHub emails you.
+
+## Optional: an on-time trigger (10 minutes, free)
+
+GitHub's own schedule is best-effort and often starts the job hours late. To get the post at a fixed time, let a free scheduler start it instead. The built-in schedule stays as a backup, and a run that finds nothing new does nothing, so extra triggers never cause duplicate posts.
+
+1. **Make a token that can only start this job.** On GitHub go to Settings, then Developer settings, then Personal access tokens, then Fine-grained tokens, then Generate new token. Name it `stoxsonar-trigger`, set expiry to 1 year, choose "Only select repositories" and pick StoxSonar. Under Repository permissions set **Actions** to "Read and write". Generate it and copy it. Never paste it in a chat.
+2. **Create the schedule.** Sign up at cron-job.org and create a cronjob:
+   - URL: `https://api.github.com/repos/raghavendar002/StoxSonar/actions/workflows/daily.yml/dispatches`
+   - Schedule: every day, Monday to Friday, at 16:45, 18:00 and 20:00, time zone Asia/Kolkata.
+   - Advanced: request method **POST**, and headers `Accept: application/vnd.github+json` and `Authorization: Bearer <your token>`.
+   - Request body: `{"ref":"main","inputs":{"mode":"daily"}}`
+3. Press "Test run". It should return status 204, and a new run appears under the repository's Actions tab.
 
 ## Step 1: the repository
 

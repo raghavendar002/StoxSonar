@@ -206,7 +206,7 @@ to that failure level.</p>
 # ---------------------------------------------------------------------------
 
 def telegram_text(s: dict) -> str:
-    lines = [f"StoxSonar · NSE close {s['as_of']}",
+    lines = [("Delayed · " if s.get("delayed") else "") + f"StoxSonar · NSE close {s['as_of']}",
              f"Regime: {s['regime']} · Advancing {s['breadth']['Advancing']}% of {s['stocks']} stocks", ""]
     if s["breakouts"]:
         lines.append("New breakouts")
