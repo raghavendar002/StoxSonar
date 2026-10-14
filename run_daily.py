@@ -14,6 +14,7 @@ close yet, it does nothing and a later attempt picks it up.
 from __future__ import annotations
 
 import argparse
+import json
 import logging
 import os
 import sys
@@ -61,7 +62,7 @@ def latest_session(prices) -> str:
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--mode", choices=["daily", "replay", "check"], default="daily")
+    ap.add_argument("--mode", choices=["daily", "replay", "check", "page"], default="daily")
     ap.add_argument("--db", type=Path, default=ROOT / "ledger" / "stoxsonar.db")
     ap.add_argument("--site", type=Path, default=ROOT / "site")
     ap.add_argument("--cache", type=Path, default=ROOT / "cache" / "prices_india.pkl")
@@ -74,6 +75,11 @@ def main(argv=None) -> int:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 
     _output(published="false")
+    if a.mode == "page":        # redraw the page from the last published data, nothing else
+        snap = json.loads((a.site / "data.json").read_text(encoding="utf-8"))
+        (a.site / "index.html").write_text(publish.render_html(snap), encoding="utf-8")
+        _output(published="true", as_of=snap["as_of"] + " (page redrawn)")
+        return 0
     con = ledger.connect(a.db)
     prev = ledger.last_run(con, "NSE")
     done = last_complete_day(datetime.now(timezone.utc))

@@ -92,26 +92,88 @@ def _grade(g: str) -> str:
     return f'<span class="g g{_e(g)}">{_e(g)}</span>'
 
 
+COLUMN_HELP = [
+    ("Type", "Breakout: the price just rose out of a sideways range. Breakdown: it just fell out of one. "
+             "A breakdown is a warning to avoid or exit the stock, not a tip to short it."),
+    ("Grade", "How good the setup was by these rules. A is the best, B is weaker. C and below are not shown. "
+              "In a Weak market every buy grade is cut one level, which is why Weak days show mostly B."),
+    ("Stage at signal", "The stock's trend when the signal fired. Advancing (Stage 2) is the uptrend breakouts "
+                        "should come from. Basing is flat after a fall, Topping is flat after a rise, "
+                        "Declining is a downtrend."),
+    ("Template", "How many of 8 trend checks pass (averages in the right order, near the 52-week high, "
+                 "stronger than most stocks). 8/8 is a clean uptrend."),
+    ("RS rank", "Relative strength: how this stock moved over the past year compared with all others, "
+                "1 to 99. 90 means it beat 90% of NSE stocks."),
+    ("Base", "The sideways range it broke out of: how many trading days it lasted and how deep it was "
+             "from top to bottom."),
+    ("Volume", "Shares traded on the signal day compared with a normal day. 2x or more shows real buying."),
+    ("Signal date", "The trading day the signal fired, after that day's close."),
+    ("Status", "Active: still near the breakout level, where you risk the least if you are wrong. "
+               "Extended: already more than 5% above it, so buying now means chasing. "
+               "Confirmed: held above the level for 10 days. Failed: fell back more than 3% below it. "
+               "Faded: dipped below and never recovered or failed."),
+    ("Move since", "How much the stock has moved since the signal day's close."),
+]
+STATUS_PLAIN = {"Active": "Active · near level", "Extended": "Extended · don't chase"}
+
+
+def today_summary(s: dict) -> list:
+    """Plain sentences for the top of the page: what today's list means for a reader."""
+    out = []
+    if s["regime"] == "Weak":
+        out.append("The market is weak, so breakouts fail more often than usual. Every buy grade is cut "
+                   "one level, and fewer good setups appear.")
+    else:
+        out.append("The market is healthy, which is when breakouts have worked best.")
+    a_new = [r for r in s["breakouts"] if r["grade"] == "A"]
+    if a_new:
+        out.append(f"{len(a_new)} new Grade A breakout{'s' if len(a_new) > 1 else ''} today: "
+                   + ", ".join(r["symbol"] for r in a_new) + ". These are the ones worth a look.")
+    elif s["breakouts"]:
+        out.append("No Grade A breakouts today, only B. In past data B breakouts beat the Nifty 500 by only "
+                   "a fraction of a percent a month on average, so treat them as a watchlist, not buys.")
+    else:
+        out.append("No new breakouts today. Nothing new to look at.")
+    ups = [r for r in s["open_signals"] if r["direction"] == "up"]
+    act = sum(r["status"] == "Active" for r in ups)
+    ext = sum(r["status"] == "Extended" for r in ups)
+    if ups:
+        out.append(f"Of {len(ups)} earlier breakouts still open, {act} are Active (near the breakout level, "
+                   f"lowest risk) and {ext} are Extended (already more than 5% up; buying now is chasing).")
+    out.append("Paper-trade only for now: write down what you would do and check it later. The live "
+               "track record is too short to trust with money.")
+    return out
+
+
+def _column_help() -> str:
+    items = "".join(f"<dt>{_e(k)}</dt><dd>{_e(v)}</dd>" for k, v in COLUMN_HELP)
+    return f'<details class="help"><summary>What the columns mean</summary><dl>{items}</dl></details>'
+
+
 def _signal_table(rows, empty: str, show_status=False) -> str:
+    """Most useful columns first, so phones see them without scrolling."""
     if not rows:
         return f'<p class="empty">{_e(empty)}</p>'
-    head = ("<tr><th>Stock</th>" + ("<th>Type</th>" if show_status else "") + "<th>Grade</th><th>Stage at signal</th><th>Template</th>"
-            "<th>RS rank</th><th>Base</th><th>Volume</th>"
-            + ("<th>Signal date</th><th>Status</th><th>Move since</th>" if show_status else "")
-            + "</tr>")
-    body = []
-    for r in rows:
-        mv = "" if r["move_pct"] is None else f'{r["move_pct"]:+.1f}%'
-        body.append(
-            f"<tr><td>{_tv(r['symbol'])}</td>"
-            + (f"<td>{'Breakout' if r['direction'] == 'up' else 'Breakdown'}</td>" if show_status else "")
-            + f"<td>{_grade(r['grade'])}</td>"
-            f"<td>{_e(C.STAGE_NAMES[r['stage']])}</td><td>{r['template']}/8</td>"
-            f"<td>{_e(r['rs_rank'])}</td><td>{r['base_len']} sessions, {r['depth_pct']}% deep</td>"
-            f"<td>{r['vol_ratio']}x avg</td>"
-            + (f"<td>{_e(r['trigger_date'])}</td><td>{_e(r['status'])}</td><td>{mv}</td>" if show_status else "")
-            + "</tr>")
-    return f'<div class="scroll"><table>{head}{"".join(body)}</table></div>'
+    help_of = dict(COLUMN_HELP)
+
+    def cells(r):
+        c = [("Stock", _tv(r["symbol"]))]
+        if show_status:
+            c += [("Type", "Breakout" if r["direction"] == "up" else "Breakdown")]
+        c += [("Grade", _grade(r["grade"]))]
+        if show_status:
+            mv = "" if r["move_pct"] is None else f'{r["move_pct"]:+.1f}%'
+            c += [("Status", _e(STATUS_PLAIN.get(r["status"], r["status"]))), ("Move since", mv),
+                  ("Signal date", _e(r["trigger_date"]))]
+        c += [("RS rank", _e(r["rs_rank"])), ("Stage at signal", _e(C.STAGE_NAMES[r["stage"]])),
+              ("Template", f"{r['template']}/8"), ("Volume", f"{r['vol_ratio']}x avg"),
+              ("Base", f"{r['base_len']} sessions, {r['depth_pct']}% deep")]
+        return c
+
+    cols = [k for k, _ in cells(rows[0])]
+    head = "<tr>" + "".join(f'<th title="{_e(help_of.get(c, ""))}">{c}</th>' for c in cols) + "</tr>"
+    body = "".join("<tr>" + "".join(f"<td>{v}</td>" for _, v in cells(r)) + "</tr>" for r in rows)
+    return f'<div class="scroll"><table>{head}{body}</table></div>'
 
 
 def _record_table(rows, note: str) -> str:
@@ -151,6 +213,10 @@ th{color:var(--mute);font-weight:500;font-size:12px}tr:last-child td{border-bott
 a{color:var(--accent);text-decoration:none;font-weight:600}
 .g{display:inline-block;min-width:22px;text-align:center;border-radius:5px;font-weight:700;color:#fff;padding:0 6px}
 .gA{background:var(--a)}.gB{background:var(--b)}.gC{background:var(--c)}.gW{background:var(--w)}
+.today{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+border-radius:10px;padding:12px 16px;margin:16px 0}.today p{margin:6px 0}
+.help{margin:10px 0;color:var(--mute);font-size:14px}.help summary{cursor:pointer;color:var(--accent);font-weight:600}
+.help dt{font-weight:600;color:var(--fg);margin-top:8px}.help dd{margin:2px 0 0}
 .empty,.note{color:var(--mute)}.foot{margin-top:40px;color:var(--mute);font-size:13px;border-top:1px solid var(--line);padding-top:16px}
 """
 
@@ -172,6 +238,7 @@ def render_html(s: dict) -> str:
 <p>Market regime <span class="pill {_e(s['regime'])}">{_e(s['regime'])}</span>
 {'' if s['regime'] == 'Healthy' else ' Bullish grades are cut one level in a weak market.'}</p>
 <div class="bar">{bar}</div><div class="legend">{legend}</div>
+<div class="today"><b>What this means today</b>{''.join(f"<p>{_e(x)}</p>" for x in today_summary(s))}</div>
 
 <h2>New breakouts today</h2>
 {_signal_table(s['breakouts'], 'No Grade A or B breakouts today.')}
@@ -181,6 +248,7 @@ def render_html(s: dict) -> str:
 
 <h2>Signals still in play</h2>
 {_signal_table(s['open_signals'], 'Nothing open.', show_status=True)}
+{_column_help()}
 
 <h2>Track record (live)</h2>
 {_record_table(s['track_record_live'], live_note)}
