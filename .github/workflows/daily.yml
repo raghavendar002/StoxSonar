@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: "daily, or replay to bootstrap the ledger"
+        description: "daily, replay to bootstrap the ledger, or check to report data freshness only"
         default: daily
 
 permissions:

@@ -38,6 +38,13 @@ def _output(**kv) -> None:
             fh.writelines(f"{k}={v}\n" for k, v in kv.items())
 
 
+def _log_freshness(prices, bench: pd.Series) -> None:
+    """Which dates the data source actually has, so late data is easy to spot."""
+    last = pd.Series([str(df.index.max().date()) for df in prices.values() if len(df)])
+    log.info("benchmark %s last date %s; stocks by last date: %s", bench.name,
+             bench.index.max().date(), last.value_counts().head(4).to_dict())
+
+
 def latest_session(prices, bench: pd.Series) -> str:
     """The newest date most stocks have a bar for, and the benchmark too."""
     last = pd.Series([df.index.max() for df in prices.values() if len(df)])
@@ -47,7 +54,7 @@ def latest_session(prices, bench: pd.Series) -> str:
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--mode", choices=["daily", "replay"], default="daily")
+    ap.add_argument("--mode", choices=["daily", "replay", "check"], default="daily")
     ap.add_argument("--db", type=Path, default=ROOT / "ledger" / "stoxsonar.db")
     ap.add_argument("--site", type=Path, default=ROOT / "site")
     ap.add_argument("--cache", type=Path, default=ROOT / "cache" / "prices_india.pkl")
@@ -80,6 +87,9 @@ def main(argv=None) -> int:
     if a.limit:
         prices = dict(list(prices.items())[:a.limit])
 
+    _log_freshness(prices, bench)
+    if a.mode == "check":       # report how fresh the data is, publish nothing
+        return 0
     as_of = latest_session(prices, bench)
     if a.mode == "daily" and prev is not None and as_of <= prev:
         # The data source has not posted a newer close yet (or it is a market

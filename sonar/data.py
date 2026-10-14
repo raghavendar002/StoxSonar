@@ -61,7 +61,10 @@ def fetch_prices(tickers: List[str], period: str = C.FETCH_PERIOD,
             except KeyError:
                 continue
             df = df.dropna(subset=["Close"])
-            df = df[df["Volume"] > 0]
+            zero = df["Volume"] <= 0
+            if len(df) and zero.iloc[-1]:
+                log.debug("%s: newest bar %s has no volume", t, df.index[-1])
+            df = df[~zero]
             if len(df):
                 df.index = pd.DatetimeIndex(df.index).tz_localize(None)
                 out[t] = df[["Open", "High", "Low", "Close", "Volume"]]
