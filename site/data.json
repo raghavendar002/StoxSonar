@@ -1,10 +1,10 @@
 {
- "as_of": "2026-10-21",
+ "as_of": "2026-10-22",
  "engine_version": "0.1.0",
  "site_url": "https://raghavendar002.github.io/StoxSonar/",
  "regime": "Weak",
  "benchmark_above_rising_sma200": false,
- "stocks": 1326,
+ "stocks": 1331,
  "breadth": {
   "Basing": 11.9,
   "Advancing": 46.7,
@@ -12,7 +12,8 @@
   "Declining": 29.8
  },
  "breakouts": [],
- "breakdowns": [
+ "breakdowns": [],
+ "open_signals": [
   {
    "symbol": "NTPCGREEN",
    "grade": "A",
@@ -20,19 +21,17 @@
    "trigger_date": "2026-10-21",
    "stage": 3,
    "stage_now": 3,
-   "stage_age": 94,
+   "stage_age": 95,
    "template": 1,
    "rs_rank": 34,
    "base_len": 23,
    "depth_pct": 12.7,
    "vol_ratio": 2.6,
    "status": "Active",
-   "sessions": 0,
-   "move_pct": 0.0,
+   "sessions": 1,
+   "move_pct": 0.4,
    "source": "live"
-  }
- ],
- "open_signals": [
+  },
   {
    "symbol": "CARRARO",
    "grade": "A",
@@ -40,15 +39,15 @@
    "trigger_date": "2026-10-19",
    "stage": 3,
    "stage_now": 3,
-   "stage_age": 77,
+   "stage_age": 78,
    "template": 1,
    "rs_rank": 36,
    "base_len": 47,
    "depth_pct": 16.3,
    "vol_ratio": 2.9,
    "status": "Active",
-   "sessions": 1,
-   "move_pct": 0.8,
+   "sessions": 2,
+   "move_pct": 1.9,
    "source": "live"
   },
   {
@@ -58,15 +57,15 @@
    "trigger_date": "2026-10-16",
    "stage": 2,
    "stage_now": 2,
-   "stage_age": 66,
+   "stage_age": 67,
    "template": 8,
    "rs_rank": 81,
    "base_len": 62,
    "depth_pct": 24.3,
    "vol_ratio": 1.9,
    "status": "Active",
-   "sessions": 2,
-   "move_pct": -2.9,
+   "sessions": 3,
+   "move_pct": 1.6,
    "source": "live"
   },
   {
@@ -76,15 +75,15 @@
    "trigger_date": "2026-10-16",
    "stage": 1,
    "stage_now": 1,
-   "stage_age": 239,
+   "stage_age": 240,
    "template": 7,
    "rs_rank": 75,
    "base_len": 54,
    "depth_pct": 16.9,
    "vol_ratio": 8.7,
    "status": "Extended",
-   "sessions": 2,
-   "move_pct": 2.5,
+   "sessions": 3,
+   "move_pct": 2.2,
    "source": "live"
   },
   {
@@ -94,15 +93,15 @@
    "trigger_date": "2026-10-16",
    "stage": 2,
    "stage_now": 2,
-   "stage_age": 107,
+   "stage_age": 108,
    "template": 8,
    "rs_rank": 81,
    "base_len": 62,
    "depth_pct": 21.1,
    "vol_ratio": 14.7,
    "status": "Active",
-   "sessions": 2,
-   "move_pct": 0.1,
+   "sessions": 3,
+   "move_pct": -3.2,
    "source": "live"
   },
   {
@@ -112,15 +111,15 @@
    "trigger_date": "2026-10-13",
    "stage": 2,
    "stage_now": 2,
-   "stage_age": 33,
+   "stage_age": 34,
    "template": 8,
    "rs_rank": 92,
    "base_len": 34,
    "depth_pct": 45.9,
    "vol_ratio": 7.6,
-   "status": "Extended",
-   "sessions": 5,
-   "move_pct": 3.9,
+   "status": "Active",
+   "sessions": 6,
+   "move_pct": -5.9,
    "source": "late"
   },
   {
@@ -130,15 +129,15 @@
    "trigger_date": "2026-10-12",
    "stage": 2,
    "stage_now": 2,
-   "stage_age": 104,
+   "stage_age": 105,
    "template": 8,
    "rs_rank": 83,
    "base_len": 63,
    "depth_pct": 33.6,
    "vol_ratio": 11.9,
    "status": "Active",
-   "sessions": 6,
-   "move_pct": 2.3,
+   "sessions": 7,
+   "move_pct": -0.3,
    "source": "live"
   },
   {
@@ -166,33 +165,15 @@
    "trigger_date": "2026-10-08",
    "stage": 3,
    "stage_now": 3,
-   "stage_age": 13,
+   "stage_age": 14,
    "template": 4,
    "rs_rank": 52,
    "base_len": 64,
    "depth_pct": 11.5,
    "vol_ratio": 2.4,
    "status": "Active",
-   "sessions": 8,
-   "move_pct": 4.1,
-   "source": "replay"
-  },
-  {
-   "symbol": "PTCIL",
-   "grade": "B",
-   "direction": "up",
-   "trigger_date": "2026-10-07",
-   "stage": 2,
-   "stage_now": 2,
-   "stage_age": 33,
-   "template": 8,
-   "rs_rank": 88,
-   "base_len": 21,
-   "depth_pct": 12.2,
-   "vol_ratio": 3.5,
-   "status": "Active",
    "sessions": 9,
-   "move_pct": 1.7,
+   "move_pct": 3.8,
    "source": "replay"
   }
  ],
@@ -251,9 +232,9 @@
   {
    "grade": "B",
    "signals": 235,
-   "closed": 234,
-   "confirmed_pct": 41.0,
-   "failed_pct": 43.6,
+   "closed": 235,
+   "confirmed_pct": 41.3,
+   "failed_pct": 43.4,
    "measured_21": 216,
    "avg_excess_21_pct": 0.8,
    "median_excess_21_pct": -0.3,
@@ -273,5 +254,5 @@
    "avg_r_21": 0.1
   }
  ],
- "live_signals": 22
+ "live_signals": 23
 }
