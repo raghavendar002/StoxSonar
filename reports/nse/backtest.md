@@ -1,6 +1,6 @@
 # StoxSonar backtest, rules v0.2.0
 
-Data to 2026-10-23. Benchmark: ^CRSLDX from 2005-09-26; ^BSESN before 2005-09-26. 3830 of 3830 stocks listed today had price data; the earliest starts 2015-01-01.
+Data to 2026-10-23. Benchmark: ^CRSLDX from 2005-09-26; ^BSESN before 2005-09-26. 3830 of 3830 stocks that traded on NSE since --start had price data; the earliest starts 2015-01-01.
 
 **Source: NSE daily files.** Every stock that traded on each day is included, also those later delisted or merged, so there is no survivorship bias. Prices are adjusted for splits and bonuses from NSE's own previous-close figures.
 
@@ -8,7 +8,7 @@ Excess = stock return minus benchmark return over the same 21 sessions after the
 
 ## Last 10 years (from 2016-10-23)
 
-Coverage: 1728 of today's 3830 stocks have prices back to 2016-10-23; 680 of them were liquid (Rs 1 crore/day) and labelled at the start of the window, against 1417 today. First signal in this window: 2016-10-25.
+Coverage: 1728 of the 3830 stocks that traded on NSE since --start have prices back to 2016-10-23; 680 of them were liquid (Rs 1 crore/day) and labelled at the start of the window, against 1417 today. First signal in this window: 2016-10-25.
 
 ### Breakouts by grade
 

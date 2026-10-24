@@ -8,15 +8,15 @@ Excess = stock return minus benchmark return over the same 21 sessions after the
 
 ## Last 10 years (from 2016-10-23)
 
-Coverage: 1138 of today's 2358 stocks have prices back to 2016-10-23; 532 of them were liquid (Rs 1 crore/day) and labelled at the start of the window, against 1335 today. First signal in this window: 2016-10-25.
+Coverage: 1138 of the 2358 stocks listed today have prices back to 2016-10-23; 532 of them were liquid (Rs 1 crore/day) and labelled at the start of the window, against 1335 today. First signal in this window: 2016-10-25.
 
 ### Breakouts by grade
 
 | grade | signals | closed | confirmed_pct | failed_pct | measured_21 | avg_excess_21_pct | median_excess_21_pct | win_pct_21 | avg_r_21 |
 |---|---|---|---|---|---|---|---|---|---|
-| A | 610 | 610 | 61.3 | 14.3 | 610 | 2.1 | -1.1 | 45.6 | 0.34 |
-| B | 863 | 862 | 56.1 | 15.2 | 853 | 1.2 | -1.0 | 47.5 | 0.26 |
-| C | 1367 | 1363 | 51.1 | 16.1 | 1351 | 0.3 | -1.6 | 44.3 | 0.17 |
+| A | 612 | 612 | 61.3 | 14.2 | 612 | 2.2 | -1.1 | 45.8 | 0.35 |
+| B | 866 | 865 | 56.3 | 15.1 | 856 | 1.2 | -0.9 | 47.5 | 0.26 |
+| C | 1367 | 1363 | 51.4 | 16.2 | 1351 | 0.3 | -1.6 | 44.3 | 0.17 |
 
 ### Stage 2 vs Stage 4, average excess return per year (%)
 
@@ -61,9 +61,9 @@ Stage 2 beat Stage 4 over 21 sessions in 10 of 11 years.
 | 2007 | B | 27 | 2.4 | 48.0 |
 | 2008 | A | 5 | -10.5 | 20.0 |
 | 2009 | A | 23 | 1.7 | 57.0 |
-| 2009 | B | 20 | -0.6 | 40.0 |
+| 2009 | B | 21 | -0.4 | 43.0 |
 | 2010 | A | 19 | 1.9 | 58.0 |
-| 2010 | B | 29 | -1.7 | 34.0 |
+| 2010 | B | 30 | -1.4 | 37.0 |
 | 2011 | A | 1 | 1.9 | 100.0 |
 | 2011 | B | 3 | -8.5 | 0.0 |
 | 2012 | A | 6 | 5.7 | 83.0 |
@@ -72,7 +72,7 @@ Stage 2 beat Stage 4 over 21 sessions in 10 of 11 years.
 | 2013 | B | 6 | 1.4 | 50.0 |
 | 2014 | A | 45 | 4.0 | 44.0 |
 | 2014 | B | 46 | 3.7 | 63.0 |
-| 2015 | A | 20 | -1.0 | 55.0 |
+| 2015 | A | 21 | 2.0 | 57.0 |
 | 2015 | B | 36 | 1.4 | 39.0 |
 | 2016 | A | 12 | -0.6 | 33.0 |
 | 2016 | B | 43 | 3.4 | 44.0 |
@@ -83,14 +83,14 @@ Stage 2 beat Stage 4 over 21 sessions in 10 of 11 years.
 | 2019 | B | 8 | 1.1 | 62.0 |
 | 2020 | A | 20 | 1.3 | 50.0 |
 | 2020 | B | 54 | 1.1 | 41.0 |
-| 2021 | A | 183 | 3.9 | 49.0 |
-| 2021 | B | 156 | 2.0 | 46.0 |
-| 2022 | A | 39 | -1.9 | 41.0 |
-| 2022 | B | 88 | 0.7 | 53.0 |
+| 2021 | A | 184 | 4.2 | 49.0 |
+| 2021 | B | 157 | 2.0 | 46.0 |
+| 2022 | A | 40 | -1.6 | 42.0 |
+| 2022 | B | 89 | 0.7 | 54.0 |
 | 2023 | A | 107 | 3.7 | 46.0 |
 | 2023 | B | 151 | 3.9 | 55.0 |
 | 2024 | A | 144 | -0.9 | 44.0 |
-| 2024 | B | 176 | 0.2 | 48.0 |
+| 2024 | B | 177 | 0.1 | 47.0 |
 | 2025 | A | 14 | 0.3 | 43.0 |
 | 2025 | B | 51 | -1.3 | 39.0 |
 | 2026 | A | 11 | 6.9 | 64.0 |
