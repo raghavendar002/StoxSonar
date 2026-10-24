@@ -178,9 +178,10 @@ def main(argv=None) -> int:
     ev.to_csv(a.out / "backtest_signals.csv.gz", index=False)
     res.regime.to_csv(a.out / "backtest_regime.csv.gz")
 
+    universe = "stocks that traded on NSE since --start" if a.source == "nse" else "stocks listed today"
     md = [f"# StoxSonar backtest, rules v{C.ENGINE_VERSION}", "",
           f"Data to {as_of.date()}. Benchmark: {'; '.join(bench.attrs.get('sources', []))}. "
-          f"{len(first_bar)} of {len(tickers)} stocks listed today had price data; the earliest starts "
+          f"{len(first_bar)} of {len(tickers)} {universe} had price data; the earliest starts "
           f"{first_bar.min().date()}.", "",
           ("**Source: NSE daily files.** Every stock that traded on each day is included, also those "
            "later delisted or merged, so there is no survivorship bias. Prices are adjusted for splits "
@@ -205,7 +206,7 @@ def main(argv=None) -> int:
         s2_wins = int((both["s2_21"] > both["s4_21"]).sum())
         tr = track_record(sub, ["replay"])
         md += [f"## Last {w} years (from {start.date()})", "",
-               f"Coverage: {has_data} of today's {len(first_bar)} stocks have prices back to {start.date()}; "
+               f"Coverage: {has_data} of the {len(first_bar)} {universe} have prices back to {start.date()}; "
                f"{liquid_then} of them were liquid (Rs 1 crore/day) and labelled at the start of the "
                f"window, against {int(liquid.iloc[-1]) if len(liquid) else 0} today. "
                f"First signal in this window: {signals_start}.", "",
