@@ -1,0 +1,55 @@
+{
+ "as_of": "2026-10-23",
+ "tickers": 3830,
+ "with_data": 3830,
+ "windows": {
+  "10": {
+   "start": "2016-10-23",
+   "has_data": 1728,
+   "liquid_at_start": 680,
+   "first_signal": "2016-10-25",
+   "stage2_beat_stage4_years": [
+    8,
+    11
+   ],
+   "track_record": [
+    {
+     "grade": "A",
+     "signals": 643,
+     "closed": 643,
+     "confirmed_pct": 58.5,
+     "failed_pct": 15.9,
+     "measured_21": 642,
+     "avg_excess_21_pct": 0.5,
+     "median_excess_21_pct": -2.3,
+     "win_pct_21": 43.3,
+     "avg_r_21": 0.21
+    },
+    {
+     "grade": "B",
+     "signals": 846,
+     "closed": 841,
+     "confirmed_pct": 56.8,
+     "failed_pct": 15.1,
+     "measured_21": 828,
+     "avg_excess_21_pct": 1.6,
+     "median_excess_21_pct": -0.4,
+     "win_pct_21": 48.6,
+     "avg_r_21": 0.3
+    },
+    {
+     "grade": "C",
+     "signals": 1377,
+     "closed": 1372,
+     "confirmed_pct": 50.7,
+     "failed_pct": 16.4,
+     "measured_21": 1363,
+     "avg_excess_21_pct": -0.1,
+     "median_excess_21_pct": -1.6,
+     "win_pct_21": 44.2,
+     "avg_r_21": 0.11
+    }
+   ]
+  }
+ }
+}
