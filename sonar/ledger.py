@@ -19,14 +19,15 @@ from .engine import Event
 
 FROZEN = ["engine_version", "market", "symbol", "direction", "trigger_date", "grade", "stage",
           "template", "rs_rank", "mansfield", "regime", "pivot", "entry", "base_len", "depth",
-          "vol_ratio", "first_seen_utc", "source"]
+          "vol_ratio", "stop", "score", "first_seen_utc", "source"]
+REAL = ("rs_rank", "mansfield", "pivot", "entry", "depth", "vol_ratio", "stop", "score")
 OUTCOME = ["status", "status_date", "sessions"] + [f"{k}_{h}" for h in C.HORIZONS
                                                    for k in ("ret", "bench")] + ["r_21"]
 
 SCHEMA = f"""
 CREATE TABLE IF NOT EXISTS events (
   id INTEGER PRIMARY KEY,
-  {", ".join(c + " " + ("REAL" if c in ("rs_rank", "mansfield", "pivot", "entry", "depth", "vol_ratio") else "TEXT") for c in FROZEN)},
+  {", ".join(c + " " + ("REAL" if c in REAL else "TEXT") for c in FROZEN)},
   {", ".join(c + (" TEXT" if c in ("status", "status_date") else " REAL") for c in OUTCOME)},
   UNIQUE (engine_version, market, symbol, direction, trigger_date)
 );
@@ -47,6 +48,11 @@ def connect(path: Path) -> sqlite3.Connection:
     path.parent.mkdir(parents=True, exist_ok=True)
     con = sqlite3.connect(path)
     con.executescript(SCHEMA)
+    # Columns added after the first ledger was written (v0.2: stop, score)
+    have = {r[1] for r in con.execute("PRAGMA table_info(events)")}
+    for c in FROZEN + OUTCOME:
+        if c not in have:
+            con.execute(f"ALTER TABLE events ADD COLUMN {c} {'REAL' if c in REAL else 'TEXT'}")
     return con
 
 
@@ -64,6 +70,8 @@ def record_events(con, events: Iterable[Event], market: str, as_of: str, mode: s
     added; one on `as_of` is "live", one in between (a missed run being caught
     up) is "late". Older unseen signals are never back-inserted, so the live
     record cannot be padded after the fact. mode "replay": everything, as "replay".
+    mode "bootstrap" (the first daily run of a new engine version): history as
+    "replay", and only signals on `as_of` itself as "live".
     """
     now = datetime.now(timezone.utc).isoformat(timespec="seconds")
     new = 0
@@ -73,7 +81,9 @@ def record_events(con, events: Iterable[Event], market: str, as_of: str, mode: s
             continue
         d = ev.to_dict()
         d.update(engine_version=C.ENGINE_VERSION, market=market, first_seen_utc=now,
-                 source="replay" if mode == "replay" else ("live" if ev.trigger_date == as_of else "late"))
+                 source=("replay" if mode == "replay"
+                         or (mode == "bootstrap" and ev.trigger_date < as_of)
+                         else "live" if ev.trigger_date == as_of else "late"))
         cur = con.execute(
             f"INSERT OR IGNORE INTO events ({', '.join(FROZEN + OUTCOME)}) "
             f"VALUES ({', '.join('?' * len(FROZEN + OUTCOME))})",

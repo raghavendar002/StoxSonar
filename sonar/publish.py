@@ -18,6 +18,7 @@ import pandas as pd
 
 from . import config as C
 from .ledger import track_record
+from .plan import trade_plan
 
 log = logging.getLogger(__name__)
 
@@ -50,15 +51,22 @@ def build_snapshot(states: pd.DataFrame, events: pd.DataFrame, regime: pd.DataFr
                 template=int(r.template), rs_rank=None if pd.isna(r.rs_rank) else int(r.rs_rank),
                 base_len=int(r.base_len), depth_pct=round(r.depth * 100, 1),
                 vol_ratio=round(r.vol_ratio, 1), status=r.status,
-                sessions=int(r.sessions or 0), move_pct=move, source=r.source))
+                score=None if pd.isna(getattr(r, "score", None)) else round(float(r.score), 2),
+                stop_pct=None if pd.isna(getattr(r, "stop", None)) or not r.entry
+                else round((r.stop / r.entry - 1) * 100, 1),
+                sessions=int(r.sessions or 0), move_pct=move, source=r.source,
+                plan=trade_plan(float(r.entry), float(r.stop), r.trigger_date)
+                if r.direction == "up" and not pd.isna(getattr(r, "stop", None)) else None))
         return out
 
     today = events[events["trigger_date"] == as_of]
     is_open = events["status"].isin(["Active", "Extended"]) & (events["trigger_date"] != as_of)
     live_sources = ["live", "late"]
+    weak = reg is None or bool(reg["weak"])
     return dict(
         as_of=as_of, engine_version=C.ENGINE_VERSION, site_url=site_url,
-        regime="Weak" if reg is None or bool(reg["weak"]) else "Healthy",
+        regime="Weak" if weak else "Healthy",
+        buys_allowed=not (weak and C.NO_LONGS_WHEN_WEAK),
         benchmark_above_rising_sma200=None if reg is None else bool(reg["bench_ok"]),
         stocks=int(len(day)),
         breadth={C.STAGE_NAMES[s]: round(counts.get(s, 0) / total * 100, 1) for s in (1, 2, 3, 4)},
@@ -95,8 +103,17 @@ def _grade(g: str) -> str:
 COLUMN_HELP = [
     ("Type", "Breakout: the price just rose out of a sideways range. Breakdown: it just fell out of one. "
              "A breakdown is a warning to avoid or exit the stock, not a tip to short it."),
-    ("Grade", "How good the setup was by these rules. A is the best, B is weaker. C and below are not shown. "
-              "In a Weak market every buy grade is cut one level, which is why Weak days show mostly B."),
+    ("Grade", "How strong the stock's momentum was at the breakout, by its score. A is the top fifth of "
+              "past breakouts, B the top half. C and below are not shown. In a Weak market every buy "
+              "grade is cut one level, and no buys are suggested at all."),
+    ("Score", "Average of four momentum measures: RS rank, 6-month return, distance above the 200-day "
+              "average and how far above the base it closed. 0 is a typical past breakout."),
+    ("Buy", f"How many shares risk {C.RISK_PCT * 100:g}% of Rs {C.CAPITAL_RS:,} if the stop is hit. Buy at "
+            "the next open, and skip it if the open is above the limit shown (1 ATR above the close)."),
+    ("Stop", "Sell if it closes below this, measured from the signal close: 2.5 average daily ranges."),
+    ("Sell by", f"Time exit: sell at the close {C.HOLD_SESSIONS} trading days after the signal (approximate; "
+                "exchange holidays move it later)."),
+    ("Fail line", "Same level as the stop: a close beyond it marks the signal Failed."),
     ("Stage at signal", "The stock's trend when the signal fired. Advancing (Stage 2) is the uptrend breakouts "
                         "should come from. Basing is flat after a fall, Topping is flat after a rise, "
                         "Declining is a downtrend."),
@@ -110,7 +127,7 @@ COLUMN_HELP = [
     ("Signal date", "The trading day the signal fired, after that day's close."),
     ("Status", "Active: still near the breakout level, where you risk the least if you are wrong. "
                "Extended: already more than 5% above it, so buying now means chasing. "
-               "Confirmed: held above the level for 10 days. Failed: fell back more than 3% below it. "
+               "Confirmed: held above the level for 10 days. Failed: closed beyond its fail line. "
                "Faded: dipped below and never recovered or failed."),
     ("Move since", "How much the stock has moved since the signal day's close."),
 ]
@@ -120,13 +137,18 @@ STATUS_PLAIN = {"Active": "Active · near level", "Extended": "Extended · don't
 def today_summary(s: dict) -> list:
     """Plain sentences for the top of the page: what today's list means for a reader."""
     out = []
-    if s["regime"] == "Weak":
+    if s["regime"] == "Weak" and not s.get("buys_allowed", True):
+        out.append("The market is weak, so no new buys are suggested. Breakouts are still logged below "
+                   "so the record stays complete, but in past data most of them lagged the index.")
+    elif s["regime"] == "Weak":
         out.append("The market is weak, so breakouts fail more often than usual. Every buy grade is cut "
                    "one level, and fewer good setups appear.")
     else:
         out.append("The market is healthy, which is when breakouts have worked best.")
     a_new = [r for r in s["breakouts"] if r["grade"] == "A"]
-    if a_new:
+    if not s.get("buys_allowed", True):
+        pass
+    elif a_new:
         out.append(f"{len(a_new)} new Grade A breakout{'s' if len(a_new) > 1 else ''} today: "
                    + ", ".join(r["symbol"] for r in a_new) + ". These are the ones worth a look.")
     elif s["breakouts"]:
@@ -150,7 +172,11 @@ def _column_help() -> str:
     return f'<details class="help"><summary>What the columns mean</summary><dl>{items}</dl></details>'
 
 
-def _signal_table(rows, empty: str, show_status=False) -> str:
+def _v(x, suffix="") -> str:
+    return "–" if x is None or x != x else f"{x}{suffix}"
+
+
+def _signal_table(rows, empty: str, show_status=False, plan=False) -> str:
     """Most useful columns first, so phones see them without scrolling."""
     if not rows:
         return f'<p class="empty">{_e(empty)}</p>'
@@ -165,6 +191,13 @@ def _signal_table(rows, empty: str, show_status=False) -> str:
             mv = "" if r["move_pct"] is None else f'{r["move_pct"]:+.1f}%'
             c += [("Status", _e(STATUS_PLAIN.get(r["status"], r["status"]))), ("Move since", mv),
                   ("Signal date", _e(r["trigger_date"]))]
+        p = r.get("plan")
+        if plan and p:
+            c += [("Buy", f"{p['qty']} shares, only if the open is under +{p['max_buy_pct']}%"),
+                  ("Stop", f"{p['stop_pct']}%"), ("Sell by", _e(p["exit_by"]))]
+        elif plan:
+            c += [("Buy", ""), ("Stop", ""), ("Sell by", "")]
+        c += [("Score", _v(r.get("score"))), ("Fail line", _v(r.get("stop_pct"), "%"))]
         c += [("RS rank", _e(r["rs_rank"])), ("Stage at signal", _e(C.STAGE_NAMES[r["stage"]])),
               ("Template", f"{r['template']}/8"), ("Volume", f"{r['vol_ratio']}x avg"),
               ("Base", f"{r['base_len']} sessions, {r['depth_pct']}% deep")]
@@ -240,10 +273,10 @@ def render_html(s: dict) -> str:
 <div class="bar">{bar}</div><div class="legend">{legend}</div>
 <div class="today"><b>What this means today</b>{''.join(f"<p>{_e(x)}</p>" for x in today_summary(s))}</div>
 
-<h2>New breakouts today</h2>
-{_signal_table(s['breakouts'], 'No Grade A or B breakouts today.')}
+<h2>{'New buys today' if s.get('buys_allowed', True) else 'New breakouts today (logged, not suggested: market weak)'}</h2>
+{_signal_table(s['breakouts'], 'No Grade A or B breakouts today.', plan=s.get('buys_allowed', True))}
 
-<h2>New breakdowns today</h2>
+<h2>New breakdowns today (avoid or exit; not shorts)</h2>
 {_signal_table(s['breakdowns'], 'No Grade A or B breakdowns today.')}
 
 <h2>Signals still in play</h2>
@@ -259,12 +292,15 @@ def render_html(s: dict) -> str:
 <h2>How it works</h2>
 <p><b>Stage</b> follows Weinstein: the 150-day average and its one-month slope decide Basing, Advancing,
 Topping or Declining, and a change counts only after 5 sessions. <b>Template</b> is Minervini's 8-point
-trend template. <b>Breakout</b> is a close at least 0.5% above a base of 15+ sessions and 8–35% depth,
-on 1.5x average volume, closing in the upper half of the day with a small upper wick.
-<b>Grade A</b> needs Stage 2 with 8/8 (or a Stage 1 base turning into Stage 2) and positive relative
-strength; B is 6–7/8. A signal is <b>Confirmed</b> if it holds above the base for 10 sessions and
-<b>Failed</b> if it closes more than 3% back inside. R measures the 21-session move against the distance
-to that failure level.</p>
+trend template, shown for context. <b>Breakout</b> is a close at least 2% above a base of 15+ sessions
+and 8–35% depth, on 1.5x average volume, closing in the upper half of the day with a small upper wick.
+<b>Score</b> averages four measures of momentum: RS rank, the 6-month return, distance above the
+200-day average and how far above the base the stock closed. Only breakouts above the 200-day average
+can grade A or B: <b>A</b> is a score in the top fifth of 2006–2018 breakouts, <b>B</b> the top half.
+A signal is <b>Confirmed</b> if it holds above the base for 10 sessions and <b>Failed</b> if it closes
+below its fail line, 2.5 average daily ranges under the breakout close. Results are measured from the
+next day's open, the first price anyone could buy at. R is the 21-session move divided by the distance
+to the fail line.</p>
 <p class="foot">{_e(DISCLAIMER)} Charts open on TradingView.</p>
 </main></body></html>"""
 
@@ -273,20 +309,31 @@ to that failure level.</p>
 # Telegram
 # ---------------------------------------------------------------------------
 
+def _rs(x: float) -> str:
+    return f"Rs {x:,.2f}" if x < 1000 else f"Rs {x:,.0f}"
+
+
 def telegram_text(s: dict) -> str:
     lines = [("Delayed · " if s.get("delayed") else "") + f"StoxSonar · NSE close {s['as_of']}",
              f"Regime: {s['regime']} · Advancing {s['breadth']['Advancing']}% of {s['stocks']} stocks", ""]
-    if s["breakouts"]:
-        lines.append("New breakouts")
+    if s["breakouts"] and not s.get("buys_allowed", True):
+        lines.append(f"Market is Weak: no new buys today. {len(s['breakouts'])} breakout(s) logged for "
+                     "the record only: " + ", ".join(r["symbol"] for r in s["breakouts"]))
+    elif s["breakouts"]:
+        lines.append(f"New buys (risk {C.RISK_PCT * 100:g}% of Rs {C.CAPITAL_RS:,} each)")
         for r in s["breakouts"]:
-            lines.append(f"{r['grade']} · {r['symbol']} · {C.STAGE_NAMES[r['stage']]} · template "
-                         f"{r['template']}/8" + (f" · RS {r['rs_rank']}" if r['rs_rank'] is not None else "")
-                         + f" · vol {r['vol_ratio']}x")
+            lines.append(f"{r['grade']} · {r['symbol']} · score {_v(r['score'])}"
+                         + (f" · RS {r['rs_rank']}" if r['rs_rank'] is not None else ""))
+            p = r.get("plan")
+            if p:
+                lines.append(f"   Buy {p['qty']} at the open, only if under {_rs(p['max_buy'])} · "
+                             f"stop {_rs(p['stop'])} ({p['stop_pct']}%) · sell by close {p['exit_by']}"
+                             f" · ~Rs {p['value_rs']:,}, risk Rs {p['risk_rs']:,}")
     else:
         lines.append("No Grade A or B breakouts today.")
     if s["breakdowns"]:
-        lines += ["", "New breakdowns"] + [f"{r['grade']} · {r['symbol']} · {C.STAGE_NAMES[r['stage']]}"
-                                           for r in s["breakdowns"]]
+        lines += ["", "Breakdowns (avoid or exit; not shorts)"] + [
+            f"{r['grade']} · {r['symbol']} · {C.STAGE_NAMES[r['stage']]}" for r in s["breakdowns"]]
     if s["closed_today"]:
         lines += ["", "Closed today"] + [f"{r['grade']} · {r['symbol']} {r['status']} ({r['move_pct']:+.1f}%)"
                                          for r in s["closed_today"]]
@@ -306,7 +353,9 @@ def send_telegram(text: str, token: Optional[str] = None, chat_id: Optional[str]
     r = requests.post(f"https://api.telegram.org/bot{token}/sendMessage",
                       data={"chat_id": chat_id, "text": text, "disable_web_page_preview": True},
                       timeout=30)
-    r.raise_for_status()
+    if not r.ok:
+        # raise_for_status() would put the URL, and with it the bot token, in the public log
+        raise RuntimeError(f"Telegram post failed with HTTP {r.status_code}")
     return True
 
 

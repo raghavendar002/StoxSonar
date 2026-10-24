@@ -123,14 +123,15 @@ def main(argv=None) -> int:
         # Earlier attempts wait for a later one; the last one fails loudly
         return 2 if datetime.now(IST).hour >= 22 else 0
 
-    if a.mode == "daily" and prev is None:
-        log.error("Ledger is empty. Run once with --mode replay to bootstrap it.")
-        return 2
+    # A new engine version starts with no record: replay its history once, then go live
+    record_mode = "bootstrap" if a.mode == "daily" and prev is None else a.mode
+    if record_mode == "bootstrap":
+        log.info("no %s record yet; replaying history before today's live signals", C.ENGINE_VERSION)
     prices = {s: df.loc[:as_of] for s, df in prices.items()}
     bench = bench.loc[:as_of]
     res = engine.run_market(prices, bench)
 
-    new = ledger.record_events(con, res.events, "NSE", as_of, a.mode, after=prev)
+    new = ledger.record_events(con, res.events, "NSE", as_of, record_mode, after=prev)
     reg = res.regime.loc[pd.Timestamp(as_of)]
     ledger.record_day(con, res.states, "NSE", as_of, "Weak" if reg["weak"] else "Healthy",
                       float(reg["stage2_share"]) if pd.notna(reg["stage2_share"]) else None, new)
