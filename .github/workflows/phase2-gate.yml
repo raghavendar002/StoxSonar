@@ -5,7 +5,7 @@ name: Phase 2 data gate
 on:
   push:
     branches: [claude/phase2-data]
-    paths: [sonar/nse.py, backtest.py, research/compare_sources.py, research/explain_gap.py, .github/workflows/phase2-gate.yml]
+    paths: [sonar/nse.py, backtest.py, research/compare_sources.py, research/explain_gap.py, research/inspect_gaps.py, .github/workflows/phase2-gate.yml]
   workflow_dispatch:
 
 permissions:
@@ -61,10 +61,11 @@ jobs:
         run: |
           python research/explain_gap.py reports/yahoo/backtest_signals.csv.gz reports/nse/backtest_signals.csv.gz universe/nse_sec_list.csv > reports/phase2_gap.md
           cat reports/phase2_gap.md
+          python research/inspect_gaps.py reports/phase2_worst.csv cache/nse_panel.pkl 8 > reports/phase2_worst.md || true; cat reports/phase2_worst.md
       - name: Commit the gate report
         run: |
           git config user.name "stoxsonar-bot"
           git config user.email "stoxsonar-bot@users.noreply.github.com"
-          git add reports/phase2_gate.md reports/phase2_gap.md reports/nse/backtest.md reports/nse/backtest.json reports/yahoo/backtest.md reports/yahoo/backtest.json
+          git add reports/phase2_gate.md reports/phase2_gap.md reports/phase2_worst.md reports/nse/backtest.md reports/nse/backtest.json reports/yahoo/backtest.md reports/yahoo/backtest.json
           git commit --quiet -m "Phase 2 gate report $(date -u +%F)"
           git push --quiet origin HEAD:claude/phase2-data

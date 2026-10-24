@@ -25,7 +25,8 @@ def load(p: str) -> pd.DataFrame:
     d = d[(d["direction"] == "up") & (d["trigger_date"] >= start) & d["grade"].isin(["A", "B"])]
     d = d.dropna(subset=["ret_21"]).copy()
     d["excess"] = (d["ret_21"] - d["bench_21"]) * 100
-    return d[["symbol", "trigger_date", "grade", "ret_21", "excess"]]
+    return d[["symbol", "trigger_date", "grade", "ret_21", "excess"] +
+             [c for c in ("entry", "fail_level") if c in d.columns]]
 
 
 def outside(d: pd.DataFrame, keys: pd.MultiIndex) -> pd.DataFrame:
@@ -57,6 +58,19 @@ def main(yahoo_path: str, nse_path: str, universe_csv: str) -> int:
             diff = (both["ret_21"] - both["ret_21_y"]).abs() * 100
             print(f"| {g} | both: median abs return gap | {len(both)} | {diff.median():.2f} | "
                   f"over 1 pt: {(diff > 1).mean() * 100:.0f}% | |")
+    # The worst disagreements on shared signals, to check by hand against NSE's own files
+    both = n.merge(y, on=["symbol", "trigger_date"], suffixes=("_nse", "_yahoo"))
+    both["gap_pt"] = ((both["ret_21_nse"] - both["ret_21_yahoo"]) * 100).round(1)
+    worst = both.reindex(both["gap_pt"].abs().sort_values(ascending=False).index).head(25)
+    cols = ["symbol", "trigger_date", "grade_nse", "grade_yahoo", "ret_21_nse", "ret_21_yahoo", "gap_pt"]
+    cols += [c for c in ("entry_nse", "entry_yahoo") if c in worst.columns]
+    worst[["symbol", "trigger_date"]].to_csv("reports/phase2_worst.csv", index=False)
+    print("\n### Largest 21-session return gaps on the same signal\n")
+    print("| " + " | ".join(cols) + " |\n|" + "---|" * len(cols))
+    for r in worst[cols].itertuples(index=False):
+        print("| " + " | ".join(f"{v:.4f}" if isinstance(v, float) else str(v) for v in r) + " |")
+    print(f"\nShare of shared signals with NSE lower by >1 pt: {(both['gap_pt'] < -1).mean() * 100:.0f}%, "
+          f"higher by >1 pt: {(both['gap_pt'] > 1).mean() * 100:.0f}%")
     return 0
 
 
