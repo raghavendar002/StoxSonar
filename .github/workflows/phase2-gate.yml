@@ -39,8 +39,8 @@ jobs:
       - uses: actions/cache/restore@v4
         with:
           path: cache/nse_panel.pkl
-          key: nse-panel-${{ github.run_id }}
-          restore-keys: nse-panel-
+          key: nse-panel-v2-${{ github.run_id }}
+          restore-keys: nse-panel-v2-
       - name: Backtest on NSE files (survivorship-free)
         run: python backtest.py --source nse --start 2015-01-01 --windows 10 --out reports/nse
       # Saved straight away, so a later failure doesn't throw away hours of downloads
@@ -48,7 +48,7 @@ jobs:
         if: always()
         with:
           path: cache/nse_panel.pkl
-          key: nse-panel-${{ github.run_id }}
+          key: nse-panel-v2-${{ github.run_id }}
       - name: Backtest on Yahoo (listed stocks only), same rules
         run: python backtest.py --source yahoo --windows 10 --out reports/yahoo
       - name: Compare
