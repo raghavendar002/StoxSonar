@@ -306,7 +306,9 @@ def send_telegram(text: str, token: Optional[str] = None, chat_id: Optional[str]
     r = requests.post(f"https://api.telegram.org/bot{token}/sendMessage",
                       data={"chat_id": chat_id, "text": text, "disable_web_page_preview": True},
                       timeout=30)
-    r.raise_for_status()
+    if not r.ok:
+        # raise_for_status() would put the URL, and with it the bot token, in the public log
+        raise RuntimeError(f"Telegram post failed with HTTP {r.status_code}")
     return True
 
 
