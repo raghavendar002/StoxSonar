@@ -39,6 +39,17 @@ def bhavcopy_url(d: date) -> str:
             f"{d:%Y}/{mon}/cm{d:%d}{mon}{d:%Y}bhav.csv.zip")
 
 
+def _old_dates(s: pd.Series) -> pd.Series:
+    """Old-format TIMESTAMP is 02-JAN-2024 in most files but 13-Jul-20 in some."""
+    s = s.astype(str).str.strip()
+    four = pd.to_datetime(s, format="%d-%b-%Y", errors="coerce")
+    two = pd.to_datetime(s, format="%d-%b-%y", errors="coerce")
+    out = four.fillna(two)
+    if out.isna().any():
+        raise ValueError(f"unreadable bhavcopy date {s[out.isna()].iloc[0]!r}")
+    return out
+
+
 def parse_bhavcopy(raw: pd.DataFrame) -> pd.DataFrame:
     """Either file format -> one row per EQ-series stock, standard columns."""
     if "TckrSymb" in raw.columns:
@@ -52,7 +63,7 @@ def parse_bhavcopy(raw: pd.DataFrame) -> pd.DataFrame:
         raw = raw.rename(columns=lambda c: c.strip())
         df = raw[raw["SERIES"].astype(str).str.strip() == "EQ"]
         out = pd.DataFrame({
-            "date": pd.to_datetime(df["TIMESTAMP"], format="%d-%b-%Y"),
+            "date": _old_dates(df["TIMESTAMP"]),
             "symbol": df["SYMBOL"].str.strip(), "isin": df["ISIN"], "open": df["OPEN"],
             "high": df["HIGH"], "low": df["LOW"], "close": df["CLOSE"], "prev_close": df["PREVCLOSE"],
             "volume": df["TOTTRDQTY"], "value": df["TOTTRDVAL"]})

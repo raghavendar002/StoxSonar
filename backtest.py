@@ -106,12 +106,14 @@ def nse_prices(start: str, end, cache: Path) -> dict:
     have = set(pd.to_datetime(panel["date"]).dt.date) if len(panel) else set()
     tried = set(panel.attrs.get("holidays", []))
     todo = [d for d in nse.weekdays(pd.Timestamp(start).date(), end) if d not in have and d not in tried]
-    if todo:
-        new = nse.build_panel(todo)
+    # Saved after every chunk, so a failure late in a long first download keeps what was fetched
+    for i in range(0, len(todo), 250):
+        chunk = todo[i:i + 250]
+        new = nse.build_panel(chunk)
         got = set(pd.to_datetime(new["date"]).dt.date) if len(new) else set()
-        holidays = sorted(tried | (set(todo) - got))
-        panel = pd.concat([panel, new], ignore_index=True)
-        panel.attrs["holidays"] = holidays
+        tried |= set(chunk) - got
+        panel = pd.concat([panel, new], ignore_index=True) if len(panel) else new
+        panel.attrs["holidays"] = sorted(tried)
         cache.parent.mkdir(parents=True, exist_ok=True)
         with open(cache, "wb") as fh:
             pickle.dump(panel, fh)

@@ -40,3 +40,10 @@ def test_urls():
     from datetime import date
     assert nse.bhavcopy_url(date(2026, 10, 23)).endswith("BhavCopy_NSE_CM_0_0_0_20261023_F_0000.csv.zip")
     assert nse.bhavcopy_url(date(2024, 1, 2)).endswith("EQUITIES/2024/JAN/cm02JAN2024bhav.csv.zip")
+
+
+def test_old_format_two_digit_year():
+    old = pd.DataFrame({"SYMBOL": ["AAA"], "SERIES": ["EQ"], "OPEN": [1], "HIGH": [2], "LOW": [1],
+                        "CLOSE": [2], "PREVCLOSE": [1], "TOTTRDQTY": [10], "TOTTRDVAL": [20],
+                        "TIMESTAMP": ["13-Jul-20"], "ISIN": ["x"]})
+    assert nse.parse_bhavcopy(old).iloc[0]["date"] == pd.Timestamp("2020-07-13")
