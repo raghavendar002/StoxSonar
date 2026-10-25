@@ -80,6 +80,8 @@ def build_snapshot(states: pd.DataFrame, events: pd.DataFrame, regime: pd.DataFr
                                  & events["grade"].isin(["A", "B"])]),
         track_record_live=track_record(events, live_sources).to_dict("records"),
         track_record_replay=track_record(events, ["replay"]).to_dict("records"),
+        # Logged-only phase 3 grade on the same live signals; compare with track_record_live
+        track_record_live_shadow=track_record(events, live_sources, grade_col="shadow_grade").to_dict("records"),
         live_signals=int(events["source"].isin(live_sources).sum()),
     )
 

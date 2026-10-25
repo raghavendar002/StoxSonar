@@ -27,6 +27,7 @@ For each of the ~1,300 NSE stocks that trade at least Rs 1 crore a day:
    - **B:** above the 200-day average with a score in the top half.
    - **C:** everything else (not posted).
    - In a Weak market, every grade drops one level, and **no buys are suggested at all**: breakouts are still logged for the record, but the post says "no new buys". In the live audit, longs taken in a Weak market lost 7% in two weeks.
+   - **Shadow grade (logged only):** each breakout also gets a second grade from a newer score: near the 52-week high, trend template passes, a shallow and tight base, low volatility, not stretched above the 50-day average. In a 2019–2026 test on unseen years it did better than the live grade, but not by enough to rule out luck, so it changes nothing you see. It sits in `ledger.csv` (`shadow_grade`) and `data.json` (`track_record_live_shadow`) so the two grades can be compared on live trades.
 5. **Trade plan** on every suggested buy, sized for the account in `sonar/config.py` (`CAPITAL_RS`, now Rs 1 lakh):
    - **Shares:** enough that hitting the stop loses 0.5% of the account (Rs 500), and never more than a quarter of the account in one stock.
    - **Buy:** at the next open, but only if it opens no more than 1 average daily range above the signal close. Bought right at that limit, the loss to the stop is about 0.7%.

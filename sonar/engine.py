@@ -193,6 +193,25 @@ def momentum_score(values: Dict[str, float]) -> float:
     return float(np.mean(zs))
 
 
+def shadow_score(values: Dict[str, float]) -> float:
+    """The logged-only phase 3 score: signed z-scores of SHADOW_FEATURES, averaged.
+    A missing value counts as the clip floor, as in research/retune.py."""
+    zs = []
+    for name, (lo, hi, mean, std, sign) in C.SHADOW_FEATURES.items():
+        x = values.get(name)
+        x = lo if x is None or x != x else min(max(x, lo), hi)
+        zs.append(sign * (x - mean) / std)
+    return float(np.mean(zs))
+
+
+def shadow_grade(score: float, above_sma200: bool, weak_regime: bool) -> str:
+    """Same gates as the live bullish grade, with the shadow score and cut-offs."""
+    if not above_sma200:
+        return "C"
+    g = "A" if score >= C.SHADOW_A else "B" if score >= C.SHADOW_B else "C"
+    return {"A": "B", "B": "C"}.get(g, g) if weak_regime else g
+
+
 def grade_event(direction: str, stage: int, score: float, above_sma200: bool,
                 weak_regime: bool) -> str:
     """Bullish: graded by momentum score, only above the 200-day average, cut one
@@ -229,6 +248,8 @@ class Event:
     vol_ratio: float
     stop: float = 0.0
     score: Optional[float] = None
+    shadow_score: Optional[float] = None    # logged only, see config.SHADOW_FEATURES
+    shadow_grade: Optional[str] = None
     status: str = "Active"
     status_date: str = ""
     sessions: int = 0
@@ -320,6 +341,13 @@ def replay_symbol(symbol: str, f: pd.DataFrame, rs_rank: pd.Series,
                     sign = 1 if trig["direction"] == "up" else -1
                     trig["stop"] = float(Cl[t] * (1 - sign * C.STOP_ATR * atr[t]))
                     trig["score"] = round(score, 3) if trig["direction"] == "up" else None
+                    if trig["direction"] == "up":
+                        sh = shadow_score(dict(
+                            template=template, depth=trig["depth"], atr_pct=row.atr_pct,
+                            from_hi52=Cl[t] / row.hi52 - 1, dist_sma50=Cl[t] / row.sma50 - 1,
+                            tight10=float(np.std(Cl[t - 10:t]) / trig["pivot"]) if t >= 10 else None))
+                        trig["shadow_score"] = round(sh, 3)
+                        trig["shadow_grade"] = shadow_grade(sh, Cl[t] > row.sma200, bool(weak.iloc[t]))
                     ev = Event(symbol=symbol, trigger_date=str(dates[t].date()), grade=g,
                                stage=confirmed, template=template,
                                rs_rank=None if pd.isna(rr) else float(rr),
