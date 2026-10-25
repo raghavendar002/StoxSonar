@@ -77,7 +77,9 @@ def parse_bhavcopy(raw: pd.DataFrame) -> pd.DataFrame:
         df, series = raw[series.isin(SERIES)], series[series.isin(SERIES)]
         out = pd.DataFrame({
             "date": _old_dates(df["TIMESTAMP"]),
-            "symbol": df["SYMBOL"].str.strip(), "isin": df["ISIN"], "open": df["OPEN"],
+            "symbol": df["SYMBOL"].str.strip(),
+            "isin": df["ISIN"] if "ISIN" in df else "",   # files before ~2011 have no ISIN column
+            "open": df["OPEN"],
             "high": df["HIGH"], "low": df["LOW"], "close": df["CLOSE"], "prev_close": df["PREVCLOSE"],
             "volume": df["TOTTRDQTY"], "value": df["TOTTRDVAL"]})
     out["rank"] = series.map(SERIES.index)

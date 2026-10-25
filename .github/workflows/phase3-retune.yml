@@ -1,0 +1,67 @@
+name: Phase 3 grade re-tune
+
+# Builds survivorship-free history from NSE's daily files back to 2006, replays
+# the v0.2 rules on it, and runs the walk-forward re-tune study.
+on:
+  push:
+    branches: [claude/phase3-retune]
+    paths: [sonar/**, backtest.py, research/retune.py, .github/workflows/phase3-retune.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: phase3-retune
+  cancel-in-progress: true
+
+jobs:
+  retune:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: python -m pytest -q tests
+      - name: Do NSE's files go back to 2006?
+        run: |
+          python - <<'PY'
+          from datetime import date
+          from sonar import nse
+          import io, zipfile, requests
+          for d in (date(2006, 1, 2), date(2008, 1, 1), date(2010, 1, 4), date(2013, 1, 1)):
+              r = requests.get(nse.bhavcopy_url(d), headers=nse.UA, timeout=60)
+              if r.ok:
+                  z = zipfile.ZipFile(io.BytesIO(r.content))
+                  print(d, "columns:", z.open(z.namelist()[0]).readline().decode().strip())
+              df = nse.fetch_bhavcopy(d)
+              print(d, nse.bhavcopy_url(d), "->", "404" if df is None else f"{len(df)} rows")
+              assert df is not None, f"no NSE file for {d}: a 404 here would be read as a holiday"
+          PY
+      - uses: actions/cache/restore@v4
+        with:
+          path: cache/nse_panel.pkl
+          key: nse-panel-v2-${{ github.run_id }}
+          restore-keys: nse-panel-v2-
+      - name: Replay v0.2 on NSE files from 2006
+        run: python backtest.py --source nse --start 2006-01-01 --windows 18 --out reports/nse_full
+      - uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: cache/nse_panel.pkl
+          key: nse-panel-v2-${{ github.run_id }}
+      - name: Walk-forward re-tune
+        run: |
+          python research/retune.py reports/nse_full/backtest_signals.csv.gz > reports/retune.md
+          cat reports/retune.md
+      - name: Commit the report
+        run: |
+          git config user.name "stoxsonar-bot"
+          git config user.email "stoxsonar-bot@users.noreply.github.com"
+          git add reports/retune.md reports/nse_full/retune.json reports/nse_full/backtest.md reports/nse_full/backtest.json
+          git commit --quiet -m "Phase 3 re-tune report $(date -u +%F)"
+          git push --quiet origin HEAD:claude/phase3-retune

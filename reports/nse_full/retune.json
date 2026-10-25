@@ -1,0 +1,193 @@
+{
+ "summary": {
+  "v02": {
+   "A": {
+    "n": 560,
+    "avg_net_pct": 1.32,
+    "median_net_pct": -1.55,
+    "win_pct": 44.1
+   },
+   "B": {
+    "n": 605,
+    "avg_net_pct": 0.82,
+    "median_net_pct": -1.45,
+    "win_pct": 45.1
+   },
+   "C": {
+    "n": 541,
+    "avg_net_pct": -0.24,
+    "median_net_pct": -2.9,
+    "win_pct": 39.6
+   },
+   "A_years_positive": [
+    3,
+    7
+   ],
+   "A_monthly_mean_pct": 0.63,
+   "A_monthly_t": 0.62,
+   "A_deflated_sharpe": 0.556,
+   "A_minus_C_pct": 1.56
+  },
+  "refit": {
+   "A": {
+    "n": 366,
+    "avg_net_pct": 1.29,
+    "median_net_pct": -1.7,
+    "win_pct": 42.6
+   },
+   "B": {
+    "n": 537,
+    "avg_net_pct": 0.35,
+    "median_net_pct": -1.7,
+    "win_pct": 44.1
+   },
+   "C": {
+    "n": 803,
+    "avg_net_pct": 0.55,
+    "median_net_pct": -2.3,
+    "win_pct": 42.5
+   },
+   "A_years_positive": [
+    3,
+    7
+   ],
+   "A_monthly_mean_pct": 0.99,
+   "A_monthly_t": 0.8,
+   "A_deflated_sharpe": 0.631,
+   "A_minus_C_pct": 0.74
+  },
+  "selected": {
+   "A": {
+    "n": 356,
+    "avg_net_pct": 2.36,
+    "median_net_pct": -0.74,
+    "win_pct": 47.2
+   },
+   "B": {
+    "n": 582,
+    "avg_net_pct": 0.3,
+    "median_net_pct": -2.0,
+    "win_pct": 42.3
+   },
+   "C": {
+    "n": 768,
+    "avg_net_pct": 0.12,
+    "median_net_pct": -2.83,
+    "win_pct": 41.7
+   },
+   "A_years_positive": [
+    4,
+    7
+   ],
+   "A_monthly_mean_pct": 1.26,
+   "A_monthly_t": 1.61,
+   "A_deflated_sharpe": 0.866,
+   "A_minus_C_pct": 2.24
+  }
+ },
+ "verdicts": {
+  "refit": "False",
+  "selected": false
+ },
+ "picks": {
+  "2012": {},
+  "2013": {},
+  "2014": {},
+  "2015": {
+   "base_len": -1
+  },
+  "2016": {},
+  "2017": {},
+  "2018": {
+   "from_hi52": 1
+  },
+  "2019": {},
+  "2020": {
+   "from_hi52": 1,
+   "template": 1
+  },
+  "2021": {
+   "from_hi52": 1,
+   "template": 1
+  },
+  "2022": {
+   "template": 1,
+   "from_hi52": 1,
+   "tight10": -1,
+   "depth": -1
+  },
+  "2023": {
+   "from_hi52": 1,
+   "template": 1,
+   "depth": -1
+  },
+  "2024": {
+   "from_hi52": 1,
+   "depth": -1,
+   "template": 1,
+   "tight10": -1,
+   "dist_sma50": -1
+  },
+  "2025": {
+   "depth": -1,
+   "dist_sma50": -1,
+   "tight10": -1,
+   "atr_pct": -1
+  },
+  "2026": {
+   "depth": -1,
+   "dist_sma50": -1,
+   "atr_pct": -1,
+   "tight10": -1,
+   "from_hi52": 1
+  }
+ },
+ "final_fit": {
+  "features": {
+   "dist_sma50": [
+    0.079275,
+    0.45759000000000005,
+    0.1946404630620985,
+    0.07782147704430402,
+    -1.0
+   ],
+   "depth": [
+    0.085633158659165,
+    0.45715457471833604,
+    0.2158118772419448,
+    0.08186010890760977,
+    -1.0
+   ],
+   "atr_pct": [
+    0.020335,
+    0.070465,
+    0.04096622055674518,
+    0.010632891281796862,
+    -1.0
+   ],
+   "from_hi52": [
+    -0.450175,
+    0.0,
+    -0.070539119379015,
+    0.10066643722739453,
+    1.0
+   ],
+   "tight10": [
+    0.006435000000000001,
+    0.06249500000000003,
+    0.02536534796573876,
+    0.012327963917999295,
+    -1.0
+   ],
+   "template": [
+    3.0,
+    8.0,
+    6.643468950749464,
+    1.6166056496909382,
+    1.0
+   ]
+  },
+  "cut_a": 0.5216795629457653,
+  "cut_b": 0.08329955708095076
+ }
+}

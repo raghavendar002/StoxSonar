@@ -184,8 +184,8 @@ def main(argv=None) -> int:
           f"{len(first_bar)} of {len(tickers)} {universe} had price data; the earliest starts "
           f"{first_bar.min().date()}.", "",
           ("**Source: NSE daily files.** Every stock that traded on each day is included, also those "
-           "later delisted or merged, so there is no survivorship bias. Prices are adjusted for splits "
-           "and bonuses from NSE's own previous-close figures." if a.source == "nse" else
+           "later delisted or merged, so there is no survivorship bias. Splits and bonuses are inferred "
+           "from overnight gaps and back-adjusted (sonar/nse.py); dividends are not." if a.source == "nse" else
            "**Survivorship warning:** only companies listed today are included. Companies that were "
            "delisted, went bust or merged are missing, so these results are better than reality, "
            "and the gap grows with the window."), "",
