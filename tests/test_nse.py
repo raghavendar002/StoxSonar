@@ -73,3 +73,11 @@ def test_be_series_kept_and_eq_preferred():
                         "PrvsClsgPric": [1, 2, 3], "TtlTradgVol": [1, 1, 1], "TtlTrfVal": [1, 1, 1]})
     out = nse.parse_bhavcopy(raw).set_index("symbol")["close"]
     assert out.to_dict() == {"AAA": 2, "BBB": 3}
+
+
+def test_old_format_without_isin():
+    old = pd.DataFrame({"SYMBOL": ["AAA"], "SERIES": ["EQ"], "OPEN": [1], "HIGH": [2], "LOW": [1],
+                        "CLOSE": [2], "PREVCLOSE": [1], "TOTTRDQTY": [10], "TOTTRDVAL": [20],
+                        "TIMESTAMP": ["02-JAN-2006"]})
+    out = nse.parse_bhavcopy(old)
+    assert list(out.columns) == nse.COLUMNS and out.iloc[0]["isin"] == ""

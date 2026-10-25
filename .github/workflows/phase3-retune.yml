@@ -32,7 +32,12 @@ jobs:
           python - <<'PY'
           from datetime import date
           from sonar import nse
+          import io, zipfile, requests
           for d in (date(2006, 1, 2), date(2008, 1, 1), date(2010, 1, 4), date(2013, 1, 1)):
+              r = requests.get(nse.bhavcopy_url(d), headers=nse.UA, timeout=60)
+              if r.ok:
+                  z = zipfile.ZipFile(io.BytesIO(r.content))
+                  print(d, "columns:", z.open(z.namelist()[0]).readline().decode().strip())
               df = nse.fetch_bhavcopy(d)
               print(d, nse.bhavcopy_url(d), "->", "404" if df is None else f"{len(df)} rows")
               assert df is not None, f"no NSE file for {d}: a 404 here would be read as a holiday"
