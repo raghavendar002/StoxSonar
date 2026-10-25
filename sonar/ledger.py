@@ -19,8 +19,8 @@ from .engine import Event
 
 FROZEN = ["engine_version", "market", "symbol", "direction", "trigger_date", "grade", "stage",
           "template", "rs_rank", "mansfield", "regime", "pivot", "entry", "base_len", "depth",
-          "vol_ratio", "stop", "score", "first_seen_utc", "source"]
-REAL = ("rs_rank", "mansfield", "pivot", "entry", "depth", "vol_ratio", "stop", "score")
+          "vol_ratio", "stop", "score", "shadow_score", "shadow_grade", "first_seen_utc", "source"]
+REAL = ("rs_rank", "mansfield", "pivot", "entry", "depth", "vol_ratio", "stop", "score", "shadow_score")
 OUTCOME = ["status", "status_date", "sessions"] + [f"{k}_{h}" for h in C.HORIZONS
                                                    for k in ("ret", "bench")] + ["r_21"]
 
@@ -48,7 +48,7 @@ def connect(path: Path) -> sqlite3.Connection:
     path.parent.mkdir(parents=True, exist_ok=True)
     con = sqlite3.connect(path)
     con.executescript(SCHEMA)
-    # Columns added after the first ledger was written (v0.2: stop, score)
+    # Columns added after the first ledger was written (v0.2: stop, score; shadow grade)
     have = {r[1] for r in con.execute("PRAGMA table_info(events)")}
     for c in FROZEN + OUTCOME:
         if c not in have:
@@ -126,13 +126,14 @@ def events_frame(con, market: str) -> pd.DataFrame:
                              con, params=(market, C.ENGINE_VERSION))
 
 
-def track_record(ev: pd.DataFrame, sources: List[str], direction: str = "up") -> pd.DataFrame:
+def track_record(ev: pd.DataFrame, sources: List[str], direction: str = "up",
+                 grade_col: str = "grade") -> pd.DataFrame:
     """Per-grade results for signals old enough to have a 21-session outcome."""
     d = ev[(ev["source"].isin(sources)) & (ev["direction"] == direction)].copy()
     rows = []
     sign = 1 if direction == "up" else -1
     for g in ["A", "B", "C"]:
-        x = d[d["grade"] == g]
+        x = d[d[grade_col] == g] if grade_col in d else d.iloc[:0]
         closed = x[x["status"].isin(["Confirmed", "Failed", "Faded"])]
         m = x.dropna(subset=["ret_21"])
         excess = sign * (m["ret_21"] - m["bench_21"])

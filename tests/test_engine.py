@@ -213,3 +213,35 @@ def test_fail_line_is_atr_based_and_outcomes_start_next_open():
     atr = engine.compute_features(df, rising_bench(df.index))["atr_pct"].iloc[260]
     assert ev.stop == pytest.approx(ev.entry * (1 - C.STOP_ATR * atr))
     assert ev.outcomes["ret_21"] == pytest.approx(df["Close"].iloc[281] / df["Open"].iloc[261] - 1, abs=1e-4)
+
+
+def test_shadow_grade_is_logged_and_changes_nothing(tmp_path):
+    df = uptrend_with_base_and_breakout()
+    res = engine.run_market({"TEST.NS": df}, rising_bench(df.index))
+    ev = [e for e in res.events if e.direction == "up"][0]
+    assert ev.grade == "A"                                  # live grade unchanged
+    assert ev.shadow_score is not None and ev.shadow_grade in ("A", "B", "C")
+    con = ledger.connect(tmp_path / "l.db")
+    ledger.record_events(con, [ev], "NSE", ev.trigger_date, "daily", after="2000-01-01")
+    row = ledger.events_frame(con, "NSE").iloc[0]
+    assert row["shadow_grade"] == ev.shadow_grade and row["shadow_score"] == pytest.approx(ev.shadow_score)
+
+
+def test_shadow_score_signs_and_gates():
+    means = {k: v[2] for k, v in C.SHADOW_FEATURES.items()}
+    assert engine.shadow_score(means) == pytest.approx(0)
+    tighter = dict(means, tight10=means["tight10"] / 2)    # tighter is better (sign -1)
+    assert engine.shadow_score(tighter) > 0
+    assert engine.shadow_grade(9.9, above_sma200=False, weak_regime=False) == "C"
+    assert engine.shadow_grade(9.9, above_sma200=True, weak_regime=True) == "B"
+
+
+def test_old_ledger_gains_shadow_columns(tmp_path):
+    import sqlite3
+    path = tmp_path / "old.db"
+    con = sqlite3.connect(path)
+    con.execute("CREATE TABLE events (id INTEGER PRIMARY KEY, engine_version TEXT, market TEXT, symbol TEXT, "
+                "direction TEXT, trigger_date TEXT, UNIQUE (engine_version, market, symbol, direction, trigger_date))")
+    con.close()
+    have = {r[1] for r in ledger.connect(path).execute("PRAGMA table_info(events)")}
+    assert {"shadow_score", "shadow_grade"} <= have
