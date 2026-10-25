@@ -1,0 +1,71 @@
+name: Phase 2 data gate
+
+# Builds 10+ years of survivorship-free history from NSE's daily files and
+# checks that the v0.2 backtest on it lands within 0.5 point of the Yahoo run.
+on:
+  push:
+    branches: [claude/phase2-data]
+    paths: [sonar/nse.py, backtest.py, research/compare_sources.py, research/explain_gap.py, research/inspect_gaps.py, .github/workflows/phase2-gate.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: phase2-gate
+  cancel-in-progress: true
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: python -m pytest -q tests
+      - name: Can the runner reach NSE's old and new daily files?
+        run: |
+          python - <<'PY'
+          from datetime import date
+          from sonar import nse
+          for d in (date(2015, 1, 2), date(2020, 3, 2), date(2024, 7, 5), date(2024, 7, 8), date(2026, 10, 23)):
+              df = nse.fetch_bhavcopy(d)
+              print(d, nse.bhavcopy_url(d), "->", "holiday/404" if df is None else f"{len(df)} EQ rows")
+          PY
+      - uses: actions/cache/restore@v4
+        with:
+          path: cache/nse_panel.pkl
+          key: nse-panel-v2-${{ github.run_id }}
+          restore-keys: nse-panel-v2-
+      - name: Backtest on NSE files (survivorship-free)
+        run: python backtest.py --source nse --start 2015-01-01 --windows 10 --out reports/nse
+      # Saved straight away, so a later failure doesn't throw away hours of downloads
+      - uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: cache/nse_panel.pkl
+          key: nse-panel-v2-${{ github.run_id }}
+      - name: Backtest on Yahoo (listed stocks only), same rules
+        run: python backtest.py --source yahoo --windows 10 --out reports/yahoo
+      - name: Compare
+        run: |
+          set +e
+          python research/compare_sources.py reports/yahoo/backtest.json reports/nse/backtest.json > reports/phase2_gate.md
+          echo "exit=$?" >> reports/phase2_gate.md
+          cat reports/phase2_gate.md
+      - name: Where the gap comes from
+        run: |
+          python research/explain_gap.py reports/yahoo/backtest_signals.csv.gz reports/nse/backtest_signals.csv.gz universe/nse_sec_list.csv > reports/phase2_gap.md
+          cat reports/phase2_gap.md
+          python research/inspect_gaps.py reports/phase2_worst.csv cache/nse_panel.pkl 8 > reports/phase2_worst.md || true; cat reports/phase2_worst.md
+      - name: Commit the gate report
+        run: |
+          git config user.name "stoxsonar-bot"
+          git config user.email "stoxsonar-bot@users.noreply.github.com"
+          git add reports/phase2_gate.md reports/phase2_gap.md reports/phase2_worst.md reports/nse/backtest.md reports/nse/backtest.json reports/yahoo/backtest.md reports/yahoo/backtest.json
+          git commit --quiet -m "Phase 2 gate report $(date -u +%F)"
+          git push --quiet origin HEAD:claude/phase2-data

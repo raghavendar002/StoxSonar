@@ -25,7 +25,7 @@ import numpy as np
 import pandas as pd
 
 from sonar import config as C
-from sonar import data, engine
+from sonar import data, engine, nse
 from sonar.ledger import track_record
 
 ROOT = Path(__file__).resolve().parent
@@ -96,6 +96,30 @@ class StageSink:
         return pd.DataFrame(rows)
 
 
+def nse_prices(start: str, end, cache: Path) -> dict:
+    """Adjusted prices for every EQ stock from NSE's daily files, cached raw so reruns only fetch new days."""
+    import pickle
+    panel = pd.DataFrame(columns=nse.COLUMNS)
+    if cache.exists():
+        with open(cache, "rb") as fh:          # written by this function, never from elsewhere
+            panel = pickle.load(fh)
+    have = set(pd.to_datetime(panel["date"]).dt.date) if len(panel) else set()
+    tried = set(panel.attrs.get("holidays", []))
+    todo = [d for d in nse.weekdays(pd.Timestamp(start).date(), end) if d not in have and d not in tried]
+    # Saved after every chunk, so a failure late in a long first download keeps what was fetched
+    for i in range(0, len(todo), 250):
+        chunk = todo[i:i + 250]
+        new = nse.build_panel(chunk)
+        got = set(pd.to_datetime(new["date"]).dt.date) if len(new) else set()
+        tried |= set(chunk) - got
+        panel = pd.concat([panel, new], ignore_index=True) if len(panel) else new
+        panel.attrs["holidays"] = sorted(tried)
+        cache.parent.mkdir(parents=True, exist_ok=True)
+        with open(cache, "wb") as fh:
+            pickle.dump(panel, fh)
+    return nse.to_price_dict(panel)
+
+
 def per_year(ev: pd.DataFrame) -> pd.DataFrame:
     d = ev[(ev["direction"] == "up") & ev["grade"].isin(["A", "B"])].dropna(subset=["ret_21"]).copy()
     d["year"] = d["trigger_date"].str[:4].astype(int)
@@ -122,14 +146,26 @@ def main(argv=None) -> int:
     ap.add_argument("--out", type=Path, default=ROOT / "reports")
     ap.add_argument("--limit", type=int, default=0)
     ap.add_argument("--universe-csv", type=Path, default=ROOT / "universe" / "nse_sec_list.csv")
+    ap.add_argument("--source", choices=["yahoo", "nse"], default="yahoo",
+                    help="yahoo: today's listed stocks only; nse: NSE's daily files, delisted stocks included")
+    ap.add_argument("--start", default="2015-01-01", help="first day of NSE files to download (--source nse)")
+    ap.add_argument("--nse-cache", type=Path, default=ROOT / "cache" / "nse_panel.pkl",
+                    help="raw NSE files already downloaded; only missing days are fetched")
     a = ap.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 
-    tickers = data.load_universe(a.universe_csv)
-    if a.limit:
-        tickers = tickers[:a.limit]
     bench = spliced_benchmark()
-    prices = data.fetch_prices(tickers, period="max")
+    if a.source == "nse":
+        prices = nse_prices(a.start, bench.index.max().date(), a.nse_cache)
+        tickers = sorted(prices)
+        if a.limit:
+            prices = {t: prices[t] for t in tickers[:a.limit]}
+            tickers = tickers[:a.limit]
+    else:
+        tickers = data.load_universe(a.universe_csv)
+        if a.limit:
+            tickers = tickers[:a.limit]
+        prices = data.fetch_prices(tickers, period="max")
     as_of = bench.index.max()
     first_bar = pd.Series({s: df.index.min() for s, df in prices.items() if len(df)})
     log.info("%d of %d tickers have data; earliest %s", len(first_bar), len(tickers), first_bar.min().date())
@@ -142,13 +178,17 @@ def main(argv=None) -> int:
     ev.to_csv(a.out / "backtest_signals.csv.gz", index=False)
     res.regime.to_csv(a.out / "backtest_regime.csv.gz")
 
+    universe = "stocks that traded on NSE since --start" if a.source == "nse" else "stocks listed today"
     md = [f"# StoxSonar backtest, rules v{C.ENGINE_VERSION}", "",
           f"Data to {as_of.date()}. Benchmark: {'; '.join(bench.attrs.get('sources', []))}. "
-          f"{len(first_bar)} of {len(tickers)} stocks listed today had price data; the earliest starts "
+          f"{len(first_bar)} of {len(tickers)} {universe} had price data; the earliest starts "
           f"{first_bar.min().date()}.", "",
-          "**Survivorship warning:** only companies listed today are included. Companies that were "
-          "delisted, went bust or merged are missing, so these results are better than reality, "
-          "and the gap grows with the window.", "",
+          ("**Source: NSE daily files.** Every stock that traded on each day is included, also those "
+           "later delisted or merged, so there is no survivorship bias. Prices are adjusted for splits "
+           "and bonuses from NSE's own previous-close figures." if a.source == "nse" else
+           "**Survivorship warning:** only companies listed today are included. Companies that were "
+           "delisted, went bust or merged are missing, so these results are better than reality, "
+           "and the gap grows with the window."), "",
           "Excess = stock return minus benchmark return over the same 21 sessions after the signal. "
           "R = 21-session move divided by the distance to the failure level.", ""]
     summary = {"as_of": str(as_of.date()), "tickers": len(tickers), "with_data": len(first_bar),
@@ -166,7 +206,7 @@ def main(argv=None) -> int:
         s2_wins = int((both["s2_21"] > both["s4_21"]).sum())
         tr = track_record(sub, ["replay"])
         md += [f"## Last {w} years (from {start.date()})", "",
-               f"Coverage: {has_data} of today's {len(first_bar)} stocks have prices back to {start.date()}; "
+               f"Coverage: {has_data} of the {len(first_bar)} {universe} have prices back to {start.date()}; "
                f"{liquid_then} of them were liquid (Rs 1 crore/day) and labelled at the start of the "
                f"window, against {int(liquid.iloc[-1]) if len(liquid) else 0} today. "
                f"First signal in this window: {signals_start}.", "",
