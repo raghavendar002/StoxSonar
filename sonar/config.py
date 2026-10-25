@@ -53,6 +53,23 @@ SCORE_FEATURES = {           # name: (clip low, clip high, mean, std)
 SCORE_A = 0.565
 SCORE_B = -0.118
 
+# Shadow grade (logged only, v0.2.x): the 'selected' score from the phase 3
+# walk-forward study (research/retune.py, reports/retune.md), fitted on NSE
+# breakouts 2007-2026. It beat v0.2 out of sample but missed the 0.95 deflated
+# Sharpe bar, so it changes no grade, suggestion or message: it is recorded next
+# to each live signal so the two can be compared on trades neither has seen.
+# Changing it does not need an ENGINE_VERSION bump, since nothing shown depends on it.
+SHADOW_FEATURES = {          # name: (clip low, clip high, mean, std, sign; +1 = higher is better)
+    "dist_sma50": (0.079275, 0.45759, 0.19464, 0.0778215, -1),
+    "depth": (0.0856332, 0.457155, 0.215812, 0.0818601, -1),
+    "atr_pct": (0.020335, 0.070465, 0.0409662, 0.0106329, -1),
+    "from_hi52": (-0.450175, 0, -0.0705391, 0.100666, +1),
+    "tight10": (0.006435, 0.062495, 0.0253653, 0.012328, -1),
+    "template": (3, 8, 6.64347, 1.61661, +1),
+}
+SHADOW_A = 0.5217
+SHADOW_B = 0.0833
+
 # Trade plan on every bullish signal (v0.2). Sizing is for one account: change
 # CAPITAL_RS to yours. These only shape what is suggested, not what is recorded.
 CAPITAL_RS = 100_000         # account size
