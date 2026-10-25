@@ -5,8 +5,10 @@
 Reads the signals written by `backtest.py --source nse` and the NSE price cache
 it built, replays one account day by day (sonar/portfolio.py), and reports the
 whole period and the 2019-on years separately, each from a fresh Rs 1 lakh.
-Position caps of 5 and 8 are shown beside "no cap" for information only; the
-plan's default is no cap beyond cash and the 25% per-stock limit.
+
+The position cap (none, 8 or 5 open stocks) is chosen on 2007-2018 only, by
+the highest Sharpe ratio, and then reported on 2019 on: the years we judge by
+never help pick it.
 
 The benchmark is the Nifty 500 price index: it leaves out dividends, worth
 roughly 1-1.5% a year, so the strategy's lead over it is overstated by that much.
@@ -25,7 +27,9 @@ sys.path.insert(0, str(ROOT))
 from backtest import spliced_benchmark  # noqa: E402
 from sonar import config as C, nse, portfolio  # noqa: E402
 
-PERIODS = [("2007-01-01", "All years"), ("2019-01-01", "2019 on (unseen by v0.2's fit)")]
+PERIODS = [("2007-01-01", "2018-12-31", "2007-2018 (cap chosen here)"),
+           ("2019-01-01", None, "2019 on (unseen by v0.2's fit and by the cap choice)"),
+           ("2007-01-01", None, "All years")]
 CAPS = [None, 8, 5]
 
 
@@ -51,22 +55,27 @@ def main(signals_path: str, cache_path: str, out_dir: str = "reports/sim") -> in
              f"{C.HOLD_SESSIONS} sessions after the signal. Costs: STT, exchange and SEBI fees, stamp duty, "
              "GST, DP charge, and 0.05-0.5% slippage each way by liquidity. "
              "Benchmark: Nifty 500 price index (no dividends, so about 1-1.5 points a year flattering to us).", ""]
-    rows, keep = [], {}
-    for start, label in PERIODS:
+    rows, keep, sharpe = [], {}, {}
+    for start, end, label in PERIODS:
         for cap in CAPS:
-            r = portfolio.simulate(sig, prices, bench, max_positions=cap, start=start)
+            r = portfolio.simulate(sig, prices, bench, max_positions=cap, start=start, end=end)
             m = portfolio.metrics(r["equity"]["equity"], r["bench"], r["trades"])
             rows.append({"period": label, "max positions": cap or "no cap", **m})
-            if cap is None:
-                keep[label] = r
-    lines += ["## Headline", "", md(pd.DataFrame(rows)), ""]
+            if end:
+                sharpe[cap] = m.get("sharpe") or float("-inf")
+            keep[(label, cap)] = r
+    chosen = max(CAPS, key=lambda c: sharpe.get(c, float("-inf")))
+    keep = {label: keep[(label, chosen)] for _, end, label in PERIODS if not end}
+    lines += ["## Headline", "", md(pd.DataFrame(rows)), "",
+              f"Cap chosen on 2007-2018 by Sharpe: **{chosen or 'no cap'}**. The sections below use it.", ""]
     for label, r in keep.items():
         eq, tr = r["equity"], r["trades"]
         tag = "all" if label.startswith("All") else "2019"
+        label = f"{label}, max positions {chosen or 'no cap'}"
         eq.to_csv(out / f"equity_{tag}.csv")
         tr.to_csv(out / f"trades_{tag}.csv", index=False)
         lines += [f"## {label}: year by year (%)", "", md(portfolio.yearly(eq["equity"], r["bench"]).reset_index()
-                                                       .rename(columns={"index": "year"})), ""]
+                                                       .rename(columns={"index": "year", "date": "year"})), ""]
         if len(tr):
             why = tr.groupby("reason").agg(trades=("pnl", "size"), avg_ret_pct=("ret", lambda x: round(x.mean() * 100, 2)),
                                            total_pnl_rs=("pnl", lambda x: round(x.sum())))
