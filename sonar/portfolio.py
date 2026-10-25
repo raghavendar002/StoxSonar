@@ -39,6 +39,13 @@ BROKERAGE = 0.0             # zero for delivery at most discount brokers
 DP_SELL_RS = 15.93          # depository charge per stock sold (Rs 13.5 + GST)
 # One-way slippage by median daily traded value (Rs): thinner stocks cost more
 SLIPPAGE = ((50e7, 0.0005), (10e7, 0.0010), (1e7, 0.0025), (0, 0.0050))
+# Idle cash parked in an index ETF: yearly fee, and the cost each way of moving
+# money in or out of it (spread, exchange fees, STT on the sale)
+ETF_FEE = 0.001
+ETF_SWITCH = 0.0005
+TREND_DAYS = 200             # "etf_trend" holds the ETF only while the index closes above this average
+LIQUID_RATE = 0.055          # "liquid": a liquid/overnight fund, net of fees; a flat assumption (RBI rates ran ~3.5-8%)
+IDLE = ("cash", "liquid", "etf", "etf_trend")
 
 
 def slippage(traded_value: float) -> float:
@@ -106,7 +113,15 @@ def _prep(f: pd.DataFrame) -> pd.DataFrame:
 def simulate(signals: pd.DataFrame, prices: Dict[str, pd.DataFrame], bench: pd.Series,
              capital: float = C.CAPITAL_RS, max_positions: Optional[int] = None,
              exit_rule: ExitRule = v02_exit, entry_filter=default_entry_filter,
-             start: Optional[str] = None, end: Optional[str] = None) -> dict:
+             start: Optional[str] = None, end: Optional[str] = None,
+             risk_pct: float = C.RISK_PCT, fixed_frac: Optional[float] = None, idle: str = "cash") -> dict:
+    """Replay the account. Sizing: risk_pct of equity from entry to stop, or, with
+    fixed_frac, that share of equity per stock (the stop still applies). idle:
+    "cash" earns nothing; "etf" keeps uninvested money in the benchmark index;
+    "etf_trend" does so only while the index closed above its TREND_DAYS average
+    the day before; "liquid" earns LIQUID_RATE a year. Index returns are price only (no dividends), so this
+    understates the ETF by its dividend yield."""
+    assert idle in IDLE
     sig = signals[signals.apply(entry_filter, axis=1)].copy()
     sig["date"] = pd.to_datetime(sig["trigger_date"])
     if start:
@@ -124,6 +139,12 @@ def simulate(signals: pd.DataFrame, prices: Dict[str, pd.DataFrame], bench: pd.S
     cash, open_pos, trades, curve = float(capital), [], [], []
     pending = []                                       # signals waiting for the next open
     last_close: Dict[str, float] = {}
+    trend = (bench > bench.rolling(TREND_DAYS).mean()).reindex(days).fillna(False)
+    in_etf, etf_costs, prev_b = idle == "etf", 0.0, None
+
+    def move(amount: float) -> float:                  # cost of moving money in or out of the ETF
+        return abs(amount) * ETF_SWITCH if in_etf else 0.0
+
     for day in days:
         # 1. Buys at today's open from yesterday's signals
         for s in pending:
@@ -134,18 +155,22 @@ def simulate(signals: pd.DataFrame, prices: Dict[str, pd.DataFrame], bench: pd.S
             if max_positions is not None and len(open_pos) >= max_positions:
                 break
             equity = cash + sum(p.qty * last_close.get(p.symbol, p.entry) for p in open_pos)
-            plan = trade_plan(s.entry, s.stop, s.trigger_date, capital=equity)
+            plan = trade_plan(s.entry, s.stop, s.trigger_date, capital=equity, risk_pct=risk_pct)
             o = f["Open"].iat[i]
             if plan is None or o > plan["max_buy"] or o <= s.stop:
                 continue
             fill = o * (1 + slippage(f["tv"].iat[i - 1] if i else 0))
             qty = plan["qty"]
-            while qty > 0 and qty * fill + buy_cost(qty * fill) > cash:
+            if fixed_frac:
+                qty = math.floor(equity * min(fixed_frac, C.MAX_POSITION_PCT) / s.entry)
+            while qty > 0 and qty * fill + buy_cost(qty * fill) + move(qty * fill) > cash:
                 qty -= 1
             if qty < 1:
                 continue
             cost = buy_cost(qty * fill)
-            cash -= qty * fill + cost
+            sw = move(qty * fill + cost)
+            etf_costs += sw
+            cash -= qty * fill + cost + sw
             sig_i = ix.get(s.date)
             due = (sig_i if sig_i is not None else i - 1) + C.HOLD_SESSIONS
             open_pos.append(Position(s.symbol, s.date, day, qty, fill, s.stop, due, cost, s.grade,
@@ -178,7 +203,9 @@ def simulate(signals: pd.DataFrame, prices: Dict[str, pd.DataFrame], bench: pd.S
             cost = sell_cost(proceeds)
             cost_in = p.cost_in * qty / p.qty
             slip_in = p.slip_in * qty / p.qty
-            cash += proceeds - cost
+            sw = move(proceeds - cost)
+            etf_costs += sw
+            cash += proceeds - cost - sw
             trades.append(dict(symbol=p.symbol, grade=p.grade, signal=p.signal_date.date(),
                                entry_date=p.entry_date.date(), exit_date=day.date(), qty=qty,
                                entry=round(p.entry, 2), exit=round(px, 2), reason=why,
@@ -192,7 +219,18 @@ def simulate(signals: pd.DataFrame, prices: Dict[str, pd.DataFrame], bench: pd.S
                 continue
             last_close.pop(p.symbol, None)
         open_pos = still
-        # 3. Mark to market at the close; queue today's signals for tomorrow's open
+        # 3. The ETF's day, then tomorrow's ETF decision; mark to market at the close;
+        #    queue today's signals for tomorrow's open
+        b = bench.get(day)
+        if in_etf and prev_b and b == b:
+            cash *= (b / prev_b) * (1 - ETF_FEE / 252)
+        elif idle == "liquid":
+            cash *= 1 + LIQUID_RATE / 252
+        prev_b = b if b == b else prev_b
+        if idle == "etf_trend" and bool(trend.get(day, False)) != in_etf:
+            etf_costs += cash * ETF_SWITCH
+            cash -= cash * ETF_SWITCH
+            in_etf = not in_etf
         for p in open_pos:
             i = pos_idx[p.symbol].get(day)
             if i is not None:
@@ -202,7 +240,8 @@ def simulate(signals: pd.DataFrame, prices: Dict[str, pd.DataFrame], bench: pd.S
         if day in by_day:
             pending = list(by_day[day].itertuples(index=False))
     eq = pd.DataFrame(curve, columns=["date", "equity", "positions", "cash"]).set_index("date")
-    return {"equity": eq, "trades": pd.DataFrame(trades), "bench": bench.reindex(eq.index).ffill()}
+    return {"equity": eq, "trades": pd.DataFrame(trades), "bench": bench.reindex(eq.index).ffill(),
+            "etf_costs": round(etf_costs)}
 
 
 def metrics(eq: pd.Series, bench: pd.Series, trades: pd.DataFrame) -> dict:

@@ -12,7 +12,7 @@ from . import config as C
 
 
 def trade_plan(entry: float, stop: float, trigger_date: str,
-               capital: float = C.CAPITAL_RS) -> Optional[dict]:
+               capital: float = C.CAPITAL_RS, risk_pct: float = C.RISK_PCT) -> Optional[dict]:
     """Size a long so that entry-to-stop loses RISK_PCT of `capital`.
 
     The buy is at the next open, which is unknown tonight, so the plan gives a
@@ -25,7 +25,7 @@ def trade_plan(entry: float, stop: float, trigger_date: str,
     per_share = entry - stop
     if not entry or not stop or per_share <= 0:
         return None
-    risk = capital * C.RISK_PCT
+    risk = capital * risk_pct
     qty = min(math.floor(risk / per_share), math.floor(capital * C.MAX_POSITION_PCT / entry))
     if qty < 1:
         return None
