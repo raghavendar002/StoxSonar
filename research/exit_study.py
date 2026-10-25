@@ -51,6 +51,35 @@ def monthly_excess(r: dict) -> pd.Series:
     return m["s"] - m["b"]
 
 
+def report_data(r: dict, trades_cols=("charges", "slippage")) -> dict:
+    """What the HTML report draws: weekly equity, drawdown and exposure, years, costs."""
+    eq, tr = r["equity"], r["trades"]
+    inv = 1 - eq["cash"] / eq["equity"]
+    wk = pd.DataFrame({"equity": eq["equity"], "bench": r["bench"], "dd": eq["equity"] / eq["equity"].cummax() - 1,
+                       "bdd": r["bench"] / r["bench"].cummax() - 1, "invested": inv, "positions": eq["positions"]})
+    wk = wk.resample("W-FRI").agg({"equity": "last", "bench": "last", "dd": "min", "bdd": "min",
+                                   "invested": "mean", "positions": "mean"}).dropna()
+    y = portfolio.yearly(eq["equity"], r["bench"])
+    y["invested_pct"] = (inv.groupby(inv.index.year).mean() * 100).round(1)
+    y["max_positions"] = eq["positions"].groupby(eq.index.year).max()
+    out = {"weekly": {"date": [d.strftime("%Y-%m-%d") for d in wk.index],
+                      **{c: [round(float(v), 4) for v in wk[c]] for c in wk.columns}},
+           "yearly": y.reset_index().rename(columns={"date": "year", "index": "year"}).to_dict("records"),
+           "avg_invested_pct": round(float(inv.mean() * 100), 1), "avg_positions": round(float(eq["positions"].mean()), 2),
+           "max_positions": int(eq["positions"].max())}
+    if len(tr):
+        tr = tr.assign(year=pd.to_datetime(tr["exit_date"]).dt.year)
+        out["costs_rs"] = {c: round(float(tr[c].sum())) for c in trades_cols if c in tr}
+        out["costs_by_year"] = tr.groupby("year")[[c for c in trades_cols if c in tr]].sum().round().reset_index().to_dict("records")
+        out["by_reason"] = tr.groupby("reason").agg(trades=("pnl", "size"), avg_ret_pct=("ret", lambda x: round(x.mean() * 100, 2)),
+                                                    total_pnl_rs=("pnl", lambda x: round(x.sum()))).reset_index().to_dict("records")
+        out["ret_hist"] = [int(n) for n in pd.cut(tr["ret"].clip(-0.4, 1.0), bins=[i / 20 for i in range(-8, 21)],
+                                                  include_lowest=True).value_counts(sort=False)]
+        out["best_trades"] = tr.nlargest(5, "pnl")[["symbol", "entry_date", "exit_date", "ret", "pnl"]].astype(str).to_dict("records")
+        out["worst_trades"] = tr.nsmallest(5, "pnl")[["symbol", "entry_date", "exit_date", "ret", "pnl", "reason"]].astype(str).to_dict("records")
+    return out
+
+
 def main(signals_path: str, cache_path: str) -> int:
     sig = pd.read_csv(signals_path)
     with open(cache_path, "rb") as fh:          # written by backtest.py on this runner
@@ -62,9 +91,11 @@ def main(signals_path: str, cache_path: str) -> int:
             r = portfolio.simulate(sig, prices, bench, exit_rule=rule, start=start, end=end)
             runs[(name, label)] = r
             m = portfolio.metrics(r["equity"]["equity"], r["bench"], r["trades"])
+            inv = (1 - r["equity"]["cash"] / r["equity"]["equity"]).mean() * 100
             rows.append({"exit": name, "period": label, **{k: m.get(k) for k in (
-                "cagr_pct", "bench_cagr_pct", "max_drawdown_pct", "sharpe", "final_rs", "trades",
-                "win_pct", "avg_win_pct", "avg_loss_pct", "profit_factor", "avg_sessions")}})
+                "cagr_pct", "bench_cagr_pct", "max_drawdown_pct", "bench_max_drawdown_pct", "sharpe", "final_rs",
+                "trades", "win_pct", "avg_win_pct", "avg_loss_pct", "profit_factor", "avg_sessions")},
+                "invested_pct": round(float(inv), 1), "max_positions": int(r["equity"]["positions"].max())})
     tab = pd.DataFrame(rows)
     train = tab[tab["period"] == "2007-2018"].set_index("exit")
     test = tab[tab["period"] == "2019 on"].set_index("exit")
@@ -109,8 +140,11 @@ def main(signals_path: str, cache_path: str) -> int:
         lines += [f"### {cand}: how trades ended, 2019 on", "", md(why.reset_index()), ""]
     print("\n".join(lines))
     Path("reports").mkdir(exist_ok=True)
-    json.dump({"table": rows, "candidate": cand, "recommend": bool(beats), "deflated_sharpe": dsr},
+    json.dump({"table": rows, "candidate": cand, "recommend": bool(beats), "deflated_sharpe": dsr,
+               "years_beating_index": {n: years[n][:2] for n in exits.RULES}},
               open("reports/exit_study.json", "w"), indent=1, default=str)
+    json.dump({f"{n}|{p}": report_data(r) for (n, p), r in runs.items()},
+              open("reports/exit_study_data.json", "w"), default=str)
     return 0
 
 
