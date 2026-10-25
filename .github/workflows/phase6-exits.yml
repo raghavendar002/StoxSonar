@@ -1,0 +1,52 @@
+name: Phase 6 exit study
+
+# Replays v0.2 on NSE files from 2006, then trades its signals with six exits
+# in fresh Rs 1 lakh accounts (research/exit_study.py).
+on:
+  push:
+    branches: [claude/phase6-exits]
+    paths: [sonar/**, backtest.py, research/exit_study.py, .github/workflows/phase6-exits.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: phase6-exits
+  cancel-in-progress: true
+
+jobs:
+  exits:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: python -m pytest -q tests
+      - uses: actions/cache/restore@v4
+        with:
+          path: cache/nse_panel.pkl
+          key: nse-panel-v2-${{ github.run_id }}
+          restore-keys: nse-panel-v2-
+      - name: Replay v0.2 on NSE files from 2006
+        run: python backtest.py --source nse --start 2006-01-01 --windows 18 --out reports/nse_full
+      - uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: cache/nse_panel.pkl
+          key: nse-panel-v2-${{ github.run_id }}
+      - name: Run the exit study
+        run: |
+          python research/exit_study.py reports/nse_full/backtest_signals.csv.gz cache/nse_panel.pkl > reports/exit_study.md
+          cat reports/exit_study.md
+      - name: Commit the report
+        run: |
+          git config user.name "stoxsonar-bot"
+          git config user.email "stoxsonar-bot@users.noreply.github.com"
+          git add reports/exit_study.md reports/exit_study.json
+          git commit --quiet -m "Phase 6 exit study report $(date -u +%F)"
+          git push --quiet origin HEAD:claude/phase6-exits
