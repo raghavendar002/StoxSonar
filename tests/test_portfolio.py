@@ -89,3 +89,11 @@ def test_fixed_fraction_sizing_and_risk_pct():
     q = lambda **k: portfolio.simulate(sig, {"AAA.NS": f}, f["Close"], **k)["trades"]["qty"].iloc[0]
     assert q(fixed_frac=0.10) == 100              # 10% of Rs 1 lakh at Rs 100
     assert q(risk_pct=0.01) == 2 * q()            # double the risk, double the size (within the 25% cap)
+
+
+def test_liquid_fund_earns_its_rate_on_idle_cash():
+    f, sig = _flat_with_signal(253)
+    cash = portfolio.simulate(sig, {"AAA.NS": f}, f["Close"])
+    liq = portfolio.simulate(sig, {"AAA.NS": f}, f["Close"], idle="liquid")
+    gain = liq["equity"]["equity"].iloc[-1] / cash["equity"]["equity"].iloc[-1] - 1
+    assert 0.04 < gain < portfolio.LIQUID_RATE + 0.002     # daily compounding

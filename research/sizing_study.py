@@ -8,9 +8,10 @@ entries, each run from a fresh Rs 1 lakh with full costs:
   exit     v02 (today), sma50, chandelier (the two best in PR 6)
   sizing   risk 0.5%, 0.75% or 1% of equity to the stop, or a fixed 10% of
            equity per stock (25% cap per stock throughout)
-  idle     cash (earns nothing), etf (always in the index), etf_trend (in the
-           index only while it closes above its 200-day average)
-36 variants, each on 2007-2018 and on 2019 on. Leverage is not tested: it only
+  idle     cash (earns nothing), liquid (a liquid fund at a flat 5.5% a year),
+           etf (always in the index), etf_trend (in the index only while it
+           closes above its 200-day average)
+48 variants, each on 2007-2018 and on 2019 on. Leverage is not tested: it only
 matters once the account is fully invested, which no variant here is on average.
 
 Decision rule, fixed before the first run:
@@ -19,7 +20,7 @@ Decision rule, fixed before the first run:
      plan's whole bar: CAGR at least 5 points over the Nifty 500, maximum
      drawdown under 25%, beating the index in at least 5 of 7 full years, and a
      deflated Sharpe of its monthly return over the index of at least 0.95,
-     counting all 36 variants as trials.
+     counting all 48 variants as trials.
   3. Every variant is listed with its CAGR and drawdown in both periods, so
      the trade between return and risk is visible.
 The index is a price index without dividends, which understates both the

@@ -44,7 +44,8 @@ SLIPPAGE = ((50e7, 0.0005), (10e7, 0.0010), (1e7, 0.0025), (0, 0.0050))
 ETF_FEE = 0.001
 ETF_SWITCH = 0.0005
 TREND_DAYS = 200             # "etf_trend" holds the ETF only while the index closes above this average
-IDLE = ("cash", "etf", "etf_trend")
+LIQUID_RATE = 0.055          # "liquid": a liquid/overnight fund, net of fees; a flat assumption (RBI rates ran ~3.5-8%)
+IDLE = ("cash", "liquid", "etf", "etf_trend")
 
 
 def slippage(traded_value: float) -> float:
@@ -118,7 +119,7 @@ def simulate(signals: pd.DataFrame, prices: Dict[str, pd.DataFrame], bench: pd.S
     fixed_frac, that share of equity per stock (the stop still applies). idle:
     "cash" earns nothing; "etf" keeps uninvested money in the benchmark index;
     "etf_trend" does so only while the index closed above its TREND_DAYS average
-    the day before. Index returns are price only (no dividends), so this
+    the day before; "liquid" earns LIQUID_RATE a year. Index returns are price only (no dividends), so this
     understates the ETF by its dividend yield."""
     assert idle in IDLE
     sig = signals[signals.apply(entry_filter, axis=1)].copy()
@@ -223,6 +224,8 @@ def simulate(signals: pd.DataFrame, prices: Dict[str, pd.DataFrame], bench: pd.S
         b = bench.get(day)
         if in_etf and prev_b and b == b:
             cash *= (b / prev_b) * (1 - ETF_FEE / 252)
+        elif idle == "liquid":
+            cash *= 1 + LIQUID_RATE / 252
         prev_b = b if b == b else prev_b
         if idle == "etf_trend" and bool(trend.get(day, False)) != in_etf:
             etf_costs += cash * ETF_SWITCH

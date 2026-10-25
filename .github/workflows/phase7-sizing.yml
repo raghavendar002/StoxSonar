@@ -1,6 +1,6 @@
 name: Phase 7 sizing study
 
-# Replays v0.2 on NSE files from 2006, then trades its signals with 36 sizing,
+# Replays v0.2 on NSE files from 2006, then trades its signals with 48 sizing,
 # idle-cash and exit variants (research/sizing_study.py).
 on:
   push:
