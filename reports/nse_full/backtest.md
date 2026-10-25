@@ -2,7 +2,7 @@
 
 Data to 2026-10-23. Benchmark: ^CRSLDX from 2005-09-26; ^BSESN before 2005-09-26. 4639 of 4639 stocks that traded on NSE since --start had price data; the earliest starts 2006-01-02.
 
-**Source: NSE daily files.** Every stock that traded on each day is included, also those later delisted or merged, so there is no survivorship bias. Prices are adjusted for splits and bonuses from NSE's own previous-close figures.
+**Source: NSE daily files.** Every stock that traded on each day is included, also those later delisted or merged, so there is no survivorship bias. Splits and bonuses are inferred from overnight gaps and back-adjusted (sonar/nse.py); dividends are not.
 
 Excess = stock return minus benchmark return over the same 21 sessions after the signal. R = 21-session move divided by the distance to the failure level.
 
