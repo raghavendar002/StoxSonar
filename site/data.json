@@ -1,15 +1,15 @@
 {
- "as_of": "2026-10-28",
+ "as_of": "2026-10-29",
  "engine_version": "0.2.0",
  "site_url": "https://raghavendar002.github.io/StoxSonar/",
  "regime": "Weak",
  "buys_allowed": false,
  "benchmark_above_rising_sma200": false,
- "stocks": 1330,
+ "stocks": 1324,
  "breadth": {
-  "Basing": 12.0,
-  "Advancing": 47.0,
-  "Topping": 11.3,
+  "Basing": 12.1,
+  "Advancing": 46.9,
+  "Topping": 11.2,
   "Declining": 29.8
  },
  "breakouts": [],
@@ -22,7 +22,7 @@
    "trigger_date": "2026-10-26",
    "stage": 4,
    "stage_now": 4,
-   "stage_age": 11,
+   "stage_age": 12,
    "template": 2,
    "rs_rank": 45,
    "base_len": 26,
@@ -31,8 +31,8 @@
    "status": "Active",
    "score": null,
    "stop_pct": 9.0,
-   "sessions": 2,
-   "move_pct": -0.6,
+   "sessions": 3,
+   "move_pct": -1.2,
    "source": "live",
    "plan": null
   },
@@ -43,7 +43,7 @@
    "trigger_date": "2026-10-21",
    "stage": 3,
    "stage_now": 3,
-   "stage_age": 99,
+   "stage_age": 100,
    "template": 1,
    "rs_rank": 34,
    "base_len": 23,
@@ -52,8 +52,8 @@
    "status": "Active",
    "score": null,
    "stop_pct": 8.3,
-   "sessions": 5,
-   "move_pct": -1.0,
+   "sessions": 6,
+   "move_pct": -0.1,
    "source": "replay",
    "plan": null
   },
@@ -64,7 +64,7 @@
    "trigger_date": "2026-10-19",
    "stage": 3,
    "stage_now": 3,
-   "stage_age": 82,
+   "stage_age": 83,
    "template": 1,
    "rs_rank": 36,
    "base_len": 47,
@@ -73,8 +73,8 @@
    "status": "Active",
    "score": null,
    "stop_pct": 8.3,
-   "sessions": 6,
-   "move_pct": 5.3,
+   "sessions": 7,
+   "move_pct": 2.6,
    "source": "replay",
    "plan": null
   }
@@ -107,7 +107,7 @@
   },
   {
    "grade": "C",
-   "signals": 1,
+   "signals": 4,
    "closed": 0,
    "confirmed_pct": null,
    "failed_pct": null,
@@ -171,7 +171,7 @@
   },
   {
    "grade": "B",
-   "signals": 0,
+   "signals": 1,
    "closed": 0,
    "confirmed_pct": null,
    "failed_pct": null,
@@ -183,7 +183,7 @@
   },
   {
    "grade": "C",
-   "signals": 1,
+   "signals": 3,
    "closed": 0,
    "confirmed_pct": null,
    "failed_pct": null,
@@ -194,5 +194,5 @@
    "avg_r_21": null
   }
  ],
- "live_signals": 2
+ "live_signals": 7
 }
