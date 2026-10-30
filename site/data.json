@@ -1,19 +1,41 @@
 {
- "as_of": "2026-10-29",
+ "as_of": "2026-10-30",
  "engine_version": "0.2.0",
  "site_url": "https://raghavendar002.github.io/StoxSonar/",
  "regime": "Weak",
  "buys_allowed": false,
  "benchmark_above_rising_sma200": false,
- "stocks": 1324,
+ "stocks": 1318,
  "breadth": {
   "Basing": 12.1,
-  "Advancing": 46.9,
+  "Advancing": 47.0,
   "Topping": 11.2,
-  "Declining": 29.8
+  "Declining": 29.7
  },
  "breakouts": [],
- "breakdowns": [],
+ "breakdowns": [
+  {
+   "symbol": "INTELLECT",
+   "grade": "B",
+   "direction": "down",
+   "trigger_date": "2026-10-30",
+   "stage": 4,
+   "stage_now": 4,
+   "stage_age": 190,
+   "template": 0,
+   "rs_rank": 6,
+   "base_len": 15,
+   "depth_pct": 15.9,
+   "vol_ratio": 8.6,
+   "status": "Extended",
+   "score": null,
+   "stop_pct": 15.1,
+   "sessions": 0,
+   "move_pct": 0.0,
+   "source": "live",
+   "plan": null
+  }
+ ],
  "open_signals": [
   {
    "symbol": "SUPREMEIND",
@@ -22,7 +44,7 @@
    "trigger_date": "2026-10-26",
    "stage": 4,
    "stage_now": 4,
-   "stage_age": 12,
+   "stage_age": 13,
    "template": 2,
    "rs_rank": 45,
    "base_len": 26,
@@ -31,8 +53,8 @@
    "status": "Active",
    "score": null,
    "stop_pct": 9.0,
-   "sessions": 3,
-   "move_pct": -1.2,
+   "sessions": 4,
+   "move_pct": -3.1,
    "source": "live",
    "plan": null
   },
@@ -43,7 +65,7 @@
    "trigger_date": "2026-10-21",
    "stage": 3,
    "stage_now": 3,
-   "stage_age": 100,
+   "stage_age": 101,
    "template": 1,
    "rs_rank": 34,
    "base_len": 23,
@@ -52,8 +74,8 @@
    "status": "Active",
    "score": null,
    "stop_pct": 8.3,
-   "sessions": 6,
-   "move_pct": -0.1,
+   "sessions": 7,
+   "move_pct": -1.9,
    "source": "replay",
    "plan": null
   },
@@ -64,7 +86,7 @@
    "trigger_date": "2026-10-19",
    "stage": 3,
    "stage_now": 3,
-   "stage_age": 83,
+   "stage_age": 84,
    "template": 1,
    "rs_rank": 36,
    "base_len": 47,
@@ -73,8 +95,8 @@
    "status": "Active",
    "score": null,
    "stop_pct": 8.3,
-   "sessions": 7,
-   "move_pct": 2.6,
+   "sessions": 8,
+   "move_pct": 0.8,
    "source": "replay",
    "plan": null
   }
@@ -137,11 +159,11 @@
    "closed": 126,
    "confirmed_pct": 60.3,
    "failed_pct": 15.1,
-   "measured_21": 118,
-   "avg_excess_21_pct": 0.2,
-   "median_excess_21_pct": -2.4,
-   "win_pct_21": 44.9,
-   "avg_r_21": -0.1
+   "measured_21": 119,
+   "avg_excess_21_pct": 0.3,
+   "median_excess_21_pct": -2.3,
+   "win_pct_21": 45.4,
+   "avg_r_21": -0.09
   },
   {
    "grade": "C",
@@ -149,10 +171,10 @@
    "closed": 390,
    "confirmed_pct": 47.4,
    "failed_pct": 16.9,
-   "measured_21": 381,
+   "measured_21": 382,
    "avg_excess_21_pct": -0.3,
    "median_excess_21_pct": -1.6,
-   "win_pct_21": 42.8,
+   "win_pct_21": 42.7,
    "avg_r_21": -0.07
   }
  ],
@@ -194,5 +216,5 @@
    "avg_r_21": null
   }
  ],
- "live_signals": 7
+ "live_signals": 10
 }
