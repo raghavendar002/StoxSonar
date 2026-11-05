@@ -1,18 +1,41 @@
 {
- "as_of": "2026-11-04",
+ "as_of": "2026-11-05",
  "engine_version": "0.2.0",
  "site_url": "https://raghavendar002.github.io/StoxSonar/",
  "regime": "Weak",
  "buys_allowed": false,
  "benchmark_above_rising_sma200": false,
- "stocks": 1323,
+ "stocks": 1325,
  "breadth": {
   "Basing": 12.2,
-  "Advancing": 46.6,
+  "Advancing": 46.7,
   "Topping": 11.9,
-  "Declining": 29.4
+  "Declining": 29.2
  },
- "breakouts": [
+ "breakouts": [],
+ "breakdowns": [],
+ "open_signals": [
+  {
+   "symbol": "GPTINFRA",
+   "grade": "A",
+   "direction": "down",
+   "trigger_date": "2026-11-04",
+   "stage": 3,
+   "stage_now": 3,
+   "stage_age": 24,
+   "template": 2,
+   "rs_rank": 44,
+   "base_len": 42,
+   "depth_pct": 26.8,
+   "vol_ratio": 2.3,
+   "status": "Active",
+   "score": null,
+   "stop_pct": 12.7,
+   "sessions": 1,
+   "move_pct": 6.1,
+   "source": "live",
+   "plan": null
+  },
   {
    "symbol": "CNL",
    "grade": "B",
@@ -20,7 +43,7 @@
    "trigger_date": "2026-11-04",
    "stage": 2,
    "stage_now": 2,
-   "stage_age": 78,
+   "stage_age": 79,
    "template": 8,
    "rs_rank": 96,
    "base_len": 44,
@@ -29,8 +52,8 @@
    "status": "Active",
    "score": 1.12,
    "stop_pct": -17.9,
-   "sessions": 0,
-   "move_pct": 0.0,
+   "sessions": 1,
+   "move_pct": 0.1,
    "source": "live",
    "plan": {
     "qty": 2,
@@ -51,17 +74,17 @@
    "trigger_date": "2026-11-04",
    "stage": 2,
    "stage_now": 2,
-   "stage_age": 101,
+   "stage_age": 102,
    "template": 8,
    "rs_rank": 95,
    "base_len": 28,
    "depth_pct": 26.4,
    "vol_ratio": 19.5,
-   "status": "Extended",
+   "status": "Active",
    "score": 1.08,
    "stop_pct": -11.8,
-   "sessions": 0,
-   "move_pct": 0.0,
+   "sessions": 1,
+   "move_pct": -4.6,
    "source": "live",
    "plan": {
     "qty": 8,
@@ -82,7 +105,7 @@
    "trigger_date": "2026-11-04",
    "stage": 2,
    "stage_now": 2,
-   "stage_age": 84,
+   "stage_age": 85,
    "template": 8,
    "rs_rank": 92,
    "base_len": 62,
@@ -91,8 +114,8 @@
    "status": "Extended",
    "score": 1.28,
    "stop_pct": -9.8,
-   "sessions": 0,
-   "move_pct": 0.0,
+   "sessions": 1,
+   "move_pct": -0.7,
    "source": "live",
    "plan": {
     "qty": 7,
@@ -105,32 +128,7 @@
     "stop_pct": -9.8,
     "exit_by": "2026-12-03"
    }
-  }
- ],
- "breakdowns": [
-  {
-   "symbol": "GPTINFRA",
-   "grade": "A",
-   "direction": "down",
-   "trigger_date": "2026-11-04",
-   "stage": 3,
-   "stage_now": 3,
-   "stage_age": 23,
-   "template": 2,
-   "rs_rank": 44,
-   "base_len": 42,
-   "depth_pct": 26.8,
-   "vol_ratio": 2.3,
-   "status": "Active",
-   "score": null,
-   "stop_pct": 12.7,
-   "sessions": 0,
-   "move_pct": 0.0,
-   "source": "live",
-   "plan": null
-  }
- ],
- "open_signals": [
+  },
   {
    "symbol": "WELSPUNLIV",
    "grade": "B",
@@ -138,17 +136,17 @@
    "trigger_date": "2026-11-03",
    "stage": 2,
    "stage_now": 2,
-   "stage_age": 99,
+   "stage_age": 100,
    "template": 8,
    "rs_rank": 97,
    "base_len": 18,
    "depth_pct": 19.9,
    "vol_ratio": 7.0,
-   "status": "Extended",
+   "status": "Active",
    "score": 0.83,
    "stop_pct": -13.0,
-   "sessions": 1,
-   "move_pct": 4.5,
+   "sessions": 2,
+   "move_pct": 0.1,
    "source": "live",
    "plan": {
     "qty": 15,
@@ -169,7 +167,7 @@
    "trigger_date": "2026-11-02",
    "stage": 4,
    "stage_now": 4,
-   "stage_age": 143,
+   "stage_age": 144,
    "template": 0,
    "rs_rank": 11,
    "base_len": 20,
@@ -178,8 +176,8 @@
    "status": "Active",
    "score": null,
    "stop_pct": 8.5,
-   "sessions": 2,
-   "move_pct": 1.9,
+   "sessions": 3,
+   "move_pct": 1.5,
    "source": "live",
    "plan": null
   },
@@ -190,7 +188,7 @@
    "trigger_date": "2026-11-02",
    "stage": 4,
    "stage_now": 4,
-   "stage_age": 11,
+   "stage_age": 12,
    "template": 1,
    "rs_rank": 2,
    "base_len": 19,
@@ -199,8 +197,8 @@
    "status": "Active",
    "score": null,
    "stop_pct": 11.0,
-   "sessions": 2,
-   "move_pct": 3.7,
+   "sessions": 3,
+   "move_pct": 4.4,
    "source": "live",
    "plan": null
   },
@@ -211,7 +209,7 @@
    "trigger_date": "2026-10-30",
    "stage": 4,
    "stage_now": 4,
-   "stage_age": 193,
+   "stage_age": 194,
    "template": 0,
    "rs_rank": 6,
    "base_len": 15,
@@ -220,8 +218,8 @@
    "status": "Extended",
    "score": null,
    "stop_pct": 15.1,
-   "sessions": 3,
-   "move_pct": 5.0,
+   "sessions": 4,
+   "move_pct": 6.0,
    "source": "live",
    "plan": null
   },
@@ -232,7 +230,7 @@
    "trigger_date": "2026-10-26",
    "stage": 4,
    "stage_now": 4,
-   "stage_age": 16,
+   "stage_age": 17,
    "template": 2,
    "rs_rank": 45,
    "base_len": 26,
@@ -241,8 +239,8 @@
    "status": "Active",
    "score": null,
    "stop_pct": 9.0,
-   "sessions": 7,
-   "move_pct": 3.2,
+   "sessions": 8,
+   "move_pct": 1.3,
    "source": "live",
    "plan": null
   }
@@ -275,7 +273,7 @@
   },
   {
    "grade": "C",
-   "signals": 6,
+   "signals": 12,
    "closed": 0,
    "confirmed_pct": null,
    "failed_pct": null,
@@ -317,10 +315,10 @@
    "closed": 392,
    "confirmed_pct": 47.4,
    "failed_pct": 16.8,
-   "measured_21": 382,
+   "measured_21": 383,
    "avg_excess_21_pct": -0.3,
    "median_excess_21_pct": -1.6,
-   "win_pct_21": 42.7,
+   "win_pct_21": 42.6,
    "avg_r_21": -0.07
   }
  ],
@@ -339,7 +337,7 @@
   },
   {
    "grade": "B",
-   "signals": 1,
+   "signals": 3,
    "closed": 0,
    "confirmed_pct": null,
    "failed_pct": null,
@@ -351,7 +349,7 @@
   },
   {
    "grade": "C",
-   "signals": 9,
+   "signals": 13,
    "closed": 0,
    "confirmed_pct": null,
    "failed_pct": null,
@@ -362,5 +360,5 @@
    "avg_r_21": null
   }
  ],
- "live_signals": 21
+ "live_signals": 27
 }
