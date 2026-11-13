@@ -256,6 +256,28 @@ border-radius:10px;padding:12px 16px;margin:16px 0}.today p{margin:6px 0}
 """
 
 
+BOOK_NAMES = {"raw": "Raw v0.2", "twin": "Twin (every pick)", "judge": "Judge"}
+
+
+def _books_section(rows) -> str:
+    if not rows:
+        return ""
+    body = "".join(
+        f"<tr><td>{_e(BOOK_NAMES.get(r['book'], r['book']))}</td>"
+        f"<td>{'Long' if r['direction'] == 'up' else 'Shadow short'}</td><td>{r['picks']}</td>"
+        f"<td>{r['closed']}</td><td>{r['open']}</td><td>{_v(r['avg_r'], 'R')}</td><td>{_v(r['median_r'], 'R')}</td>"
+        f"<td>{_v(r['win_pct'], '%')}</td><td>{_v(r['avg_excess_pct'], '%')}</td></tr>" for r in rows)
+    return (
+        "<h2>Mid-term books (paper)</h2>"
+        "<p class=\"note\">Every candidate is turned into a paper trade with fixed rules: buy at the next open, "
+        "exit at the stop, the target or the close 21 sessions later, after costs. <b>Raw</b> trades as v0.2 "
+        "suggests today; <b>Twin</b> takes every breakout (C grades too) and every A/B breakdown as a shadow "
+        "short, with no market filter. The Judge's book joins once its debates start. "
+        "<a href=\"books.csv\">Every pick</a>.</p>"
+        "<table><thead><tr><th>Book</th><th>Side</th><th>Picks</th><th>Closed</th><th>Open</th><th>Avg R</th>"
+        f"<th>Median R</th><th>Wins</th><th>Vs index</th></tr></thead><tbody>{body}</tbody></table>")
+
+
 def render_html(s: dict) -> str:
     colors = {"Basing": "var(--s1)", "Advancing": "var(--s2)", "Topping": "var(--s3)", "Declining": "var(--s4)"}
     bar = "".join(f'<span style="width:{v}%;background:{colors[k]}" title="{k} {v}%"></span>'
@@ -287,6 +309,8 @@ def render_html(s: dict) -> str:
 
 <h2>Track record (live)</h2>
 {_record_table(s['track_record_live'], live_note)}
+
+{_books_section(s.get('books') or [])}
 
 <h2>Backtest replay</h2>
 {_record_table(s['track_record_replay'], 'The same rules replayed over past data before the live record began. Treat it as a hint, not proof.')}
@@ -339,9 +363,38 @@ def telegram_text(s: dict) -> str:
     if s["closed_today"]:
         lines += ["", "Closed today"] + [f"{r['grade']} · {r['symbol']} {r['status']} ({r['move_pct']:+.1f}%)"
                                          for r in s["closed_today"]]
+    book_lines = books_lines(s.get("books") or [])
+    if book_lines:
+        lines += ["", "Mid-term paper books (after costs)"] + book_lines
     if s.get("site_url"):
         lines += ["", f"Full list and track record: {s['site_url']}"]
     lines += ["", "Rule-based screen output, not investment advice."]
+    return "\n".join(lines)
+
+
+def books_lines(rows) -> list:
+    out = []
+    for r in rows:
+        if not r["closed"]:
+            continue
+        side = "longs" if r["direction"] == "up" else "shadow shorts"
+        out.append(f"{BOOK_NAMES.get(r['book'], r['book'])} {side}: {r['closed']} closed, "
+                   f"avg {r['avg_r']:+.2f}R, wins {r['win_pct']:.0f}% · {r['open']} open")
+    return out
+
+
+def us_telegram_text(events: pd.DataFrame, as_of: str, book_rows) -> str:
+    """One short message for the US shadow list: logged and scored, never suggested."""
+    today = events[(events["trigger_date"] == as_of) & (events["source"] == "live")]
+    ups = today[(today["direction"] == "up") & today["grade"].isin(["A", "B"])]
+    downs = today[(today["direction"] == "down") & today["grade"].isin(["A", "B"])]
+    lines = [f"StoxSonar · US shadow list (S&P 500) · close {as_of}",
+             "Logged and scored only. No suggestions: grade cut-offs are still NSE's until refitted.", ""]
+    lines.append(f"Breakouts A/B: {', '.join(f'{r.grade} {r.symbol}' for r in ups.itertuples()) or 'none'}")
+    lines.append(f"Breakdowns A/B (shadow shorts): {', '.join(f'{r.grade} {r.symbol}' for r in downs.itertuples()) or 'none'}")
+    bl = books_lines(book_rows or [])
+    if bl:
+        lines += ["", "Paper books (after costs)"] + bl
     return "\n".join(lines)
 
 

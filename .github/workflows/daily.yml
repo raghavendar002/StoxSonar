@@ -49,15 +49,26 @@ jobs:
           --mode "${{ github.event.inputs.mode || 'daily' }}"
           --site-url "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
           ${{ (github.event.inputs.mode || 'daily') == 'daily' && '--telegram' || '' }}
+      # US shadow list (S&P 500): logged and scored, no page. The US close
+      # lands around 02:30 IST, so only the morning attempts find a new session;
+      # every other attempt exits in seconds. It never blocks the NSE run.
+      - name: US shadow list
+        id: us
+        if: (github.event.inputs.mode || 'daily') == 'daily'
+        continue-on-error: true
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python run_daily.py --market US --telegram
       # The ledger and page are committed every day, so git history is a public,
       # timestamped record that no signal was added or changed after the fact.
       - name: Commit ledger and page
-        if: steps.run.outputs.published == 'true'
+        if: steps.run.outputs.published == 'true' || steps.us.outputs.published == 'true'
         run: |
           git config user.name "stoxsonar-bot"
           git config user.email "stoxsonar-bot@users.noreply.github.com"
-          git add ledger site
-          git diff --cached --quiet || git commit -m "Signals for ${{ steps.run.outputs.as_of }}"
+          git add ledger site universe/sp500.csv
+          git diff --cached --quiet || git commit -m "Signals for ${{ steps.run.outputs.as_of || steps.us.outputs.as_of }}"
           git pull --rebase origin main
           git push
       - uses: actions/upload-pages-artifact@v3

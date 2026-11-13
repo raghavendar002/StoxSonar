@@ -90,4 +90,9 @@ LIQUIDITY_MIN_VALUE = 1e7    # Rs 1 crore median daily traded value (20 sessions
 BENCHMARK = "^CRSLDX"        # Nifty 500 on Yahoo
 BENCHMARK_FALLBACK = "^NSEI"  # Nifty 50
 
+# Universe (US shadow list: S&P 500, logged and scored only, no page)
+US_BENCHMARK = "RSP"         # equal-weight S&P 500 ETF
+US_BENCHMARK_FALLBACK = "^GSPC"
+VIX = {"NSE": "^INDIAVIX", "US": "^VIX"}
+
 STAGE_NAMES = {1: "Basing", 2: "Advancing", 3: "Topping", 4: "Declining"}

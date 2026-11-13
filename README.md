@@ -14,6 +14,23 @@ The rules follow the StoxSonar Stock Segregation Rules Spec. This is a fresh, st
 
 The page shows no raw prices. Charts open on TradingView.
 
+## Mid-term paper books
+
+Every candidate also becomes a paper trade, scored by fixed rules on daily bars
+(`sonar/books.py`): buy at the next open, exit at the stop, a target if one is
+set, or the close 21 sessions later, after costs. Results are in R and against
+the index, in `mt_picks` in the ledger and `site/books.csv`.
+
+- **Raw v0.2**: Grade A/B breakouts as v0.2 suggests them (none in a Weak market).
+- **Twin**: every breakout (C grades too) and every A/B breakdown as a shadow
+  short, with no market filter: "take every pick".
+- **Judge** (next PR): the Bull/Bear/Judge debate's Go picks at its own levels.
+
+The numbers each debate will read are frozen on the signal day in `mt_facts`.
+A US shadow list (`--market US`, today's S&P 500) runs the same rules and books
+in the morning, with no page and no suggestions; its grade cut-offs are still
+NSE's until they are refitted on US data.
+
 ## Run it
 ```bash
 pip install -r requirements.txt
