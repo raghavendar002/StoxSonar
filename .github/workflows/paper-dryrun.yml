@@ -1,0 +1,30 @@
+name: Paper dry run (US)
+
+# Runs when paper/request.txt changes on a claude/ branch. The file holds
+# "scan" or "settle <YYYY-MM-DD>". Results are committed to paper/out/.
+on:
+  push:
+    branches: ["claude/**"]
+    paths: ["paper/request.txt"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pandas numpy yfinance
+      - run: python paper/us_dryrun.py $(cat paper/request.txt)
+      - run: |
+          git config user.name "stoxsonar-bot"
+          git config user.email "stoxsonar-bot@users.noreply.github.com"
+          git add paper/out
+          git diff --cached --quiet || git commit -m "Paper dry run: $(cat paper/request.txt)"
+          git push
