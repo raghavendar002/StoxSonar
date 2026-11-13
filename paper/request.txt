@@ -1,1 +1,1 @@
-scan
+settle --day 2026-11-13
