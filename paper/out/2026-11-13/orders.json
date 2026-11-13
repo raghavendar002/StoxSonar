@@ -1,0 +1,12 @@
+{
+ "decided_et": "2026-11-13 12:30:00-05:00",
+ "note": "Dry run. Judge played in-session by Claude (no API). Checkpoint moved to 12:15 ET because the request came mid-session; entries count only from 12:30 ET.",
+ "mechanical": [
+  {"sym": "SO",   "trigger": 94.34, "stop": 94.10, "target": 94.83, "latest_entry_et": "14:30", "cutoff_et": "15:50"},
+  {"sym": "SCHW", "trigger": 92.13, "stop": 91.91, "target": 92.55, "latest_entry_et": "14:30", "cutoff_et": "15:50"}
+ ],
+ "judge": [
+  {"sym": "SO",  "trigger": 94.52,  "stop": 94.05,  "target": 95.22,  "latest_entry_et": "14:30", "cutoff_et": "15:50", "conviction": 3},
+  {"sym": "LOW", "trigger": 228.10, "stop": 226.80, "target": 230.05, "latest_entry_et": "14:30", "cutoff_et": "15:50", "conviction": 2}
+ ]
+}
