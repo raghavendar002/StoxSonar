@@ -28,7 +28,7 @@ CUTOFF = "15:50"       # ET
 
 def bars(tickers, period, interval):
     df = yf.download(tickers, period=period, interval=interval, group_by="ticker",
-                     auto_adjust=False, progress=False, threads=True, prepost=False)
+                     auto_adjust=False, progress=False, threads=False, prepost=False)
     out = {}
     for t in tickers:
         try:
@@ -36,7 +36,10 @@ def bars(tickers, period, interval):
         except KeyError:
             continue
         if len(d):
-            d.index = d.index.tz_convert("America/New_York")
+            if d.index.tz is None:
+                d.index = d.index.tz_localize("America/New_York")
+            else:
+                d.index = d.index.tz_convert("America/New_York")
             out[t] = d
     return out
 
@@ -79,8 +82,6 @@ def scan(top=6):
                          dist_or_hi=last / or_hi - 1))
         packs[t] = td
     df = pd.DataFrame(rows)
-    if t in ("SPY", "QQQ"):
-        pass
     # long signal: strong opening volume and price at/above the opening-range high (within 0.3% below allowed)
     sig = df[(df.relvol >= 1.5) & (df.dist_or_hi >= -0.003) & (~df.sym.isin(["SPY", "QQQ"]))]
     sig = sig.sort_values("relvol", ascending=False).head(top)
