@@ -70,6 +70,7 @@ class Position:
     cost_in: float
     grade: str
     peak: float = 0.0
+    slip_in: float = 0.0       # Rs lost to slippage on the buy
     state: dict = field(default_factory=dict)
 
 
@@ -93,6 +94,15 @@ def default_entry_filter(sig) -> bool:
         not (C.NO_LONGS_WHEN_WEAK and sig.regime == "Weak")
 
 
+def _prep(f: pd.DataFrame) -> pd.DataFrame:
+    """Liquidity, and the averages exit rules read, from data up to each day only."""
+    c = f["Close"]
+    tr = pd.concat([f["High"] - f["Low"], (f["High"] - c.shift(1)).abs(),
+                    (f["Low"] - c.shift(1)).abs()], axis=1).max(axis=1)
+    return f.assign(tv=(c * f["Volume"]).rolling(20, min_periods=5).median(),
+                    sma50=c.rolling(50, min_periods=50).mean(), atr=tr.rolling(14).mean())
+
+
 def simulate(signals: pd.DataFrame, prices: Dict[str, pd.DataFrame], bench: pd.Series,
              capital: float = C.CAPITAL_RS, max_positions: Optional[int] = None,
              exit_rule: ExitRule = v02_exit, entry_filter=default_entry_filter,
@@ -105,8 +115,7 @@ def simulate(signals: pd.DataFrame, prices: Dict[str, pd.DataFrame], bench: pd.S
         sig = sig[sig["date"] <= pd.Timestamp(end)]
     sig = sig[sig["symbol"].isin(prices)].sort_values(["date", "score"], ascending=[True, False])
     by_day = {d: g for d, g in sig.groupby("date")}
-    frames = {s: prices[s].assign(tv=(prices[s]["Close"] * prices[s]["Volume"]).rolling(20, min_periods=5).median())
-              for s in sig["symbol"].unique()}
+    frames = {s: _prep(prices[s]) for s in sig["symbol"].unique()}
     pos_idx = {s: {d: i for i, d in enumerate(f.index)} for s, f in frames.items()}
 
     days = bench.index[(bench.index >= sig["date"].min())] if len(sig) else bench.index[:0]
@@ -140,7 +149,7 @@ def simulate(signals: pd.DataFrame, prices: Dict[str, pd.DataFrame], bench: pd.S
             sig_i = ix.get(s.date)
             due = (sig_i if sig_i is not None else i - 1) + C.HOLD_SESSIONS
             open_pos.append(Position(s.symbol, s.date, day, qty, fill, s.stop, due, cost, s.grade,
-                                     peak=fill))
+                                     peak=fill, slip_in=qty * (fill - o)))
         pending = []
         # 2. Exits during today's session
         still = []
@@ -160,17 +169,27 @@ def simulate(signals: pd.DataFrame, prices: Dict[str, pd.DataFrame], bench: pd.S
             if out is None:
                 still.append(p)
                 continue
-            px, why = out
+            px, why = out[0], out[1]
+            frac = out[2] if len(out) > 2 else 1.0     # a rule may sell part of the position
+            qty = p.qty if frac >= 1 else max(1, math.floor(p.qty * frac))
+            raw = px
             px *= 1 - slippage(f["tv"].iat[i - 1] if i else 0)
-            proceeds = p.qty * px
+            proceeds = qty * px
             cost = sell_cost(proceeds)
+            cost_in = p.cost_in * qty / p.qty
+            slip_in = p.slip_in * qty / p.qty
             cash += proceeds - cost
             trades.append(dict(symbol=p.symbol, grade=p.grade, signal=p.signal_date.date(),
-                               entry_date=p.entry_date.date(), exit_date=day.date(), qty=p.qty,
+                               entry_date=p.entry_date.date(), exit_date=day.date(), qty=qty,
                                entry=round(p.entry, 2), exit=round(px, 2), reason=why,
-                               pnl=round(proceeds - cost - p.qty * p.entry - p.cost_in, 2),
-                               ret=round((proceeds - cost) / (p.qty * p.entry + p.cost_in) - 1, 4),
-                               sessions=i - pos_idx[p.symbol][p.entry_date]))
+                               pnl=round(proceeds - cost - qty * p.entry - cost_in, 2),
+                               ret=round((proceeds - cost) / (qty * p.entry + cost_in) - 1, 4),
+                               sessions=i - pos_idx[p.symbol][p.entry_date],
+                               charges=round(cost + cost_in, 2), slippage=round(slip_in + qty * (raw - px), 2)))
+            if qty < p.qty:
+                p.qty, p.cost_in, p.slip_in = p.qty - qty, p.cost_in - cost_in, p.slip_in - slip_in
+                still.append(p)
+                continue
             last_close.pop(p.symbol, None)
         open_pos = still
         # 3. Mark to market at the close; queue today's signals for tomorrow's open
