@@ -66,3 +66,15 @@ jobs:
           path: site
       - uses: actions/deploy-pages@v4
         if: steps.run.outputs.published == 'true'
+      # Push alert to the StoxSonar app on your own devices (site/app/). Sent after
+      # the deploy so tapping it opens fresh data. Skips quietly until the
+      # VAPID_PRIVATE_KEY and PUSH_SUBS secrets exist; never fails the run.
+      - name: Push alert to the app
+        if: steps.run.outputs.published == 'true' && (github.event.inputs.mode || 'daily') == 'daily'
+        continue-on-error: true
+        env:
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+          PUSH_SUBS: ${{ secrets.PUSH_SUBS }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python -m sonar.push daily --site site
