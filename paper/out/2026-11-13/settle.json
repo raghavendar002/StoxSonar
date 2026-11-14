@@ -1,0 +1,53 @@
+{
+ "mechanical": {
+  "trades": [
+   {
+    "status": "closed",
+    "entry": 94.358868,
+    "entry_t": "2026-11-13 12:37:00-05:00",
+    "exit": 94.08118,
+    "exit_t": "2026-11-13 13:22:00-05:00",
+    "reason": "stop",
+    "sym": "SO",
+    "qty": 5.3,
+    "pnl": -1.47,
+    "r_mult": -1.16
+   },
+   {
+    "status": "closed",
+    "entry": 92.15842738952637,
+    "entry_t": "2026-11-13 12:30:00-05:00",
+    "exit": 92.53149305114746,
+    "exit_t": "2026-11-13 14:03:00-05:00",
+    "reason": "target",
+    "sym": "SCHW",
+    "qty": 5.4271,
+    "pnl": 2.02,
+    "r_mult": 1.7
+   }
+  ],
+  "end_cash": 1000.55
+ },
+ "judge": {
+  "trades": [
+   {
+    "status": "closed",
+    "entry": 94.53890399999999,
+    "entry_t": "2026-11-13 12:50:00-05:00",
+    "exit": 94.03119,
+    "exit_t": "2026-11-13 13:23:00-05:00",
+    "reason": "stop",
+    "sym": "SO",
+    "qty": 5.2899,
+    "pnl": -2.69,
+    "r_mult": -1.08
+   },
+   {
+    "status": "not_triggered",
+    "sym": "LOW",
+    "qty": 2.192
+   }
+  ],
+  "end_cash": 997.31
+ }
+}

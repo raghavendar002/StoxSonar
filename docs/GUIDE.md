@@ -60,7 +60,15 @@ GitHub's own schedule is best-effort and often starts the job hours late. To get
 
 ## The StoxSonar app on your iPhone and laptop (15 minutes, once)
 
-The app lives at `https://raghavendar002.github.io/StoxSonar/app/`. It shows the same data as the web page (Today, open Signals, the Record) and sends you an alert each evening after the NSE run. It is a web app you install, so there is no App Store and nothing to re-sign. The data is as public as the page; only the alerts are yours alone.
+The app lives at `https://raghavendar002.github.io/StoxSonar/app/`. It is one place for everything: switch between **India** and **US**, and between **Mid-term** and **Intraday**, at the top.
+
+- **Today:** the market mood and new signals (mid-term), or the day's scan with the Judge's result against the fixed-rule Twin (intraday).
+- **Trades:** open signals and paper books, or every intraday paper trade.
+- **Debates:** every Bull, Bear and Judge exchange. Tap one for the chart with both books' levels, each side's argument, the Judge's ruling and what then happened.
+- **Simulator:** pick one of the last four weeks and a starting amount and replay it. It starts the `replay.yml` workflow on GitHub, which needs a token you save under More, then Simulator access (fine-grained, this repository only, Actions read and write). The replay engine is a separate piece; until it is merged the buttons stay off.
+- **More:** alerts, simulator access, light or dark, the track record.
+
+Screens fill in as their data starts: debates need the `ANTHROPIC_API_KEY` secret, and India intraday needs its scanner. The app reads `site/app/feed/*.json`, written by `python -m sonar.appfeed` at the end of each run. It also sends you an alert each evening after the NSE run. It is a web app you install, so there is no App Store and nothing to re-sign. The data is as public as the page; only the alerts are yours alone.
 
 **1. Give GitHub the signing key (once).** Open the file `app-setup/VAPID_PRIVATE_KEY.txt` in the project's files. In the repository go to Settings, then Secrets and variables, then Actions, then New repository secret. Name it `VAPID_PRIVATE_KEY` and paste the one line from that file. Then delete the file. The matching public key is already in `site/app/vapid.json`; if you ever replace one, replace both and every device must turn alerts on again.
 
