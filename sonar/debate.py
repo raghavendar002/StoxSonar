@@ -85,8 +85,8 @@ VERDICT_SCHEMA = {
     "type": "object",
     "properties": {
         "verdict": {"type": "string", "enum": ["Go", "Wait", "Avoid"]},
-        "conviction": {"type": "integer", "enum": [1, 2, 3, 4, 5]},
-        "horizon_sessions": {"type": "integer", "enum": [21, 63]},
+        "conviction": {"type": "integer", "description": "1 (barely) to 5 (very sure)"},
+        "horizon_sessions": {"type": "integer", "description": "21 for about one month, 63 for two to three"},
         "entry_low": {"type": "number"},
         "entry_high": {"type": "number"},
         "stop": {"type": "number"},
@@ -268,6 +268,8 @@ def debate_one(facts: dict, lessons: List[str], call: Caller = api_call) -> dict
     judge = call(C.DEBATE_MODEL_JUDGE, shared,
                  f"{head}BULL'S CASE\n{bull.text}\n\nBEAR'S CASE\n{bear.text}\n\n{JUDGE}", "high", VERDICT_SCHEMA)
     v = json.loads(judge.text)
+    v["conviction"] = min(5, max(1, int(v["conviction"])))
+    v["horizon_sessions"] = 63 if int(v["horizon_sessions"]) > 42 else 21
     parts = (bull, bear, judge)
     return dict(bull=bull.text, bear=bear.text, verdict=v,
                 input_tokens=sum(p.input_tokens for p in parts),

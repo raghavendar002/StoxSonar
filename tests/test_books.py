@@ -117,7 +117,7 @@ def test_fact_pack_holds_only_what_was_known_on_the_signal_day():
     df = uptrend_with_base_and_breakout()
     f = engine.compute_features(df, rising_bench(df.index))
     sd = str(f.index[260].date())
-    ev = dict(symbol="X.NS", direction="up", trigger_date=sd, grade="A", score=1.0, stage=2, template=8,
+    ev = dict(symbol="X.NS", direction="up", trigger_date=sd, grade="A", score=1.0, stage="2", template="8",
               rs_rank=90.0, mansfield=5.0, pivot=200.5, base_len=60, depth=0.1, vol_ratio=3.0,
               entry=212.0, stop=200.0, regime="Healthy")
     fp = books.fact_pack(ev, f, None, 14.2)
@@ -125,3 +125,4 @@ def test_fact_pack_holds_only_what_was_known_on_the_signal_day():
     assert len(fp["weekly_bars"]) <= 52 and fp["weekly_bars"][-1][0] <= sd
     assert fp["market"]["vix"] == 14.2 and fp["v02"]["plan"]["stop"] == 200.0
     assert fp["indicators"]["dist_sma200"] > 0
+    assert fp["v02"]["stage"] == 2 and fp["v02"]["stage_name"] == "Advancing" and fp["v02"]["template"] == 8

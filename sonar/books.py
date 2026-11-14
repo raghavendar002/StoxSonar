@@ -255,6 +255,14 @@ def _r(x, nd=4):
     return None if x is None or (isinstance(x, float) and not math.isfinite(x)) or pd.isna(x) else round(float(x), nd)
 
 
+def _int(x):
+    """The ledger stores some whole numbers as text; give them back as ints."""
+    try:
+        return None if x is None or pd.isna(x) else int(float(x))
+    except (TypeError, ValueError):
+        return None
+
+
 def sector_stats(states: pd.DataFrame, prices: Dict[str, pd.DataFrame], sectors: Dict[str, str],
                  as_of: str) -> Dict[str, dict]:
     """Per sector on `as_of`, from our own prices: how many liquid members,
@@ -302,11 +310,11 @@ def fact_pack(ev: dict, f: pd.DataFrame, regime_row: Optional[pd.Series] = None,
     plan = trade_plan(ev["entry"], ev["stop"], ev["trigger_date"]) if ev["direction"] == "up" else None
     return dict(
         symbol=ev["symbol"], direction=ev["direction"], signal_date=ev["trigger_date"],
-        v02=dict(grade=ev["grade"], score=ev.get("score"), stage=ev["stage"],
-                 stage_name=C.STAGE_NAMES.get(ev["stage"]), template=ev.get("template"),
-                 rs_rank=ev.get("rs_rank"), mansfield=ev.get("mansfield"), pivot=ev["pivot"],
-                 base_len=ev.get("base_len"), depth=ev.get("depth"), vol_ratio=ev.get("vol_ratio"),
-                 entry=ev["entry"], stop=ev["stop"], hold_sessions=C.HOLD_SESSIONS, plan=plan),
+        v02=dict(grade=ev["grade"], score=_r(ev.get("score"), 3), stage=_int(ev.get("stage")),
+                 stage_name=C.STAGE_NAMES.get(_int(ev.get("stage"))), template=_int(ev.get("template")),
+                 rs_rank=_r(ev.get("rs_rank"), 1), mansfield=_r(ev.get("mansfield"), 2), pivot=_r(ev["pivot"], 2),
+                 base_len=_int(ev.get("base_len")), depth=_r(ev.get("depth")), vol_ratio=_r(ev.get("vol_ratio"), 2),
+                 entry=_r(ev["entry"], 2), stop=_r(ev["stop"], 2), hold_sessions=C.HOLD_SESSIONS, plan=plan),
         indicators=dict(close=_r(row.Close, 2), atr_pct=_r(row.atr_pct),
                         dist_sma50=_r(row.Close / row.sma50 - 1), dist_sma200=_r(row.Close / row.sma200 - 1),
                         from_hi52=_r(row.Close / row.hi52 - 1), from_lo52=_r(row.Close / row.lo52 - 1),
