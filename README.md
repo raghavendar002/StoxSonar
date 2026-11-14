@@ -24,12 +24,33 @@ the index, in `mt_picks` in the ledger and `site/books.csv`.
 - **Raw v0.2**: Grade A/B breakouts as v0.2 suggests them (none in a Weak market).
 - **Twin**: every breakout (C grades too) and every A/B breakdown as a shadow
   short, with no market filter: "take every pick".
-- **Judge** (next PR): the Bull/Bear/Judge debate's Go picks at its own levels.
+- **Debated**: every stock the Judge ruled on, whatever the verdict, at the
+  Judge's levels. This is how Go, Wait and Avoid are each scored.
+- **Judge**: only what the Judge would trade: Go picks, and Wait picks from the
+  day their condition is met.
 
-The numbers each debate will read are frozen on the signal day in `mt_facts`.
+The numbers each debate reads are frozen on the signal day in `mt_facts`.
 A US shadow list (`--market US`, today's S&P 500) runs the same rules and books
-in the morning, with no page and no suggestions; its grade cut-offs are still
-NSE's until they are refitted on US data.
+in the morning, with no page, no debates and no suggestions; its grade cut-offs
+are still NSE's until they are refitted on US data.
+
+## Bull / Bear / Judge (experimental)
+
+After the day's signals have gone out, each Grade A/B breakout or breakdown
+(three a day at most) is argued by a Bull and a Bear and ruled on by a Judge
+(`sonar/debate.py`): Go, Wait or Avoid, with an entry zone, stop, target and a
+description of how the stock is moving. Code checks the Judge's levels and
+falls back to v0.2's stop when they break the rules. A Wait carries one
+condition that code checks after each close for up to 10 sessions, with no
+further model call. Breakdowns are shadow shorts: scored, never traded.
+
+- It runs only when the `ANTHROPIC_API_KEY` repository secret is set.
+- Spend is metered from the API's token counts and capped at
+  `DEBATE_MONTHLY_CAP_USD` (6) a month; past the cap, debates stop and the
+  books keep scoring.
+- Debates go out as a second Telegram message and to `site/debates.html`.
+- v0.2 has not passed its test, so treat every verdict as a logged experiment.
+  The Judge is kept only if, at 100 judged picks, Go beats Avoid after costs.
 
 ## Run it
 ```bash

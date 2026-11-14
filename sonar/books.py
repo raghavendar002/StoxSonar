@@ -1,11 +1,16 @@
 """Mid-term books: every candidate signal turned into a paper trade and scored.
 
-Three books will run side by side (design: "Mid-term Bull/Bear/Judge"):
-  raw    v0.2 as it trades today: Grade A/B breakouts, no buys in a Weak
-         market, skip when the next open gaps past the buy ceiling
-  twin   every candidate, longs and shadow shorts, no regime filter, always
-         filled at the next open: what "take every pick" would have done
-  judge  (PR B) the Judge's Go picks at the Judge's levels
+Four books run side by side (design: "Mid-term Bull/Bear/Judge"):
+  raw      v0.2 as it trades today: Grade A/B breakouts, no buys in a Weak
+           market, skip when the next open gaps past the buy ceiling
+  twin     every candidate, longs and shadow shorts, no regime filter, always
+           filled at the next open, at v0.2's levels: "take every pick"
+  debated  every candidate the Judge ruled on, whatever the verdict, at the
+           Judge's levels: shows how Go, Wait and Avoid each turned out
+  judge    what the Judge would actually trade: Go picks, and Wait picks from
+           the day their condition is met
+judge against debated measures the Judge's picking; debated against twin
+(same stocks) measures its levels.
 
 A pick's identity and levels are written once; only its fill and exit are
 filled in later, and once it has exited it never changes again. Exits are
@@ -38,7 +43,7 @@ from . import config as C
 from . import portfolio as P
 from .plan import trade_plan
 
-BOOKS = ("raw", "twin", "judge")
+BOOKS = ("raw", "twin", "debated", "judge")
 NOTIONAL_FALLBACK = 25_000   # Rs, for the fixed depository charge when no plan sizes the trade
 US_SLIPPAGE = 0.0005         # one-way, S&P 500 names; no commission, no STT
 
@@ -50,7 +55,7 @@ CREATE TABLE IF NOT EXISTS mt_picks (
   signal_close REAL, stop REAL, target REAL, horizon INTEGER, max_buy REAL,
   status TEXT, entry_date TEXT, entry_px REAL, exit_date TEXT, exit_px REAL, exit_reason TEXT,
   sessions INTEGER, ret REAL, cost REAL, r REAL, bench_ret REAL, excess REAL,
-  mfe_r REAL, mae_r REAL, created_utc TEXT, updated_utc TEXT,
+  mfe_r REAL, mae_r REAL, created_utc TEXT, updated_utc TEXT, verdict TEXT, conviction INTEGER,
   UNIQUE (market, book, symbol, direction, signal_date)
 );
 CREATE TABLE IF NOT EXISTS mt_facts (
@@ -61,8 +66,9 @@ CREATE TABLE IF NOT EXISTS mt_facts (
 # Written by later PRs; created now so the ledger's shape is settled once.
 SCHEMA_LATER = """
 CREATE TABLE IF NOT EXISTS mt_debates (
-  id INTEGER PRIMARY KEY, market TEXT, symbol TEXT, direction TEXT, signal_date TEXT,
-  bull TEXT, bear TEXT, judge TEXT, verdict TEXT, conviction INTEGER, models TEXT,
+  id INTEGER PRIMARY KEY, market TEXT, symbol TEXT, direction TEXT, signal_date TEXT, grade TEXT,
+  status TEXT, bull TEXT, bear TEXT, judge TEXT, verdict TEXT, conviction INTEGER,
+  levels TEXT, level_problems TEXT, wait_status TEXT, wait_date TEXT, models TEXT,
   input_tokens INTEGER, output_tokens INTEGER, cost_usd REAL, created_utc TEXT,
   UNIQUE (market, symbol, direction, signal_date)
 );
@@ -72,7 +78,8 @@ CREATE TABLE IF NOT EXISTS mt_lessons (
 );
 """
 IDENTITY = ["market", "book", "symbol", "direction", "signal_date", "grade", "score", "regime",
-            "source", "levels", "signal_close", "stop", "target", "horizon", "max_buy"]
+            "source", "levels", "signal_close", "stop", "target", "horizon", "max_buy",
+            "verdict", "conviction"]
 RESULT = ["status", "entry_date", "entry_px", "exit_date", "exit_px", "exit_reason", "sessions",
           "ret", "cost", "r", "bench_ret", "excess", "mfe_r", "mae_r"]
 
@@ -165,8 +172,11 @@ def score(pick: dict, f: pd.DataFrame) -> dict:
     stop, target = pick["stop"], pick.get("target")
     entry = O[i + 1]
     res = dict(entry_date=str(f.index[i + 1].date()), entry_px=round(float(entry), 4))
-    if pick.get("max_buy") and up and entry > pick["max_buy"]:
-        return dict(res, status="skipped", exit_reason="gap above buy ceiling")
+    # max_buy is the entry limit: a long is skipped above it, a shadow short below it
+    if pick.get("max_buy") and (entry > pick["max_buy"] if up else entry < pick["max_buy"]):
+        return dict(res, status="skipped", exit_reason="gap past the entry limit")
+    if pick["book"] in ("debated", "judge") and (entry <= stop if up else entry >= stop):
+        return dict(res, status="skipped", exit_reason="opened beyond the stop")
     if up and entry <= stop and pick["book"] == "raw":
         return dict(res, status="skipped", exit_reason="opened below stop")
     risk = abs(entry - stop) / entry
@@ -245,10 +255,32 @@ def _r(x, nd=4):
     return None if x is None or (isinstance(x, float) and not math.isfinite(x)) or pd.isna(x) else round(float(x), nd)
 
 
+def sector_stats(states: pd.DataFrame, prices: Dict[str, pd.DataFrame], sectors: Dict[str, str],
+                 as_of: str) -> Dict[str, dict]:
+    """Per sector on `as_of`, from our own prices: how many liquid members,
+    what share are Advancing (stage 2), and their median 21- and 63-session
+    returns. `sectors` maps a bare symbol (no .NS) to a sector name."""
+    day = states[states["date"] == pd.Timestamp(as_of)] if len(states) else states
+    rows = []
+    for r in day.itertuples():
+        sec = sectors.get(r.symbol.replace(".NS", ""))
+        c = prices[r.symbol]["Close"] if r.symbol in prices else None
+        if sec is None or c is None or len(c) < 64:
+            continue
+        rows.append((sec, r.stage == 2, c.iloc[-1] / c.iloc[-22] - 1, c.iloc[-1] / c.iloc[-64] - 1))
+    if not rows:
+        return {}
+    d = pd.DataFrame(rows, columns=["sector", "adv", "r21", "r63"])
+    return {sec: dict(sector=sec, members=int(len(x)), advancing_pct=_r(x["adv"].mean() * 100, 1),
+                      median_ret_21=_r(x["r21"].median()), median_ret_63=_r(x["r63"].median()))
+            for sec, x in d.groupby("sector")}
+
+
 def fact_pack(ev: dict, f: pd.DataFrame, regime_row: Optional[pd.Series] = None,
-              vix: Optional[float] = None) -> dict:
-    """Numbers only, all known at the signal close. Sector trend, the results
-    date and the Brain's past cases are added in later PRs."""
+              vix: Optional[float] = None, sector: Optional[dict] = None,
+              results_date: Optional[str] = None) -> dict:
+    """Numbers only, all known at the signal close. `sector` is this stock's
+    row from sector_stats; `results_date` the next results date if known."""
     sd = pd.Timestamp(ev["trigger_date"])
     f = f.loc[:sd]
     row = f.iloc[-1]
@@ -285,6 +317,7 @@ def fact_pack(ev: dict, f: pd.DataFrame, regime_row: Optional[pd.Series] = None,
                     stage2_share=_r(regime_row["stage2_share"]) if regime_row is not None else None,
                     bench_above_rising_sma200=bool(regime_row["bench_ok"]) if regime_row is not None else None,
                     vix=_r(vix, 2)),
+        sector=sector, next_results_date=results_date,
         daily_bars=bars(daily), weekly_bars=bars(weekly),
         columns="date, open, high, low, close, volume",
     )

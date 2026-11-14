@@ -75,6 +75,30 @@ def load_us_universe(local_csv: Path | None = None) -> List[str]:
     return syms
 
 
+def next_results_date(ticker: str, after: str):
+    """The next results (earnings) date on or after `after`, as YYYY-MM-DD, or
+    None. Best effort from Yahoo, which often has nothing for NSE stocks."""
+    try:
+        import yfinance as yf
+        cal = yf.Ticker(ticker).calendar or {}
+        dates = cal.get("Earnings Date") or []
+        ok = sorted(str(d) for d in dates if str(d) >= after)
+        return ok[0] if ok else None
+    except Exception as e:
+        log.info("no results date for %s (%s)", ticker, type(e).__name__)
+        return None
+
+
+def load_sectors(path: Path) -> Dict[str, str]:
+    """Bare symbol -> sector name, from universe/sectors_nse.json."""
+    import json
+    try:
+        return json.loads(Path(path).read_text(encoding="utf-8"))
+    except Exception as e:
+        log.warning("sector list unavailable (%s)", e)
+        return {}
+
+
 def latest_vix(market: str = "NSE"):
     """The last close of the market's volatility index, or None."""
     try:

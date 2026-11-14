@@ -44,6 +44,8 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          # Bull/Bear/Judge runs only when this secret exists; without it the step is skipped
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: >
           python run_daily.py
           --mode "${{ github.event.inputs.mode || 'daily' }}"

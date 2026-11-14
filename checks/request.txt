@@ -1,1 +1,1 @@
-run 1: first real-data check of the books and the US shadow list
+run 2: books + US after the push fix; probes VIX and results dates

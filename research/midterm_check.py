@@ -44,13 +44,16 @@ def main() -> int:
     db = tmp / "check.db"
     shutil.copy(ROOT / "ledger" / "stoxsonar.db", db)
     con = sqlite3.connect(db)
-    last = con.execute("SELECT MAX(as_of) FROM runs WHERE market='NSE'").fetchone()[0]
-    con.execute("DELETE FROM runs WHERE market='NSE' AND as_of=?", (last,))
+    # Forget the two newest NSE runs: Yahoo sometimes lacks the newest session
+    # for most stocks, and the day replayed must be newer than the last run kept.
+    last = [r[0] for r in con.execute(
+        "SELECT DISTINCT as_of FROM runs WHERE market='NSE' ORDER BY as_of DESC LIMIT 2")]
+    con.executemany("DELETE FROM runs WHERE market='NSE' AND as_of=?", [(d,) for d in last])
     con.commit()
     con.close()
 
-    out = [f"# Mid-term books: real-data check\n\nLedger copy with the NSE run of {last} replayed. "
-           "Nothing live was changed.\n"]
+    out = [f"# Mid-term books: real-data check\n\nLedger copy with the NSE runs of {', '.join(last)} forgotten "
+           "and the newest session replayed. Nothing live was changed.\n"]
     extra = ["--limit", str(a.limit)] if a.limit else []
     for market in ("NSE", "US"):
         out.append(f"\n## {market}\n")
@@ -88,6 +91,13 @@ def main() -> int:
         except Exception:
             out.append("Books tables unreadable:\n\n```\n" + traceback.format_exc()[-1500:] + "\n```\n")
         con.close()
+    out.append("\n## Outside data the fact pack leans on\n\n")
+    from sonar import data
+    out.append(f"India VIX: {data.latest_vix('NSE')} · US VIX: {data.latest_vix('US')}\n\n")
+    today = pd.Timestamp.now().strftime("%Y-%m-%d")
+    out.append("Next results date from Yahoo: " + ", ".join(
+        f"{t} {data.next_results_date(t, today)}" for t in
+        ("RELIANCE.NS", "TCS.NS", "INFY.NS", "HDFCBANK.NS", "TATAMOTORS.NS", "AAPL")) + "\n")
     site = tmp / "site" / "data.json"
     if site.exists():
         out.append("\n## Page summary rows\n\n```json\n"

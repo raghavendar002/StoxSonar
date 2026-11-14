@@ -95,4 +95,22 @@ US_BENCHMARK = "RSP"         # equal-weight S&P 500 ETF
 US_BENCHMARK_FALLBACK = "^GSPC"
 VIX = {"NSE": "^INDIAVIX", "US": "^VIX"}
 
+# Mid-term Bull / Bear / Judge debate (sonar/debate.py). Runs only when
+# ANTHROPIC_API_KEY is set. The cap is enforced in code before every candidate.
+DEBATE_MODEL_ARGUE = "claude-sonnet-5-5"   # Bull and Bear
+DEBATE_MODEL_JUDGE = "claude-opus-5-5"     # Judge
+DEBATE_PRICES = {            # USD per million tokens: (input, output, cache read)
+    "claude-sonnet-5-5": (2.0, 10.0, 0.10),
+    "claude-opus-5-5": (4.0, 20.0, 0.20),
+}
+DEBATE_CACHE_WRITE = 1.25    # a cache write costs this many times the input price
+DEBATE_MONTHLY_CAP_USD = 6.0
+DEBATE_RESERVE_USD = 0.60    # a candidate is debated only if this much of the cap is left
+DEBATE_MAX_PER_DAY = 3
+DEBATE_GRADES = ("A", "B")
+WAIT_MAX_SESSIONS = 10       # a Wait is watched this long, by code, then expires
+JUDGE_ENTRY_MAX_ATR = 1.0    # the entry zone must sit within 1 ATR of the signal close
+JUDGE_STOP_MAX_ATR = 3.0     # the stop at most 3 ATR from the entry
+JUDGE_TARGET_MIN_R = 1.5     # the first target at least 1.5R away
+
 STAGE_NAMES = {1: "Basing", 2: "Advancing", 3: "Topping", 4: "Declining"}
