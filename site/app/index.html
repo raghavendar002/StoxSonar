@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>StoxSonar</title>
+<meta name="theme-color" content="#0b1220">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="StoxSonar">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand">StoxSonar</div>
+  <div id="asof" class="asof"></div>
+  <button id="refresh" class="icon-btn" aria-label="Refresh">↻</button>
+</header>
+<main id="view" aria-live="polite"><p class="muted pad">Loading…</p></main>
+<nav class="tabs" role="tablist">
+  <a href="#today" data-tab="today">Today</a>
+  <a href="#signals" data-tab="signals">Signals</a>
+  <a href="#record" data-tab="record">Record</a>
+  <a href="#settings" data-tab="settings">Settings</a>
+</nav>
+<script src="app.js"></script>
+</body>
+</html>
