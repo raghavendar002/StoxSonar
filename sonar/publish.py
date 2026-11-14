@@ -256,6 +256,30 @@ border-radius:10px;padding:12px 16px;margin:16px 0}.today p{margin:6px 0}
 """
 
 
+BOOK_NAMES = {"raw": "Raw v0.2", "twin": "Twin (every pick)", "debated": "Debated (every verdict)",
+              "judge": "Judge (Go picks)"}
+
+
+def _books_section(rows) -> str:
+    if not rows:
+        return ""
+    body = "".join(
+        f"<tr><td>{_e(BOOK_NAMES.get(r['book'], r['book']))}</td>"
+        f"<td>{'Long' if r['direction'] == 'up' else 'Shadow short'}</td><td>{r['picks']}</td>"
+        f"<td>{r['closed']}</td><td>{r['open']}</td><td>{_v(r['avg_r'], 'R')}</td><td>{_v(r['median_r'], 'R')}</td>"
+        f"<td>{_v(r['win_pct'], '%')}</td><td>{_v(r['avg_excess_pct'], '%')}</td></tr>" for r in rows)
+    return (
+        "<h2>Mid-term books (paper)</h2>"
+        "<p class=\"note\">Every candidate is turned into a paper trade with fixed rules: buy at the next open, "
+        "exit at the stop, the target or the close 21 sessions later, after costs. <b>Raw</b> trades as v0.2 "
+        "suggests today; <b>Twin</b> takes every breakout (C grades too) and every A/B breakdown as a shadow "
+        "short, with no market filter. <b>Debated</b> is every stock the Judge ruled on, at the Judge's levels; "
+        "<b>Judge</b> is only its Go picks. <a href=\"books.csv\">Every pick</a> · "
+        "<a href=\"debates.html\">every debate</a>.</p>"
+        "<table><thead><tr><th>Book</th><th>Side</th><th>Picks</th><th>Closed</th><th>Open</th><th>Avg R</th>"
+        f"<th>Median R</th><th>Wins</th><th>Vs index</th></tr></thead><tbody>{body}</tbody></table>")
+
+
 def render_html(s: dict) -> str:
     colors = {"Basing": "var(--s1)", "Advancing": "var(--s2)", "Topping": "var(--s3)", "Declining": "var(--s4)"}
     bar = "".join(f'<span style="width:{v}%;background:{colors[k]}" title="{k} {v}%"></span>'
@@ -287,6 +311,8 @@ def render_html(s: dict) -> str:
 
 <h2>Track record (live)</h2>
 {_record_table(s['track_record_live'], live_note)}
+
+{_books_section(s.get('books') or [])}
 
 <h2>Backtest replay</h2>
 {_record_table(s['track_record_replay'], 'The same rules replayed over past data before the live record began. Treat it as a hint, not proof.')}
@@ -339,9 +365,38 @@ def telegram_text(s: dict) -> str:
     if s["closed_today"]:
         lines += ["", "Closed today"] + [f"{r['grade']} · {r['symbol']} {r['status']} ({r['move_pct']:+.1f}%)"
                                          for r in s["closed_today"]]
+    book_lines = books_lines(s.get("books") or [])
+    if book_lines:
+        lines += ["", "Mid-term paper books (after costs)"] + book_lines
     if s.get("site_url"):
         lines += ["", f"Full list and track record: {s['site_url']}"]
     lines += ["", "Rule-based screen output, not investment advice."]
+    return "\n".join(lines)
+
+
+def books_lines(rows) -> list:
+    out = []
+    for r in rows:
+        if not r["closed"]:
+            continue
+        side = "longs" if r["direction"] == "up" else "shadow shorts"
+        out.append(f"{BOOK_NAMES.get(r['book'], r['book'])} {side}: {r['closed']} closed, "
+                   f"avg {r['avg_r']:+.2f}R, wins {r['win_pct']:.0f}% · {r['open']} open")
+    return out
+
+
+def us_telegram_text(events: pd.DataFrame, as_of: str, book_rows) -> str:
+    """One short message for the US shadow list: logged and scored, never suggested."""
+    today = events[(events["trigger_date"] == as_of) & (events["source"] == "live")]
+    ups = today[(today["direction"] == "up") & today["grade"].isin(["A", "B"])]
+    downs = today[(today["direction"] == "down") & today["grade"].isin(["A", "B"])]
+    lines = [f"StoxSonar · US shadow list (S&P 500) · close {as_of}",
+             "Logged and scored only. No suggestions: grade cut-offs are still NSE's until refitted.", ""]
+    lines.append(f"Breakouts A/B: {', '.join(f'{r.grade} {r.symbol}' for r in ups.itertuples()) or 'none'}")
+    lines.append(f"Breakdowns A/B (shadow shorts): {', '.join(f'{r.grade} {r.symbol}' for r in downs.itertuples()) or 'none'}")
+    bl = books_lines(book_rows or [])
+    if bl:
+        lines += ["", "Paper books (after costs)"] + bl
     return "\n".join(lines)
 
 
@@ -366,3 +421,119 @@ def write_site(s: dict, out_dir: Path) -> None:
     (out_dir / "index.html").write_text(render_html(s), encoding="utf-8")
     (out_dir / "data.json").write_text(json.dumps(s, indent=1, default=str), encoding="utf-8")
     (out_dir / f"{s['as_of']}.json").write_text(json.dumps(s, default=str), encoding="utf-8")
+
+
+# ---------------------------------------------------------------------------
+# Bull / Bear / Judge: the second message and the debates page
+# ---------------------------------------------------------------------------
+
+DEBATE_NOTE = ("An experiment, not advice: the screen under these calls has not passed its test, and the "
+               "Judge has no track record yet. Every call is logged and scored.")
+SKIPPED = {"not_debated_daily_limit": "not debated (daily limit of 3)",
+           "not_debated_budget": "not debated (monthly API budget reached)",
+           "no_fact_pack": "not debated (no data pack)", "error": "debate failed", "refused": "debate failed"}
+
+
+def _px(x) -> str:
+    return f"{x:,.2f}" if x < 1000 else f"{x:,.0f}"
+
+
+def _levels_line(v: dict, up: bool) -> str:
+    t2 = f" then {_px(v['target_2'])}" if v.get("target_2") else ""
+    side = "Buy" if up else "Short"
+    return (f"{side} {_px(v['entry_low'])}–{_px(v['entry_high'])} · stop {_px(v['stop'])} · "
+            f"target {_px(v['target'])}{t2} · hold up to {v['horizon_sessions']} sessions")
+
+
+def _wait_line(v: dict) -> str:
+    vol = f" on volume ≥ {v['wait_min_volume_ratio']:g}x average" if v.get("wait_min_volume_ratio") else ""
+    word = "above" if v["wait_kind"] == "close_above" else "below"
+    return f"Wait for a close {word} {_px(v['wait_level'])}{vol} within {v['wait_within_sessions']} sessions"
+
+
+def debate_telegram_text(as_of: str, rows: list, waits: list, record: list, spent_usd: float) -> str:
+    lines = [f"StoxSonar · Bull/Bear/Judge · NSE close {as_of}", ""]
+    for r in rows:
+        name = r["symbol"].replace(".NS", "")
+        up = r["direction"] == "up"
+        kind = "breakout" if up else "breakdown, SHADOW SHORT (logged, not traded)"
+        if r["status"] != "done":
+            lines += [f"{name} · {r['grade']} {kind}: {SKIPPED.get(r['status'], r['status'])}", ""]
+            continue
+        v = r["v"]
+        lines.append(f"{v['verdict'].upper()} · {name} · {r['grade']} {kind} · conviction {v['conviction']}/5")
+        if not r["levels_ok"]:
+            lines.append("   The Judge's levels broke the rules (" + "; ".join(r["problems"])
+                         + "), so the paper trade uses v0.2's stop.")
+        elif v["verdict"] == "Wait":
+            lines.append("   " + _wait_line(v) + ". Then: " + _levels_line(v, up))
+        else:
+            lines.append("   " + ("" if v["verdict"] == "Go" else "If taken anyway: ") + _levels_line(v, up))
+        if up and v["verdict"] == "Go" and r.get("regime") == "Weak":
+            lines.append("   Market is Weak: v0.2 itself suggests no buys today.")
+        lines.append("   " + v["how_its_moving"])
+        if v["reasons_for"]:
+            lines.append("   For: " + " | ".join(v["reasons_for"][:3]))
+        if v["reasons_against"]:
+            lines.append("   Against: " + " | ".join(v["reasons_against"][:3]))
+        lines.append("   Wrong if: " + v["invalidation"])
+        lines.append("")
+    for w in waits:
+        name = w["symbol"].replace(".NS", "")
+        if w["status"] == "triggered":
+            lines += [f"WAIT MET · {name} (signal {w['signal_date']}): now a Go for the paper book. "
+                      + _levels_line(w["v"], w["direction"] == "up"), ""]
+        else:
+            lines += [f"Wait expired · {name} (signal {w['signal_date']}): condition not met in time.", ""]
+    closed = [r for r in record if r["closed"]]
+    if closed:
+        lines.append("How past verdicts turned out (after costs): " + " · ".join(
+            f"{r['verdict']} {r['closed']} closed, avg {r['avg_r']:+.2f}R" for r in closed))
+    lines.append(f"API spend this month: ${spent_usd:.2f} of ${C.DEBATE_MONTHLY_CAP_USD:.0f}")
+    lines += ["", DEBATE_NOTE]
+    text = "\n".join(lines)
+    return text if len(text) <= 4000 else text[:3990] + "\n(cut)"     # Telegram's limit is 4096
+
+
+def write_debates(con, market: str, out_dir: Path) -> None:
+    """site/debates.html: every debate in full, newest first, with how it ended."""
+    import json as _json
+    d = pd.read_sql_query("SELECT * FROM mt_debates WHERE market=? AND status='done' "
+                          "ORDER BY signal_date DESC, symbol", con, params=(market,))
+    picks = pd.read_sql_query("SELECT symbol, direction, signal_date, status, exit_reason, r, ret FROM mt_picks "
+                              "WHERE market=? AND book='debated'", con, params=(market,))
+    ended = {(p.symbol, p.direction, p.signal_date): p for p in picks.itertuples()}
+    parts = []
+    for r in d.itertuples():
+        v = _json.loads(r.judge)
+        up = r.direction == "up"
+        p = ended.get((r.symbol, r.direction, r.signal_date))
+        if p is None or p.status in ("pending", "open"):
+            how = "Still running." if p is not None and p.status == "open" else "Not started yet."
+        elif p.status == "skipped":
+            how = f"No paper trade: {p.exit_reason}."
+        else:
+            how = f"Paper trade closed by {p.exit_reason}: {p.r:+.2f}R ({p.ret * 100:+.1f}%) after costs."
+        wait = ""
+        if v["verdict"] == "Wait" and r.wait_status:
+            wait = f"<p>{_e(_wait_line(v))}. Status: {_e(r.wait_status)}{' on ' + _e(r.wait_date) if r.wait_date else ''}.</p>"
+        flag = f"<p class=\"note\">Levels rejected by the rule check: {_e(r.level_problems)}.</p>" if r.level_problems else ""
+        lst = lambda xs: "".join(f"<li>{_e(x)}</li>" for x in xs)  # noqa: E731
+        parts.append(
+            f"<h2>{_e(r.symbol.replace('.NS', ''))} · {_e(r.signal_date)} · "
+            f"{'breakout' if up else 'breakdown (shadow short)'} · grade {_e(r.grade)}</h2>"
+            f"<p><b>{_e(v['verdict'])}</b>, conviction {v['conviction']}/5. {_e(_levels_line(v, up))}.</p>"
+            f"{wait}{flag}<p>{_e(v['how_its_moving'])}</p>"
+            f"<p><b>For</b></p><ul>{lst(v['reasons_for'])}</ul><p><b>Against</b></p><ul>{lst(v['reasons_against'])}</ul>"
+            f"<p><b>Wrong if:</b> {_e(v['invalidation'])}</p><p><b>How it turned out:</b> {_e(how)}</p>"
+            f"<details><summary>Bull's case</summary><p>{_e(r.bull)}</p></details>"
+            f"<details><summary>Bear's case</summary><p>{_e(r.bear)}</p></details>")
+    body = "".join(parts) or "<p class=\"empty\">No debates yet.</p>"
+    page = (f"<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\">"
+            f"<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">"
+            f"<title>StoxSonar debates</title><style>{CSS}details{{margin:8px 0}}summary{{cursor:pointer}}</style>"
+            f"</head><body><main><h1>Bull / Bear / Judge</h1><p class=\"sub\">{_e(DEBATE_NOTE)} "
+            f"<a href=\"index.html\">Back to the daily page</a></p>{body}"
+            f"<p class=\"foot\">{_e(DISCLAIMER)}</p></main></body></html>")
+    out_dir.mkdir(parents=True, exist_ok=True)
+    (out_dir / "debates.html").write_text(page, encoding="utf-8")
