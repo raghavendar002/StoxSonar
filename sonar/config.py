@@ -114,3 +114,12 @@ JUDGE_STOP_MAX_ATR = 3.0     # the stop at most 3 ATR from the entry
 JUDGE_TARGET_MIN_R = 1.5     # the first target at least 1.5R away
 
 STAGE_NAMES = {1: "Basing", 2: "Advancing", 3: "Topping", 4: "Declining"}
+
+# The mid-term Brain (sonar/brain.py)
+BRAIN_MIN_CASES = 8          # a lesson must cite this many closed judged trades; no review before that many exist
+BRAIN_MAX_LESSONS = 12       # active at once
+BRAIN_MAX_ADD = 3            # new lessons per review
+BRAIN_REVIEW_EVERY_DAYS = 7
+BRAIN_REVIEW_MIN_NEW = 4     # closed judged trades since the last review
+BRAIN_TEST_AT = 100          # judged trades closed before the pass test is read
+BRAIN_KILL_AT = 150

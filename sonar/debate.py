@@ -27,7 +27,7 @@ from typing import Callable, Dict, List, Optional
 
 import pandas as pd
 
-from . import books
+from . import books, brain
 from . import config as C
 
 log = logging.getLogger(__name__)
@@ -40,7 +40,10 @@ SYSTEM = (
     "bars, indicators, the screen's own fields, the market regime and sector numbers. You have no "
     "news, no fundamentals and no knowledge of what happened after the signal date; do not guess at "
     "them or use anything you remember about this company's later price. Cite numbers from the fact "
-    "pack for every claim. Prices are in the stock's own currency."
+    "pack for every claim. Prices are in the stock's own currency. The pack may carry a "
+    "'track_record': how earlier signals like this one, and earlier verdicts, ended. Those results "
+    "were all finished before this signal's date. Use them as base rates, quote the n with any "
+    "figure you cite, and treat a small n as weak evidence."
 )
 
 BULL = (
@@ -78,7 +81,8 @@ JUDGE = (
     "Conviction 1-5 is how sure you are of the verdict itself. how_its_moving is three or four "
     "plain sentences a non-expert can follow: the trend, the base, volume, and how the stock stands "
     "against its sector and the index. Each reason names a number from the fact pack. Weigh any "
-    "lessons given under 'lessons' as rules of thumb from past calls, not as certainties."
+    "lessons given under 'lessons' as rules of thumb from past calls, not as certainties. If the "
+    "track record shows signals like this one have lost on average, a Go must say why this one differs."
 )
 
 VERDICT_SCHEMA = {
@@ -130,7 +134,8 @@ def cost_usd(model: str, usage) -> float:
             + g("cache_read_input_tokens") * p_read + g("output_tokens") * p_out) / 1e6
 
 
-def api_call(model: str, shared: str, instruction: str, effort: str, schema: Optional[dict] = None) -> Reply:
+def api_call(model: str, shared: str, instruction: str, effort: str, schema: Optional[dict] = None,
+             system: Optional[str] = None) -> Reply:
     """One message. `shared` (the fact pack) comes first and is cached, so the
     Bear's call re-reads what the Bull's call wrote."""
     import anthropic
@@ -139,7 +144,7 @@ def api_call(model: str, shared: str, instruction: str, effort: str, schema: Opt
     if schema is not None:
         out_cfg["format"] = {"type": "json_schema", "schema": schema}
     r = client.messages.create(
-        model=model, max_tokens=12000, system=SYSTEM, output_config=out_cfg,
+        model=model, max_tokens=12000, system=system or SYSTEM, output_config=out_cfg,
         messages=[{"role": "user", "content": [
             {"type": "text", "text": shared, "cache_control": {"type": "ephemeral"}},
             {"type": "text", "text": instruction}]}])
@@ -167,9 +172,12 @@ def enabled() -> bool:
 
 def month_spend(con, month: str) -> float:
     """Dollars spent on debates in `month` (YYYY-MM), every market."""
-    row = con.execute("SELECT COALESCE(SUM(cost_usd), 0) FROM mt_debates WHERE substr(created_utc, 1, 7)=?",
-                      (month,)).fetchone()
-    return float(row[0])
+    total = 0.0
+    for table in ("mt_debates", "mt_reviews"):      # the weekly lessons review draws on the same cap
+        if con.execute("SELECT 1 FROM sqlite_master WHERE name=?", (table,)).fetchone():
+            total += con.execute(f"SELECT COALESCE(SUM(cost_usd), 0) FROM {table} "
+                                 "WHERE substr(created_utc, 1, 7)=?", (month,)).fetchone()[0]
+    return float(total)
 
 
 def budget_left(con, now: Optional[datetime] = None) -> float:
@@ -252,15 +260,18 @@ def pick_from(v: dict, facts: dict, book: str, levels_ok: bool, signal_date: Opt
 # One debate
 # ---------------------------------------------------------------------------
 
-def shared_text(facts: dict, lessons: List[str]) -> str:
+def shared_text(facts: dict, lessons: List[str], record: Optional[dict] = None) -> str:
+    pack = dict(facts, lessons=lessons)
+    if record:
+        pack["track_record"] = record
     return ("FACT PACK (frozen at the signal close; nothing after it is known)\n"
-            + json.dumps(dict(facts, lessons=lessons), separators=(",", ":")))
+            + json.dumps(pack, separators=(",", ":")))
 
 
-def debate_one(facts: dict, lessons: List[str], call: Caller = api_call) -> dict:
+def debate_one(facts: dict, lessons: List[str], call: Caller = api_call, record: Optional[dict] = None) -> dict:
     """Bull, Bear, Judge for one candidate. Returns the texts, the parsed
     verdict, token counts and cost. Raises if any call fails; the caller logs it."""
-    shared = shared_text(facts, lessons)
+    shared = shared_text(facts, lessons, record)
     kind = "breakout (a long)" if facts["direction"] == "up" else "breakdown (a shadow short)"
     head = f"The signal is a {kind} in {facts['symbol']} on {facts['signal_date']}.\n\n"
     bull = call(C.DEBATE_MODEL_ARGUE, shared, head + BULL, "medium")
@@ -301,6 +312,7 @@ def run_day(con, market: str, events: pd.DataFrame, as_of: str, call: Caller = a
     message and the page. A candidate already debated is never debated twice."""
     out = []
     cands = candidates(events, as_of)
+    brain.init(con)
     lessons = lessons_now(con)
     for n, ev in enumerate(cands):
         key = (market, ev["symbol"], ev["direction"], ev["trigger_date"])
@@ -324,7 +336,12 @@ def run_day(con, market: str, events: pd.DataFrame, as_of: str, call: Caller = a
             continue
         facts = dict(json.loads(f[0]), market_code=market)
         try:
-            d = debate_one(facts, lessons, call)
+            record = brain.context(con, market, facts)
+        except Exception as e:  # the Brain is an extra; a debate without it is still a debate
+            log.warning("no track record for %s: %s %s", ev["symbol"], type(e).__name__, str(e)[:200])
+            record = None
+        try:
+            d = debate_one(facts, lessons, call, record)
         except Exception as e:  # one failed debate must not stop the others or the day
             log.warning("debate failed for %s: %s %s %s", ev["symbol"], type(e).__name__,
                         getattr(e, "status_code", ""), str(e)[:300])
@@ -340,7 +357,8 @@ def run_day(con, market: str, events: pd.DataFrame, as_of: str, call: Caller = a
         _save(con, market, ev, "done", bull=d["bull"], bear=d["bear"], judge=json.dumps(v),
               verdict=v["verdict"], conviction=int(v["conviction"]), levels="judge" if ok else "v02",
               level_problems="; ".join(problems) or None, wait_status="watching" if watching else None,
-              input_tokens=d["input_tokens"], output_tokens=d["output_tokens"], cost_usd=d["cost_usd"])
+              input_tokens=d["input_tokens"], output_tokens=d["output_tokens"], cost_usd=d["cost_usd"],
+              brain=json.dumps(dict(record=record, lessons=lessons)) if record or lessons else None)
         # The debated book always fills at the next open, so every verdict is scored the same way
         picks = [dict(pick_from(v, facts, "debated", ok), max_buy=None)]
         if v["verdict"] == "Go":
@@ -348,7 +366,8 @@ def run_day(con, market: str, events: pd.DataFrame, as_of: str, call: Caller = a
         books.add_picks(con, picks)
         out.append(dict(row, status="done", verdict=v["verdict"], conviction=int(v["conviction"]),
                         levels_ok=ok, problems=problems, v=v, cost_usd=d["cost_usd"],
-                        regime=facts["market"]["regime"], close=facts["indicators"]["close"]))
+                        regime=facts["market"]["regime"], close=facts["indicators"]["close"],
+                        base_rate=brain.headline(record)))
     return out
 
 

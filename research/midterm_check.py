@@ -69,6 +69,8 @@ def real_debate(db: Path, tmp: Path) -> str:
                        + publish.debate_telegram_text(e["trigger_date"], rows, [], [], d["cost_usd"]) + "\n```\n\n"
                        f"Bull:\n\n> {d['bull']}\n\nBear:\n\n> {d['bear']}\n\n"
                        "Judge:\n\n```json\n" + json.dumps(json.loads(d["judge"]), indent=1) + "\n```\n")
+            out.append("\nTrack record the Brain gave the debate:\n\n```json\n"
+                       + json.dumps(json.loads(d["brain"]) if d.get("brain") else None, indent=1) + "\n```\n")
             out.append("\nPicks written:\n\n" + table(pd.read_sql_query(
                 "SELECT book, symbol, verdict, conviction, levels, stop, target, horizon, max_buy FROM mt_picks "
                 "WHERE book IN ('debated','judge')", con)))

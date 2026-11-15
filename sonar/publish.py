@@ -451,7 +451,8 @@ def _wait_line(v: dict) -> str:
     return f"Wait for a close {word} {_px(v['wait_level'])}{vol} within {v['wait_within_sessions']} sessions"
 
 
-def debate_telegram_text(as_of: str, rows: list, waits: list, record: list, spent_usd: float) -> str:
+def debate_telegram_text(as_of: str, rows: list, waits: list, record: list, spent_usd: float,
+                         closed: Optional[list] = None, review: Optional[dict] = None) -> str:
     lines = [f"StoxSonar · Bull/Bear/Judge · NSE close {as_of}", ""]
     for r in rows:
         name = r["symbol"].replace(".NS", "")
@@ -472,6 +473,8 @@ def debate_telegram_text(as_of: str, rows: list, waits: list, record: list, spen
         if up and v["verdict"] == "Go" and r.get("regime") == "Weak":
             lines.append("   Market is Weak: v0.2 itself suggests no buys today.")
         lines.append("   " + v["how_its_moving"])
+        if r.get("base_rate"):
+            lines.append("   Brain: " + r["base_rate"])
         if v["reasons_for"]:
             lines.append("   For: " + " | ".join(v["reasons_for"][:3]))
         if v["reasons_against"]:
@@ -485,10 +488,22 @@ def debate_telegram_text(as_of: str, rows: list, waits: list, record: list, spen
                       + _levels_line(w["v"], w["direction"] == "up"), ""]
         else:
             lines += [f"Wait expired · {name} (signal {w['signal_date']}): condition not met in time.", ""]
-    closed = [r for r in record if r["closed"]]
-    if closed:
+    for o in closed or []:
+        name = o["symbol"].replace(".NS", "")
+        lines += [f"CLOSED · {name} (signal {o['signal_date']}): the Judge said {o['verdict']} "
+                  f"{o['conviction']}/5 and the paper trade ended {o['r']:+.2f}R by {o['exit_reason']}. "
+                  f"The verdict was {o['call']}.", ""]
+    if review:
+        lines.append(f"Brain review (version {review['version']}, {review['n_cases']} closed cases): "
+                     + " ".join(str(review["summary"]).split()))
+        lines += [f"   New lesson: {t}" for t in review["added"]]
+        if review["dropped"]:
+            lines.append(f"   Lessons dropped: {review['dropped']}")
+        lines.append("")
+    done = [r for r in record if r["closed"]]
+    if done:
         lines.append("How past verdicts turned out (after costs): " + " · ".join(
-            f"{r['verdict']} {r['closed']} closed, avg {r['avg_r']:+.2f}R" for r in closed))
+            f"{r['verdict']} {r['closed']} closed, avg {r['avg_r']:+.2f}R" for r in done))
     lines.append(f"API spend this month: ${spent_usd:.2f} of ${C.DEBATE_MONTHLY_CAP_USD:.0f}")
     lines += ["", DEBATE_NOTE]
     text = "\n".join(lines)
@@ -533,7 +548,60 @@ def write_debates(con, market: str, out_dir: Path) -> None:
             f"<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">"
             f"<title>StoxSonar debates</title><style>{CSS}details{{margin:8px 0}}summary{{cursor:pointer}}</style>"
             f"</head><body><main><h1>Bull / Bear / Judge</h1><p class=\"sub\">{_e(DEBATE_NOTE)} "
-            f"<a href=\"index.html\">Back to the daily page</a></p>{body}"
+            f"<a href=\"index.html\">Back to the daily page</a> · <a href=\"brain.html\">The Brain</a></p>{body}"
             f"<p class=\"foot\">{_e(DISCLAIMER)}</p></main></body></html>")
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "debates.html").write_text(page, encoding="utf-8")
+
+
+def write_brain(con, market: str, out_dir: Path) -> None:
+    """site/brain.html: the pass test so far, every closed verdict, and the lessons."""
+    from . import brain
+    b = brain.scoreboard(con, market)
+    f = lambda x, fmt="{:+.2f}R": "–" if x is None else fmt.format(x)  # noqa: E731
+    ci = b["go_minus_avoid_ci90"]
+    rows = [
+        ("Judged trades closed", f"{b['judged_closed']} of {b['needed']} needed (stop line at {b['kill_at']})"),
+        ("Verdicts that were right", f(b["right_pct"], "{:.0f}%")),
+        ("Go", f"{b['go']['n']} closed, average {f(b['go']['avg_r'])}"),
+        ("Avoid (as if taken)", f"{b['avoid']['n']} closed, average {f(b['avoid']['avg_r'])}"),
+        ("Go minus Avoid", f(b["go_minus_avoid"]) + (f", 90% range {ci[0]:+.2f} to {ci[1]:+.2f}" if ci else
+                                                    ", range needs 5 of each")),
+        ("Judge book", f"{b['judge_book']['n']} closed, average {f(b['judge_book']['avg_r'])}"),
+        ("Twin book (take everything)", f"{b['twin_book']['n']} closed, average {f(b['twin_book']['avg_r'])}"),
+        ("Conviction 4-5", f"{b['conviction_high']['n']} closed, {f(b['conviction_high']['right_pct'], '{:.0f}%')} right"),
+        ("Conviction 1-2", f"{b['conviction_low']['n']} closed, {f(b['conviction_low']['right_pct'], '{:.0f}%')} right"),
+        ("API spend so far", f"${b['api_spend_usd']:.2f}"),
+    ]
+    table = "".join(f"<tr><td>{_e(k)}</td><td>{_e(v)}</td></tr>" for k, v in rows)
+    lessons = brain.active_lessons(con)
+    les = ("<ol>" + "".join(f"<li>{_e(x['text'])} <span class=\"note\">(version {x['version']}, "
+                            f"{x['n_cases']} cases, added {_e(x['added'])})</span></li>" for x in lessons) + "</ol>"
+           if lessons else f"<p class=\"empty\">None yet. A lesson needs at least {C.BRAIN_MIN_CASES} closed "
+                           "judged trades behind it, so the first review is weeks away.</p>")
+    rev = brain.last_review(con, market)
+    review = (f"<h2>Last review</h2><p>{_e(rev['date'])}, version {rev['version']}, {rev['n_cases']} cases. "
+              f"{_e(rev['summary'])}</p>" if rev else "")
+    out = (pd.read_sql_query("SELECT * FROM mt_outcomes WHERE market=? ORDER BY exit_date DESC, debate_id DESC",
+                             con, params=(market,)) if brain._has(con, "mt_outcomes") else pd.DataFrame())
+    closed = "".join(
+        f"<tr><td>{_e(o.symbol.replace('.NS', ''))}</td><td>{_e(o.signal_date)}</td>"
+        f"<td>{'long' if o.direction == 'up' else 'shadow short'}</td><td>{_e(o.verdict)} {o.conviction}/5</td>"
+        f"<td>{o.r:+.2f}R</td><td>{_e(o.exit_reason)}</td><td>{_e(o.call)}</td></tr>" for o in out.itertuples())
+    closed = (f"<table><tr><th>Stock</th><th>Signal</th><th>Side</th><th>Verdict</th><th>Result</th>"
+              f"<th>Ended by</th><th>Verdict was</th></tr>{closed}</table>" if closed
+              else "<p class=\"empty\">No judged trade has closed yet.</p>")
+    page = (f"<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\">"
+            f"<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">"
+            f"<title>StoxSonar Brain</title><style>{CSS}</style></head><body><main><h1>The mid-term Brain</h1>"
+            f"<p class=\"sub\">{_e(DEBATE_NOTE)} <a href=\"debates.html\">Every debate</a> · "
+            f"<a href=\"index.html\">Daily page</a></p>"
+            f"<h2>The test</h2><p><b>{_e(b['state'])}</b> The Judge passes only if Go beats Avoid with the whole "
+            f"90% range above zero, the Judge book beats the Twin book after costs and API fees, and high "
+            f"conviction beats low.</p><table>{table}</table>"
+            f"<h2>Lessons the Judge is given</h2>{les}{review}"
+            f"<h2>Closed verdicts</h2><p>For Avoid and for a Wait that never triggered, the result is the "
+            f"paper trade as if it had been taken, so a loss there means the verdict was right.</p>{closed}"
+            f"<p class=\"foot\">{_e(DISCLAIMER)}</p></main></body></html>")
+    out_dir.mkdir(parents=True, exist_ok=True)
+    (out_dir / "brain.html").write_text(page, encoding="utf-8")

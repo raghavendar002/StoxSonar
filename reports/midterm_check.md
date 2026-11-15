@@ -222,7 +222,7 @@ Next results date from Yahoo: RELIANCE.NS 2027-01-15, TCS.NS None, INFY.NS 2027-
 
 AMANTA.NS · up · grade B · signal 2026-11-12
 
-Status **done** · input tokens 19642 · output tokens 2830 · cost $0.09556
+Status **done** · input tokens 21120 · output tokens 2598 · cost $0.09531
 
 Levels used: judge · problems: None · wait: None
 
@@ -231,12 +231,13 @@ Telegram message as it would be sent:
 ```
 StoxSonar · Bull/Bear/Judge · NSE close 2026-11-12
 
-AVOID · AMANTA · B breakout · conviction 3/5
+AVOID · AMANTA · B breakout · conviction 4/5
    If taken anyway: Buy 220.00–232.00 · stop 190.16 · target 286.00 then 310.00 · hold up to 21 sessions
-   The stock has climbed hard, up 89% over a year and 25% in the last month, while the index barely moved (+0.8% over 63 days). Its 41-session base was loose, swinging from about 207 down to 151.71 before snapping back. The breakout day traded 2.70M shares, about 32 times normal, but past spikes like this faded within weeks. Many recent sessions traded at a single price on tiny volume, and the overall market regime is Weak.
-   For: RS rank 96 and Mansfield +55 show strong outperformance against a benchmark up only 0.78% over 63 days. | The close of 228.37 cleared the 209.95 pivot by about 8.8% and sits only 2.9% below the 52-week high. | The breakout bar closed at 228.37 within a 195.14–235.24 range, in the upper part of the day.
-   Against: The market regime is Weak, and no sector data is available to show support. | The stock is extended: 22.5% above the 50-day SMA, 54.8% above the 200-day, and 148% off its 52-week low. | Two earlier thrusts failed: the 11 Jun spike on 6.0M shares at a 164 high and the 24 Aug high of 205.57, which fell to 183.47 within days.
-   Wrong if: The Avoid would be wrong if the stock holds above the 209.95 pivot, closes above the 235.24 breakout-day high on steady turnover, and stops printing single-price thin bars. That would show real demand rather than a one-day spike.
+   The stock is in a strong uptrend: up 43% in three months and 89% in a year, while the index rose only 0.8% over the same three months. Over the last 41 sessions it built a loose, 38%-deep base, falling from 207 in early October to about 158 in late October. On the signal day it jumped about 16.5% to 228.37 on 2.7 million shares, roughly 32 times normal volume, clearing the September high of 209.95. Many earlier sessions traded at a single price on tiny volume, which points to a thin, circuit-limited stock. The broad market is Weak, and no sector data is given.
+   Brain: The 25 most similar past signals: average -0.66R over 21 sessions, 28% made money (before costs).
+   For: Relative strength is top-tier: RS rank 96 and Mansfield 55.07, with a 63-day return of 43.1% against the benchmark's 0.8%. | The breakout bar closed at 228.37, near its 235.24 high and 8.8% above the 209.95 pivot, on a volume ratio of 32x. | The close is only 2.9% below the 52-week high, in Stage 2.
+   Against: The screen's base rates are negative. Same grade and regime (n=251): average -0.17R, 42% wins. Most similar cases (n=25, small sample): average -0.66R, 28% wins, -4.0% excess return. Nothing in the pack shows how this signal differs. | The market regime is Weak, so a long needs more support than usual, and none is offered here. | The entry is extended: 22.5% above the 50-day average and 54.8% above the 200-day, after a 25.3% gain over 21 days.
+   Wrong if: I would reconsider if price pulls back toward the 209.95 pivot on quiet volume (near the usual 30k-100k shares), holds there, and then closes back above 235.24 with heavy volume. That would give a tighter stop near the pivot instead of 16.7% away. A close below 209.95 would confirm the breakout failed.
 
 API spend this month: $0.10 of $6
 
@@ -245,42 +246,42 @@ An experiment, not advice: the screen under these calls has not passed its test,
 
 Bull:
 
-> **Bull case for AMANTA.NS breakout, 2026-11-12 (honest, with caveats)**
+> **Bull case, AMANTA.NS long, signal 2026-11-12**
 
-**Trend and stage:** Stage 2, template 8, and the close of 228.37 sits 22.5% above the 50-day SMA and 54.8% above the 200-day. Returns are strong at every horizon: 21d +25%, 63d +43%, 126d +70%, 252d +89%. The 63-day benchmark return is only +0.8%, so this is real outperformance. RS rank is 96 and Mansfield is +55.
+The trend and relative strength are about as good as the screen produces. Stage 2 with template 8, RS rank 96 and Mansfield 55. The close of 228.37 is 54.8% above the 200-day average and 22.5% above the 50-day. Returns are 43% over 63 days against the benchmark's 0.8%, and 89% over 252 days. The close is 2.9% below the 52-week high and 148% above the low.
 
-**Base and breakout:** The close is 2.9% below the 52-week high and clears the 209.95 pivot (the 10 Sep high) by about 8.8%. The weekly bar closed at the high end of its range (228.37 against a 235.24 high). The base is 41 sessions long, but the 38% depth is loose, not tight.
+The breakout bar is decisive. It ran from a 195.14 low to a 235.24 high and closed at 228.37, near the top of the range, up about 16.5% on the day. Volume was 2.70M shares, versus a typical 20k to 100k in recent sessions. The screen's 32x volume ratio matches that. It also clears the 209.95 pivot, which is the September high, by about 8.8%. Weekly volume of 2.9M is the heaviest since the June spike week. Demand is real, and the Weak market regime hasn't stopped this stock.
 
-**Volume:** The breakout day traded 2.70M shares, about 32x the ratio the screen cites. Volume is unusually high, and the stock has absorbed volume spikes before (6.0M on 11 Jun) and held above those levels.
+Liquidity is workable: 20-day traded value is about Rs 2.05 crore, so a 13-share order is trivial.
 
-**Stop and target:** The screen's stop is 190.16, 16.7% below entry. The risk-sized plan is 13 shares, about Rs 2,969, risking Rs 497 (worst case Rs 695). That is a small position, so the stop width is affordable. The stop sits below the October pullback area (lows near 151–175) only partly, so a tighter stop below 195 (the pre-breakout close) is arguable but would be noisy at ATR 6.7%. A reasonable target is a 2:1 or better move toward 270–280, which fits a one-month hold ending around 11 Dec.
+Stop and target: the plan stop is 190.16, below the October lows around 175 to 184 only partly, so it is a reasonable structural level. Risk is 497 rupees on 13 shares. The max buy of 243.65 caps chasing. A first target is a measured move toward 260 to 270, about 1.0 to 1.1 times the 41-day base height. That is speculative.
 
-**What would prove me wrong:** A close back below 209.95 within a few sessions, meaning a failed breakout. A close below 196, the prior day's close, would also be a warning. The 190.16 stop is the hard line.
+**Honest weaknesses:** I can't dress these up. The screen's most-similar cases (n=25) averaged -0.66R with a 28% win rate. Same grade and regime (n=251) averaged -0.17R. The stop is 16.7% away, ATR is 6.7%, and many bars are single-price prints, which suggests thin trading or circuit-limit moves. A 16.5% one-day pop after a 25% monthly gain is extended.
 
-**Honest weaknesses:** The market regime is Weak. Sector data and results dates are missing. The stock is 148% above its 52-week low and has had a gap-and-fade pattern, with the 205 high in August and the 207 high in October both reversed. Many of the bars show thin trading, with single-price prints and tiny volume, which suggests circuit-style or illiquid action. Slippage is a real risk, and the max buy is 243.65. This is a modest-conviction B grade, not a strong case.
+**What proves me wrong:** a close back below 209.95 means a failed breakout. A close below 190.16 is the exit. Volume fading to the usual 30k to 60k within days would mean the spike was a one-off.
 
 Bear:
 
-> The Bear case: this is a late, extended, illiquid-looking spike in a weak market, and the plan's own risk numbers don't hold up.
+> The case against buying AMANTA at 228.37 rests on the setup, the liquidity, and the track record.
 
-**Extension.** The close of 228.37 is 22.5% above the 50-day average and 54.8% above the 200-day. The stock is up 25% in 21 sessions, 43% in 63 and 89% in 252, while the benchmark gained 0.78% over 63 days. It is 148% off its 52-week low. Buying here means paying for a move that has already happened.
+**Track record.** The screen's own history is negative. Same grade (n=341): avg R -0.09, median -0.24, 44% wins. Same grade and Weak regime (n=251): avg R -0.17, median -0.36, 42% wins. The 25 most similar signals (small n, but matched on RS, base depth and length, and volume ratio) averaged -0.66R with 28% wins and -4.0% excess. Nothing here says this setup pays.
 
-**The base is not a base.** The pivot of 209.95 was the 9/10 intraday high. Since then the stock has ranged from 151.71 to 207.56, with a depth of 38%. A 41-day, 38%-deep structure is loose, not tight. The stock fell from 207 on 10/7 to 160 on 10/21, a 23% drop, and only recovered in the last six sessions.
+**Extended and late.** The close is 22.5% above the 50-day average and 54.8% above the 200-day. It is up 43% in 63 days and 89% in a year, against a benchmark up 0.8% over 63 days. ATR is 6.7% of price, so the stock moves wildly. The entry is also 8.8% above the 209.95 pivot, so this is a chase, and the plan's max_buy of 243.65 allows a further 6.7% of chasing.
 
-**Volume is a one-day event.** The vol_ratio of 32 comes from 2.70M shares on a day with a 40-point range (low 195.14, high 235.24), and the close sits well below the high. That looks like a news or operator spike, not accumulation. The 6/11 spike (6.0M shares, high 164) was followed by a fade to 159 within weeks, and the 8/24 high of 205 reversed to 183 within four sessions. Both earlier thrusts failed.
+**Stop too wide.** The stop at 190.16 is 16.7% below entry, and the plan itself shows worst-case risk of Rs 695 against 497 planned. That is above the 0.5% budget. Position size is just 13 shares (Rs 2,969), so the trade barely matters if it works and still hurts if gapped.
 
-**Bar quality.** Many sessions show open=high=low=close with tiny volume (7/6, 7/7, 8/6 to 8/12, 9/3 to 9/9). That points to circuit-limit style trading and thin liquidity. Traded value of about Rs 2.0 crore a day is modest, and exits may be hard if the stock turns.
+**Bars are erratic.** Many sessions show open=high=low=close with tiny volume (e.g. 7-13 Aug at 2-7k shares), which is the pattern of a thin, circuit-limited stock. The 41-day base is 38% deep, which is loose, and the stock fell from 207 on 7 Oct to 157.74 on 27 Oct before this jump. The 12 Nov bar ran from 198 to a 235.24 high and closed at 228.37, giving back some of the spike on 2.7M volume. The vol_ratio of 32 comes from one day, which looks like a single event spike rather than sustained demand. The earlier 11 June spike (6.0M shares, high 164) also faded into months of chop.
 
-**Risk math.** The stop at 190.16 is 16.7% below entry, and the max buy of 243.65 is 6.7% above. The 13-share plan carries Rs 497 risk, but worst-case risk is Rs 695, about 40% more. ATR is 6.7% daily, so the stop is only about 2.5 ATRs away. A gap through it on a thin stock is plausible. The market regime is Weak, and no sector data is available to offset that.
+**Market.** The regime is Weak, and the sector and results date are unknown, so a surprise is possible.
 
-**What would change my mind:** a pullback that holds above 209.95 on contracting volume, or a few closes above 228 with steady turnover and no circuit-style bars.
+**What would change my mind:** a pullback toward 205-210 that holds the pivot on quiet volume, or a tighter stop that keeps risk inside budget.
 
 Judge:
 
 ```json
 {
  "verdict": "Avoid",
- "conviction": 3,
+ "conviction": 4,
  "horizon_sessions": 21,
  "entry_low": 220.0,
  "entry_high": 232.0,
@@ -291,23 +292,63 @@ Judge:
  "wait_level": 0,
  "wait_min_volume_ratio": 0,
  "wait_within_sessions": 0,
- "invalidation": "The Avoid would be wrong if the stock holds above the 209.95 pivot, closes above the 235.24 breakout-day high on steady turnover, and stops printing single-price thin bars. That would show real demand rather than a one-day spike.",
- "how_its_moving": "The stock has climbed hard, up 89% over a year and 25% in the last month, while the index barely moved (+0.8% over 63 days). Its 41-session base was loose, swinging from about 207 down to 151.71 before snapping back. The breakout day traded 2.70M shares, about 32 times normal, but past spikes like this faded within weeks. Many recent sessions traded at a single price on tiny volume, and the overall market regime is Weak.",
+ "invalidation": "I would reconsider if price pulls back toward the 209.95 pivot on quiet volume (near the usual 30k-100k shares), holds there, and then closes back above 235.24 with heavy volume. That would give a tighter stop near the pivot instead of 16.7% away. A close below 209.95 would confirm the breakout failed.",
+ "how_its_moving": "The stock is in a strong uptrend: up 43% in three months and 89% in a year, while the index rose only 0.8% over the same three months. Over the last 41 sessions it built a loose, 38%-deep base, falling from 207 in early October to about 158 in late October. On the signal day it jumped about 16.5% to 228.37 on 2.7 million shares, roughly 32 times normal volume, clearing the September high of 209.95. Many earlier sessions traded at a single price on tiny volume, which points to a thin, circuit-limited stock. The broad market is Weak, and no sector data is given.",
  "reasons_for": [
-  "RS rank 96 and Mansfield +55 show strong outperformance against a benchmark up only 0.78% over 63 days.",
-  "The close of 228.37 cleared the 209.95 pivot by about 8.8% and sits only 2.9% below the 52-week high.",
-  "The breakout bar closed at 228.37 within a 195.14\u2013235.24 range, in the upper part of the day.",
-  "Stage 2 with template 8 and returns positive at all horizons (+43% over 63 days, +70% over 126 days)."
+  "Relative strength is top-tier: RS rank 96 and Mansfield 55.07, with a 63-day return of 43.1% against the benchmark's 0.8%.",
+  "The breakout bar closed at 228.37, near its 235.24 high and 8.8% above the 209.95 pivot, on a volume ratio of 32x.",
+  "The close is only 2.9% below the 52-week high, in Stage 2."
  ],
  "reasons_against": [
-  "The market regime is Weak, and no sector data is available to show support.",
-  "The stock is extended: 22.5% above the 50-day SMA, 54.8% above the 200-day, and 148% off its 52-week low.",
-  "Two earlier thrusts failed: the 11 Jun spike on 6.0M shares at a 164 high and the 24 Aug high of 205.57, which fell to 183.47 within days.",
-  "The base is 38% deep, and the stock dropped 23% from 207.56 on 7 Oct to the 151.71 low on 21 Oct.",
-  "Many bars are single-price prints on thin volume (8/6\u20138/12, 9/3\u20139/16), and 20-day traded value is only about Rs 2.05 crore, so gap and slippage risk is high.",
-  "The stop at 190.16 is 16.7% away, about 2.5 ATR at a 6.7% daily ATR. Worst-case risk of Rs 695 exceeds the Rs 500 budget.",
-  "The first target at 1.5R requires about 286, roughly 25% above entry within 21 sessions, which is a stretch after a 25% month."
+  "The screen's base rates are negative. Same grade and regime (n=251): average -0.17R, 42% wins. Most similar cases (n=25, small sample): average -0.66R, 28% wins, -4.0% excess return. Nothing in the pack shows how this signal differs.",
+  "The market regime is Weak, so a long needs more support than usual, and none is offered here.",
+  "The entry is extended: 22.5% above the 50-day average and 54.8% above the 200-day, after a 25.3% gain over 21 days.",
+  "The stop at 190.16 is 16.7% away, about 2.5 ATR at a 6.7% ATR. Worst-case risk is Rs 695 against a Rs 500 budget, on only a 13-share position.",
+  "Many bars are single-price prints on 2k-20k shares, the pattern of circuit limits and gap risk. The 11 June volume spike of 6.0M shares also faded into months of chop."
  ]
+}
+```
+
+Track record the Brain gave the debate:
+
+```json
+{
+ "record": {
+  "note": "How past signals and past verdicts ended. Small samples are weak evidence: under about 30 cases, quote the n and do not lean on the figure.",
+  "screen_history": {
+   "basis": "Every earlier signal from this screen on this side with a finished 21-session result, mostly replayed history, before costs. R is the result over the entry-to-stop distance. The screen's grades were tuned on part of this history, so it may flatter the screen.",
+   "same_grade": {
+    "n": 341,
+    "avg_r": -0.09,
+    "median_r": -0.24,
+    "win_pct": 44.0,
+    "median_ret_pct": -1.7,
+    "avg_excess_pct": 0.5
+   },
+   "same_grade_and_regime": {
+    "n": 251,
+    "avg_r": -0.17,
+    "median_r": -0.36,
+    "win_pct": 42.0,
+    "median_ret_pct": -2.4,
+    "avg_excess_pct": -0.1
+   },
+   "most_similar": {
+    "n": 25,
+    "avg_r": -0.66,
+    "median_r": -0.68,
+    "win_pct": 28.0,
+    "median_ret_pct": -5.0,
+    "avg_excess_pct": -4.0,
+    "matched_on": "RS rank, Mansfield, base depth, base length, volume ratio"
+   }
+  },
+  "judge_record": {
+   "closed": 0
+  },
+  "similar_judged_cases": []
+ },
+ "lessons": []
 }
 ```
 
@@ -315,7 +356,7 @@ Picks written:
 
 | book | symbol | verdict | conviction | levels | stop | target | horizon | max_buy |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| debated | AMANTA.NS | Avoid | 3 | judge | 190.16 | 286.0 | 21 |  |
+| debated | AMANTA.NS | Avoid | 4 | judge | 190.16 | 286.0 | 21 |  |
 
 ## Page summary rows
 
