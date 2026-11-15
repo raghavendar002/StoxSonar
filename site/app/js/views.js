@@ -1,6 +1,6 @@
 // Screens: Today, Trades, Debates, and the two detail views (a debate case, a plain signal).
 import { state, feed, esc, num, pct, rfmt, sign, money, pnl, px, day, shortDay, tv, icon, note, empty, rpill,
-  verdictChip, dots, tradeLine, findCase, currency } from "./core.js";
+  verdictChip, dots, tradeLine, findCase, currency, gain } from "./core.js";
 import { breadthBar, breadthHistory, caseChart, ladder } from "./charts.js";
 
 const ui = (k, d) => (state.ui[k] === undefined ? d : state.ui[k]);
@@ -11,23 +11,44 @@ const notes = (f) => (f && f.notes ? f.notes.map((n) => note(n, "info")).join(""
 const marketName = () => (state.market === "IN" ? "India" : "US");
 
 // ---------------------------------------------------------------- shared rows
+// What the paper books did with a signal, once the evening run has logged them
+function bookPicks(r) {
+  const f = feed(state.market, "mid");
+  return ((f && f.picks) || []).filter((p) => p.symbol === r.symbol && p.direction === r.direction && p.signal_date === r.trigger_date);
+}
+const WHY = { stop: "stopped out", target: "hit target", time: "timed out", fail: "failed" };
+function pickLine(p) {
+  if (p.status === "closed") return `${WHY[p.reason] || p.reason || "closed"} ${rfmt(p.r)}`;
+  if (p.status === "open") return `open${p.ret_pct != null ? " " + pct(p.ret_pct) : ""}`;
+  return p.status === "pending" ? "enters next open" : String(p.status || "").replace(/_/g, " ");
+}
+// The move since the signal, counted the way the signal bets: a breakdown wins when the price falls
+function resultOf(r) {
+  const move = r.move_pct != null ? r.move_pct : r.ret_21_pct;
+  if (move == null) return null;
+  const up = r.direction === "up", g = gain(move, r.direction);
+  const label = r.move_pct == null ? (up ? "after 21 days" : `price ${move >= 0 ? "rose" : "fell"} ${Math.abs(move).toFixed(1)}%`)
+    : up ? "since signal" : `price ${move >= 0 ? "rose" : "fell"} ${Math.abs(move).toFixed(1)}%`;
+  return { g, move, label, against: g < 0 };
+}
+
 function signalRow(r) {
-  const upDir = r.direction === "up";
+  const upDir = r.direction === "up", res = resultOf(r);
   const prog = Math.min(100, ((r.sessions || 0) / 21) * 100);
+  const twin = bookPicks(r).find((p) => p.book === "twin");
   return `<button class="item" data-act="open-signal" data-id="${esc(sigId(r))}">
     <span class="grade ${esc(r.grade)}">${esc(r.grade)}</span>
     <span class="grow"><span class="row"><span class="sym">${esc(r.symbol)}</span>
       ${r.status ? `<span class="chip ${r.status === "Active" ? "info" : r.status === "Failed" ? "avoid" : r.status === "Confirmed" ? "go" : ""}">${esc(r.status)}</span>` : ""}</span>
-      <span class="sub"><span class="${upDir ? "up" : "down"}">${upDir ? "▲ Breakout" : "▼ Breakdown"}</span> · ${esc(shortDay(r.trigger_date))} · day ${r.sessions || 0} of 21${r.rs_rank != null ? ` · RS ${Math.round(r.rs_rank)}` : ""}</span>
+      <span class="sub"><span class="${upDir ? "up" : "down"}">${upDir ? "▲ Breakout" : "▼ Breakdown"}</span> · ${esc(shortDay(r.trigger_date))} · day ${r.sessions || 0} of 21${r.rs_rank != null ? ` · RS ${Math.round(r.rs_rank)}` : ""}${twin && twin.status === "closed" ? ` · <b class="${sign(twin.r)}">Twin ${esc(pickLine(twin))}</b>` : ""}</span>
       <span class="meter"><span style="width:${prog}%"></span></span></span>
-    <span class="end">${r.move_pct != null ? `<span class="big ${sign(r.move_pct)}">${pct(r.move_pct)}</span>` : r.ret_21_pct != null ? `<span class="big ${sign(r.ret_21_pct)}">${pct(r.ret_21_pct)}</span>` : ""}
-      <div class="dim" style="font-size:11.5px">${r.move_pct != null ? "since signal" : ""}</div></span></button>`;
+    <span class="end">${res ? `<span class="big ${sign(res.g)}">${pct(res.g)}</span><div class="dim" style="font-size:11.5px">${esc(res.label)}</div>` : ""}</span></button>`;
 }
 
 function caseRow(c, cur) {
   const oj = c.outcome && c.outcome.judge, ot = c.outcome && c.outcome.twin;
   const sub = c.horizon === "intra"
-    ? `Judge: ${esc(tradeLine(oj))} · Twin: ${esc(tradeLine(ot))}`
+    ? `${c.market === "IN" ? `<span class="${c.side === "short" ? "down" : "up"}">${c.side === "short" ? "▼ Short" : "▲ Long"}</span> · ` : ""}Judge: ${esc(c.not_debated ? "not debated" : tradeLine(oj))} · Twin: ${esc(tradeLine(ot))}`
     : `${esc(c.headline || "")}${c.judge && c.judge.conviction ? ` · conviction ${c.judge.conviction}/5` : ""}`;
   return `<button class="item" data-act="open-case" data-id="${esc(c.id)}">
     ${c.grade ? `<span class="grade ${esc(c.grade)}">${esc(c.grade)}</span>` : `<span class="grade" style="color:var(--judge);background:var(--judge-soft)">${icon("judge")}</span>`}
@@ -43,7 +64,7 @@ function duel(j, t, cur, title) {
   const jw = (j.pnl || 0) > (t.pnl || 0), tw = (t.pnl || 0) > (j.pnl || 0);
   const side = (who, b, tone, win, ic) => `<div class="side-card ${win ? "win" : ""}">
     <div class="who" style="color:${tone}">${icon(ic)}${who}${win ? `<span class="crown">ahead</span>` : ""}</div>
-    <div class="amt ${sign(b.pnl)}">${pnl(b.pnl, cur)}</div>
+    <div class="amt ${sign(b.pnl)}">${b.pnl == null ? "–" : (b.pnl > 0 ? "+" : "") + money(b.pnl, cur, cur === "INR" ? 0 : 2)}</div>
     <div class="muted num" style="font-size:12.5px">${rfmt(b.r)} · ${b.trades} trade${b.trades === 1 ? "" : "s"}${b.trades ? ` · ${b.wins} won` : ""}</div></div>`;
   return `<div class="card">${title ? `<div class="eyebrow" style="margin-bottom:10px">${esc(title)}</div>` : ""}
     <div class="duel">${side("Judge", j, "var(--judge)", jw, "judge")}<div class="vs">VS</div>${side("Twin", t, "var(--text-2)", tw, "trades")}</div></div>`;
@@ -103,7 +124,8 @@ function todayMidIN(f) {
     ${s.breakouts.length ? `<div class="list">${s.breakouts.map(signalRow).join("")}</div>` : empty("Nothing broke out today", "No stock closed above its base on heavy volume with an A or B grade.")}
     ${s.breakdowns.length ? section("New breakdowns") + `<div class="list">${s.breakdowns.map(signalRow).join("")}</div>` : ""}
     ${s.closed_today.length ? section("Closed today") + `<div class="list">${s.closed_today.map(signalRow).join("")}</div>` : ""}
-    ${movers.length ? section("Biggest movers among open signals", `<a class="more" href="#/trades">All ${s.open_signals.length}</a>`) + `<div class="list">${movers.map(signalRow).join("")}</div>` : ""}
+    ${movers.length ? section("Biggest movers among open signals", `<a class="more" href="#/trades">All ${s.open_signals.length}</a>`) + `<div class="list">${movers.map(signalRow).join("")}</div>
+      <p class="foot" style="margin-top:8px">Green means the signal is working, red means it is going against it. A breakdown is a bet on a fall, so a rising price shows as a loss.</p>` : ""}
     ${f.history.length > 1 ? section("Market breadth") + `<div class="card">${breadthHistory(f.history)}</div>` : ""}
     ${f.books.length ? section("Paper books") + booksTable(f.books) : ""}`;
 }
@@ -129,28 +151,34 @@ function todayIntra(f) {
     ? "The India scanner and its fixed-rule twin are the next build step. Days will appear here as they run."
     : "Days will appear here once daily paper trading starts.", "clock");
   const cur = f.currency, b = d.books;
-  const head = !b ? "Decisions made, results pending"
+  const head = !b ? (d.cases.length ? "Decisions made, results after the close" : "No candidates today")
     : b.judge.pnl > b.twin.pnl ? "The Judge beat the Twin" : b.judge.pnl < b.twin.pnl ? "The Twin beat the Judge" : "Judge and Twin tied";
-  const maxRel = Math.max(...d.near_misses.map((n) => n.relvol), 1.5);
+  const near = d.near_misses || [];
+  const maxRel = Math.max(...near.map((n) => n.relvol), 1.5);
+  const whys = d.cases.map((c) => [c, takeaway(c)]).filter(([, t]) => t);
   return `${dayChips(days, i)}
     <div class="hero" style="--glow:var(--judge)">
       <div class="row"><span class="status"><span class="pulse"></span>${d.status === "dry_run" ? "Dry run" : "Paper trading"}</span>
         <span class="grow"></span><span class="chip">${esc(day(d.date))}</span></div>
       <h1>${esc(head)}</h1>
-      <p>${d.universe} stocks scanned · ${d.signals} signal${d.signals === 1 ? "" : "s"} · decided ${esc(d.checkpoint || "")} ${esc(d.tz)} ·
+      <p>${d.universe ?? "–"} stocks scanned · ${d.signals ?? 0} signal${d.signals === 1 ? "" : "s"} · decided ${esc(d.checkpoint || "")} ${esc(d.tz)} ·
         ${esc(d.index.name)} <b class="${sign(d.index.move_pct)}">${pct(d.index.move_pct, 2)}</b></p>
     </div>
     ${d.status === "dry_run" ? `<div style="margin-top:10px">${note("One test day to prove the plumbing: the Judge was played by hand, not by the API. It says nothing about whether the Judge is any good.")}</div>` : ""}
-    ${b ? `<div style="margin-top:10px">${duel(b.judge, b.twin, cur, `On ${money(f.capital, cur, 0)} of paper money`)}</div>` : ""}
+    ${b ? `<div style="margin-top:10px">${duel(b.judge, b.twin, cur, `On ${money(d.capital || f.capital, cur, 0)} of paper money each`)}</div>` : ""}
+    ${b && whys.length ? `<div class="card" style="margin-top:10px"><div class="eyebrow">Why the two books differ today</div>
+      <ul class="brief" style="margin-top:8px">${whys.map(([c, t]) => `<li>${icon("chev")}<span><b>${esc(c.symbol)}.</b> ${esc(t)}</span></li>`).join("")}</ul>
+      <p class="dim" style="font-size:12px;margin:10px 0 0">Same candidates, same money. The gap comes only from where the Judge passed or chose its own levels.${d.cost_usd ? ` Today's debates cost $${num(d.cost_usd, 2)} in API fees.` : ""}</p></div>` : ""}
+    <div style="margin-top:10px">${howItWorks(true)}</div>
     ${section("Candidates", `<span class="dim" style="font-size:12.5px">Tap one for the full debate</span>`)}
-    <div class="list">${d.cases.map((c) => caseRow(c, cur)).join("")}</div>
-    ${section("What the scanner saw")}
-    <div class="card scroll"><table><thead><tr><th>Stock</th><th>Rel. vol</th><th>Today</th><th>Vs high</th><th></th></tr></thead><tbody>
-      ${d.near_misses.map((n) => `<tr><td><b>${esc(n.symbol)}</b></td>
+    ${d.cases.length ? `<div class="list">${d.cases.map((c) => caseRow(c, cur)).join("")}</div>` : empty("No candidates today", "Nothing met the scanner's rule at the checkpoint, so neither book traded.", "clock")}
+    ${near.length ? section("What the scanner saw") : ""}
+    ${!near.length ? "" : `<div class="card scroll"><table><thead><tr><th>Stock</th><th>Rel. vol</th><th>Today</th><th>Vs high</th><th></th></tr></thead><tbody>
+      ${near.map((n) => `<tr><td><b>${esc(n.symbol)}</b></td>
         <td><div class="row" style="justify-content:flex-end"><span>${num(n.relvol, 1)}×</span><span class="meter" style="width:36px;margin:0"><span style="width:${Math.min(100, (n.relvol / maxRel) * 100)}%;background:${n.relvol >= 1.5 ? "var(--bull)" : "var(--text-3)"}"></span></span></div></td>
         <td class="${sign(n.move_pct)}">${pct(n.move_pct, 2)}</td><td class="${sign(n.dist_pct)}">${pct(n.dist_pct, 2)}</td>
-        <td>${n.passed ? `<span class="chip go">Signal</span>` : `<span class="chip">Missed</span>`}</td></tr>`).join("")}</tbody></table></div>
-    <p class="foot">A signal needs opening volume of at least 1.5× normal and a price at or above the opening-range high.</p>`;
+        <td>${n.passed ? `<span class="chip go">Signal</span>` : `<span class="chip">Missed</span>`}</td></tr>`).join("")}</tbody></table></div>`}
+    <p class="foot">A signal needs opening volume of at least 1.5× normal and a price at or beyond the edge of the first 15 minutes' range${state.market === "IN" ? " (above the high for a long, below the low for a short)" : ""}.</p>`;
 }
 
 export function today() {
@@ -183,8 +211,9 @@ function tradesMid(f) {
   const tests = { all: () => true, up: (r) => r.direction === "up", down: (r) => r.direction !== "up", active: (r) => r.status === "Active", extended: (r) => r.status === "Extended" };
   const rows = rowsAll.filter(tests[flt] || tests.all).sort((a, b) => (b.trigger_date || "").localeCompare(a.trigger_date || ""));
   const chips = [["all", "All"], ["up", "Breakouts"], ["down", "Breakdowns"], ["active", "Active"], ["extended", "Extended"]];
-  const avg = rows.length ? rows.reduce((n, r) => n + (r.move_pct || 0), 0) / rows.length : null;
-  return `${seg}<div class="grid k2" style="margin-bottom:12px">${kpi("Showing", rows.length, `of ${rowsAll.length} open`)}${kpi("Average move", pct(avg), "since each signal", sign(avg))}</div>
+  const got = rows.map(resultOf).filter(Boolean);
+  const avg = got.length ? got.reduce((n, x) => n + x.g, 0) / got.length : null;
+  return `${seg}<div class="grid k2" style="margin-bottom:12px">${kpi("Showing", rows.length, `of ${rowsAll.length} open`)}${kpi("Average result", pct(avg), "breakdowns counted as shorts", sign(avg))}</div>
     <div class="chips" style="margin-bottom:12px">${chips.map(([k, l]) => `<button class="chip ${k === flt ? "on" : ""}" data-act="set" data-k="tflt" data-v="${k}">${l}</button>`).join("")}</div>
     ${rows.length ? `<div class="list">${rows.map(signalRow).join("")}</div>` : empty("Nothing matches", "Try another filter.")}
     ${s && s.closed_today.length ? section("Closed today") + `<div class="list">${s.closed_today.map(signalRow).join("")}</div>` : ""}`;
@@ -211,6 +240,61 @@ function tradesIntra(f) {
 
 export function trades() { return state.horizon === "intra" ? tradesIntra(feed()) : tradesMid(feed()); }
 
+// ---------------------------------------------------------------- How it works, the Brain
+export function howItWorks(intra) {
+  const li = (ic, tone, title, text) => `<li><span class="av" style="color:${tone}">${icon(ic)}</span><div><b>${title}</b><span>${text}</span></div></li>`;
+  return `<details class="card how"><summary>${icon("info")}<span>How Bull, Bear, Judge and Twin work</span>${icon("chev")}</summary>
+    <ul>
+      ${li("bull", "var(--bull)", "The Bull", "argues for the trade, on one stock at a time, from a fixed sheet of numbers.")}
+      ${li("bear", "var(--bear)", "The Bear", "reads the same sheet and the Bull's case, and argues against it.")}
+      ${li("judge", "var(--judge)", "The Judge", intra
+        ? "reads both and makes the final call on that stock: Long, Short or No trade, with its own entry, stop and target."
+        : "reads both and makes the final call on that stock: Go, Wait for a condition, or Avoid, with its own entry, stop and target.")}
+      ${li("trades", "var(--text-2)", "The Twin", "is the control. It has no opinion: it takes every candidate at fixed rule-based levels. It exists only so you can tell whether the Judge adds anything.")}
+    </ul>
+    <p><b>Reading the score.</b> Both books start with the same paper money and see the same candidates. They end differently for two reasons only: the Judge passed on a trade the Twin took (or the reverse), or the Judge chose a different entry, stop or target. Tap any candidate to see which it was.</p>
+    <p><b>R</b> is the result measured against the money risked: −1R is a full stop-out, +2R is twice the risk won. It makes ₹ and $ trades comparable.</p>
+    <p><b>One day proves nothing.</b> The Judge is kept only if it beats the Twin over about 100 trades, after costs and API fees.</p></details>`;
+}
+
+function brainCard(f) {
+  const b = f && f.brain, sb = b && b.scoreboard;
+  if (!b || !sb) return "";
+  const r2 = (x) => (x == null ? "–" : rfmt(x));
+  const v = sb.verdicts || {}, sw = b.switch, bud = b.budget;
+  const prog = Math.min(100, (sb.judged_closed / (sb.needed || 100)) * 100);
+  const line = (l, val) => `<div><span>${l}</span><b>${val}</b></div>`;
+  return `${section("The Brain", `<a class="more" href="../brain.html" target="_blank" rel="noopener">Full page</a>`)}
+    <div class="card"><div class="row"><span class="grade" style="color:var(--judge);background:var(--judge-soft)">${icon("judge")}</span>
+        <div class="grow"><b>${esc(sb.state || "")}</b><div class="sub">The Judge passes only if Go beats Avoid, the Judge book beats the Twin book, and high conviction beats low.</div></div></div>
+      <span class="meter" style="margin-top:12px"><span style="width:${prog}%;background:var(--judge)"></span></span>
+      <div class="facts" style="margin-top:12px">
+        ${line("Verdicts so far", `Go ${v.Go || 0} · Wait ${v.Wait || 0} · Avoid ${v.Avoid || 0}`)}
+        ${line("Verdicts right", sb.right_pct == null ? "–" : num(sb.right_pct, 0) + "%")}
+        ${line(`Go · ${sb.go.n} closed`, `<span class="${sign(sb.go.avg_r)}">${r2(sb.go.avg_r)}</span>`)}
+        ${line(`Avoid, as if taken · ${sb.avoid.n}`, `<span class="${sign(sb.avoid.avg_r)}">${r2(sb.avoid.avg_r)}</span>`)}
+        ${line(`Judge book · ${sb.judge_book.n} closed`, `<span class="${sign(sb.judge_book.avg_r)}">${r2(sb.judge_book.avg_r)}</span>`)}
+        ${line(`Twin book · ${sb.twin_book.n} closed`, `<span class="${sign(sb.twin_book.avg_r)}">${r2(sb.twin_book.avg_r)}</span>`)}
+        ${bud ? line("API spend this month", `$${num(bud.spent_usd, 2)} of $${num(bud.cap_usd, 0)}`) : ""}
+        ${sw ? line(`Debates in a ${esc(sw.regime || "")} market`, sw.off ? `<span class="down">Switched off</span>` : `<span class="up">On</span>`) : ""}
+      </div>
+      ${sw && sw.off ? `<p class="muted" style="margin:10px 0 0;font-size:13px">Off because ${esc(sw.why)}. The books keep scoring every signal, and debates restart when the market type changes.</p>`
+        : sw ? `<p class="dim" style="margin:10px 0 0;font-size:12px">Debates stop in a market type if under ${sw.min_share_pct}% of the Judge's first ${sw.after} verdicts there are Go or Wait.</p>` : ""}
+      <div class="eyebrow" style="margin-top:14px">Lessons the Judge is given</div>
+      ${b.lessons && b.lessons.length ? `<ol class="steps">${b.lessons.map((x) => `<li>${esc(x.text)} <span class="dim">(${x.n_cases} cases)</span></li>`).join("")}</ol>`
+        : `<p class="muted" style="margin:6px 0 0;font-size:13px">None yet. A lesson needs at least ${b.min_cases || 8} closed judged trades behind it.</p>`}
+    </div>`;
+}
+
+function skippedList(f) {
+  const rows = (f && f.skipped) || [];
+  if (!rows.length) return "";
+  return `${section("Not debated")}<div class="list">${rows.slice(0, 20).map((x) => `<div class="item" style="cursor:default">
+    <span class="grade ${esc(x.grade)}">${esc(x.grade || "–")}</span>
+    <span class="grow"><span class="row"><span class="sym">${esc(x.symbol)}</span><span class="dim" style="font-size:12px">${esc(shortDay(x.date))}</span></span>
+      <span class="sub">${x.direction === "up" ? "Breakout" : "Breakdown"} · ${esc(x.why)}</span></span></div>`).join("")}</div>`;
+}
+
 // ---------------------------------------------------------------- Debates
 function allCases(f) {
   if (!f) return [];
@@ -219,7 +303,9 @@ function allCases(f) {
 
 export function debates() {
   const f = feed(), cases = allCases(f);
-  if (!cases.length) return notes(f) + empty("No debates yet", "When a Bull, a Bear and the Judge argue over a pick, the whole exchange lands here.", "debates");
+  const how = howItWorks(state.horizon === "intra");
+  if (!cases.length) return notes(f) + empty("No debates yet", "When a Bull, a Bear and the Judge argue over a pick, the whole exchange lands here.", "debates")
+    + `<div style="margin-top:10px">${how}</div>` + (state.horizon === "mid" ? brainCard(f) + skippedList(f) : "");
   const cur = f.currency, flt = ui("dflt", "all");
   const tests = { all: () => true, go: (c) => c.judge && c.judge.tone === "go", wait: (c) => c.judge && c.judge.tone === "wait", avoid: (c) => c.judge && c.judge.tone === "avoid" };
   const rows = cases.filter(tests[flt]);
@@ -230,9 +316,10 @@ export function debates() {
   } else if (f.books.length) board = booksTable(f.books.filter((b) => b.book === "judge" || b.book === "twin" || b.book === "debated"));
   const count = (k) => cases.filter(tests[k]).length;
   const labels = state.horizon === "intra" ? [["all", "All"], ["go", "Took the trade"], ["avoid", "Passed"]] : [["all", "All"], ["go", "Go"], ["wait", "Wait"], ["avoid", "Avoid"]];
-  return `${notes(f)}${board}
+  return `${notes(f)}${board}<div style="margin-top:10px">${how}</div>
     <div class="chips" style="margin:14px 0 12px">${labels.map(([k, l]) => `<button class="chip ${k === flt ? "on" : ""}" data-act="set" data-k="dflt" data-v="${k}">${l} · ${count(k)}</button>`).join("")}</div>
-    ${rows.length ? `<div class="list">${rows.map((c) => caseRow(c, cur)).join("")}</div>` : empty("Nothing matches", "Try another filter.")}`;
+    ${rows.length ? `<div class="list">${rows.map((c) => caseRow(c, cur)).join("")}</div>` : empty("Nothing matches", "Try another filter.")}
+    ${state.horizon === "mid" ? brainCard(f) + skippedList(f) : ""}`;
 }
 
 // ---------------------------------------------------------------- Detail: a debate case
@@ -243,6 +330,7 @@ function takeaway(c) {
     if (t && t.r != null) return t.r > 0 ? `The Judge passed on a trade the Twin won (${rfmt(t.r)}).` : `The Judge passed and was right: the Twin lost ${rfmt(t.r)}.`;
     return "The Judge passed; the Twin had no fill to compare.";
   }
+  if (j && j.status === "stale") return `The Judge's order went in after the price had already passed its entry, so it was not filled${t && t.r != null ? `; the Twin made ${rfmt(t.r)}.` : "."}`;
   if (j && j.status === "not_triggered") return `The Judge's entry never triggered${t && t.r != null ? `; the Twin made ${rfmt(t.r)} at its own levels.` : "."}`;
   if (j && j.r != null && t && t.r != null) {
     const diff = j.r - t.r;
@@ -268,7 +356,7 @@ function speech(c, role) {
   const j = c.judge;
   if (role === "bull") return `<div class="speech" style="--tone:var(--bull)"><div class="who">The Bull's case</div><p>${esc(c.bull || "No Bull case was recorded.")}</p></div>`;
   if (role === "bear") return `<div class="speech" style="--tone:var(--bear)"><div class="who">The Bear's case</div><p>${esc(c.bear || "No Bear case was recorded.")}</p></div>`;
-  if (!j) return `<div class="speech" style="--tone:var(--judge)"><div class="who">The Judge</div><p>This candidate was not debated.</p></div>`;
+  if (!j) return `<div class="speech" style="--tone:var(--judge)"><div class="who">The Judge</div><p>This candidate was not debated.${c.not_debated ? " " + esc(c.not_debated) : ""}</p></div>`;
   const list = (title, arr) => (arr && arr.length ? `<div class="eyebrow" style="margin-top:12px">${title}</div><ul>${arr.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>` : "");
   return `<div class="speech" style="--tone:var(--judge)"><div class="who">The Judge's ruling</div>
     <div class="verdict">${esc(j.title || j.verdict)}</div>
@@ -277,7 +365,8 @@ function speech(c, role) {
     ${j.text ? `<p>${esc(j.text)}</p>` : ""}${list("For", j.reasons_for)}${list("Against", j.reasons_against)}
     ${j.wait ? `<p><b>Waiting for:</b> ${esc(j.wait)}${j.wait_status ? ` <span class="chip warn">${esc(j.wait_status)}</span>` : ""}</p>` : ""}
     ${j.invalidation ? `<p><b>Wrong if:</b> ${esc(j.invalidation)}</p>` : ""}
-    ${ladder(j.levels, c.side)}
+    ${j.levels_if_traded && j.levels ? `<div class="eyebrow" style="margin-top:12px">Levels it would have used</div>` : ""}${ladder(j.levels, c.side)}
+    ${c.base_rate ? `<p class="dim" style="margin-top:10px">Track record all three were shown: ${esc(c.base_rate)}</p>` : ""}
     ${c.problems ? `<p class="dim" style="margin-top:10px">Level check: ${esc(c.problems)}</p>` : ""}</div>`;
 }
 
@@ -322,15 +411,21 @@ export function signalDetail(id) {
     : `<div class="card"><div class="eyebrow">Plan for a ₹1 lakh account</div>${buys ? "" : `<div style="margin-top:8px"><span class="chip warn">No buys while the market is weak</span></div>`}
         <div class="facts" style="margin-top:10px">${fact("Buy", `${p.qty} shares`)}${fact("Only below", "₹" + px(p.max_buy))}${fact("Stop", "₹" + px(p.stop))}${fact("Sell by", esc(shortDay(p.exit_by)))}
           ${fact("Position", money(p.value_rs, "INR", 0))}${fact("Risk", money(p.risk_rs, "INR", 0))}${fact("Worst case", money(p.worst_risk_rs, "INR", 0))}${fact("Stop distance", pct(p.stop_pct))}</div></div>`;
+  const res = resultOf(r), picks = bookPicks(r);
+  const skip = ((f && f.skipped) || []).find((x) => x.symbol === r.symbol && x.date === r.trigger_date && x.direction === r.direction);
+  const against = res && !upDir && res.against ? note(`This is a breakdown: the signal bets on a fall. The price has risen ${Math.abs(res.move).toFixed(1)}% since, so the shadow short is losing by that much.`, "warn") : "";
+  const books = picks.length ? section("In the paper books") + `<div class="card" style="display:grid;gap:10px">${picks.map((p) =>
+    `<div class="row"><span class="grow muted">${esc(BOOK_NAMES[p.book] || p.book)}</span><b class="num ${p.status === "closed" ? sign(p.r) : ""}">${esc(pickLine(p))}</b></div>`).join("")}</div>` : "";
   const body = `
-    <div class="grid k2">${kpi("Since the signal", pct(r.move_pct), `day ${r.sessions || 0} of 21`, sign(r.move_pct))}${kpi("Momentum score", num(r.score, 2), r.rs_rank != null ? `RS rank ${Math.round(r.rs_rank)}` : "")}</div>
-    <div style="margin-top:10px">${plan}</div>
+    <div class="grid k2">${kpi("Result since the signal", res ? pct(res.g) : "–", `${res && !upDir ? esc(res.label) + " · " : ""}day ${r.sessions || 0} of 21`, res ? sign(res.g) : "")}${kpi("Momentum score", num(r.score, 2), r.rs_rank != null ? `RS rank ${Math.round(r.rs_rank)}` : "")}</div>
+    ${against ? `<div style="margin-top:10px">${against}</div>` : ""}
+    <div style="margin-top:10px">${plan}</div>${books}
     ${section("Why it was flagged")}
     <div class="facts">${fact("Stage", r.stage_now != null ? `${r.stage_now}${r.stage_age != null ? ` · ${r.stage_age}d` : ""}` : r.stage ?? "–")}${fact("Trend template", r.template != null ? `${r.template}/8` : "–")}
       ${fact("Base", r.base_len ? `${r.base_len} days` : "–")}${fact("Base depth", r.depth_pct != null ? num(r.depth_pct, 0) + "%" : "–")}
       ${fact("Breakout volume", r.vol_ratio != null ? num(r.vol_ratio, 1) + "×" : "–")}${fact("Fail line", pct(r.stop_pct))}${fact("Source", esc(r.source || "live"))}${fact("Signal day", esc(shortDay(r.trigger_date)))}</div>
     ${debated ? section("The debate") + `<div class="list">${caseRow(debated, "INR")}</div>`
-      : `<div style="margin-top:14px">${note("No Bull, Bear or Judge debate exists for this signal.", "info")}</div>`}
+      : `<div style="margin-top:14px">${note(skip ? `Not debated. ${skip.why}` : "No Bull, Bear or Judge debate exists for this signal.", "info")}</div>`}
     <div class="row" style="margin-top:16px"><a class="btn ghost small" href="${tv(r.symbol)}" target="_blank" rel="noopener">${icon("ext")}Chart on TradingView</a></div>`;
   return { head, body };
 }

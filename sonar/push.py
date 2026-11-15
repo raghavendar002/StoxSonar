@@ -198,6 +198,50 @@ def daily_message(s: dict) -> dict:
             "url": APP_URL, "tag": f"daily-{s['as_of']}"}
 
 
+def _amount(x: float, cur: str) -> str:
+    sym = "₹" if cur == "INR" else "$"
+    body = f"{abs(x):,.0f}" if cur == "INR" else f"{abs(x):,.2f}"
+    return ("+" if x > 0 else "−" if x < 0 else "") + sym + body
+
+
+def intraday_message(feed: dict) -> Optional[dict]:
+    """The intraday alert, from the app's own feed: the Judge's calls after the
+    morning scan, both books' results after the close. None when there is no day."""
+    days = feed.get("days") or []
+    if not days:
+        return None
+    d, cur = days[0], feed.get("currency", "INR")
+    name = "India" if feed.get("market") == "IN" else "US"
+    books = d.get("books")
+    if books:
+        j, t = books["judge"], books["twin"]
+        lead = ("The Judge beat the Twin." if j["pnl"] > t["pnl"] else
+                "The Twin beat the Judge." if j["pnl"] < t["pnl"] else "Judge and Twin tied.")
+        trades = lambda b: f"{b['trades']} trade{'' if b['trades'] == 1 else 's'}"  # noqa: E731
+        body = (f"{lead} Judge {_amount(j['pnl'], cur)} ({trades(j)}), "
+                f"Twin {_amount(t['pnl'], cur)} ({trades(t)}).")
+        stage = "results"
+    else:
+        cases = d.get("cases") or []
+        took = [c for c in cases if (c.get("judge") or {}).get("tone") == "go"]
+        passed = [c for c in cases if c.get("judge") and (c["judge"].get("tone") != "go")]
+        parts = []
+        for c in took:
+            lv = c["judge"].get("levels") or {}
+            at = f" at {lv['entry_low']:g}, stop {lv['stop']:g}" if lv.get("entry_low") and lv.get("stop") else ""
+            parts.append(f"{c['judge']['verdict']} {c['symbol']}{at}.")
+        if passed:
+            parts.append("Passed on " + ", ".join(c["symbol"] for c in passed) + ".")
+        if not cases:
+            parts.append("No candidates this morning, so neither book trades.")
+        elif not took and not passed:
+            parts.append(f"{len(cases)} candidate{'' if len(cases) == 1 else 's'}, none debated.")
+        body = "Judge: " + " ".join(parts) if (took or passed) else " ".join(parts)
+        stage = "calls"
+    return {"title": f"StoxSonar · {name} intraday {stage} · {_day(d['date'])}", "body": body,
+            "url": f"./?v={feed.get('market', 'IN')}-intra", "tag": f"intra-{feed.get('market')}-{d['date']}-{stage}"}
+
+
 def run(message: dict, warn_telegram: bool = True) -> int:
     raw = os.environ.get("VAPID_PRIVATE_KEY", "").strip()
     subs = parse_subs(os.environ.get("PUSH_SUBS", ""))
@@ -216,8 +260,9 @@ def run(message: dict, warn_telegram: bool = True) -> int:
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("what", choices=["daily", "test", "keygen"])
+    ap.add_argument("what", choices=["daily", "intraday", "test", "keygen"])
     ap.add_argument("--site", type=Path, default=Path(__file__).resolve().parent.parent / "site")
+    ap.add_argument("--mkt", choices=["in", "us"], default="in", help="for intraday: which market's feed")
     a = ap.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     if a.what == "keygen":
@@ -227,6 +272,13 @@ def main(argv=None) -> int:
     if a.what == "test":
         msg = {"title": "StoxSonar · test", "body": "Alerts work on this device.", "url": APP_URL, "tag": "test"}
         return run(msg, warn_telegram=True)
+    if a.what == "intraday":
+        feed = json.loads((a.site / "app" / "feed" / f"intra-{a.mkt}.json").read_text(encoding="utf-8"))
+        msg = intraday_message(feed)
+        if msg is None:
+            log.info("no intraday day in the %s feed; nothing to send", a.mkt)
+            return 0
+        return run(msg, warn_telegram=False)
     snap = json.loads(re.sub(r"\bNaN\b", "null", (a.site / "data.json").read_text(encoding="utf-8")))
     return run(daily_message(snap))
 

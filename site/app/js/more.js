@@ -1,5 +1,5 @@
 // More: alerts, simulator access, appearance, the track record and what the app is reading.
-import { state, store, REPO_URL, esc, icon, day } from "./core.js";
+import { state, store, feed, REPO_URL, esc, icon, day } from "./core.js";
 import { recordTables } from "./views.js";
 import { token, checkToken } from "./sim.js";
 
@@ -86,7 +86,7 @@ export function more() {
         `<tr><td>${l}</td><td>${f(k).as_of ? esc(day(f(k).as_of)) : `<span class="dim">nothing yet</span>`}</td><td>${f(k).cases || 0}</td></tr>`).join("")}</tbody></table></div>
     <p class="foot">Feeds built ${esc(built)}. ${standalone() ? "Running as an installed app." : "Running in a browser tab."}
       Everything shown here is public on GitHub Pages; only the alerts are private to your devices.
-      <a href="../">Web page</a> · <a href="../ledger.csv">Ledger (CSV)</a> · <a href="${REPO_URL}" target="_blank" rel="noopener">Repository</a><br>
+      <a href="../">Web page</a> · ${(feed("IN", "mid") || {}).brain ? `<a href="../debates.html">Debates page</a> · <a href="../brain.html">Brain page</a> · ` : ""}<a href="../ledger.csv">Ledger (CSV)</a> · <a href="${REPO_URL}" target="_blank" rel="noopener">Repository</a><br>
       Output of fixed rules and an experiment in progress. Not investment advice.</p>`;
 }
 

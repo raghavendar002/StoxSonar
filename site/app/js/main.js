@@ -111,6 +111,12 @@ matchMedia("(min-width: 980px)").addEventListener("change", () => renderDetail()
 
 document.querySelectorAll(".brand-mark").forEach((el) => { el.innerHTML = logo; });
 more.applyTheme();
+// An alert can open a specific view: ./?v=IN-intra
+const want = (new URLSearchParams(location.search).get("v") || "").match(/^(IN|US)-(mid|intra)$/);
+if (want) {
+  state.market = want[1]; state.horizon = want[2]; store.set("market", want[1]); store.set("horizon", want[2]);
+  history.replaceState(null, "", location.pathname + (location.hash || "#/today"));
+}
 parseHash(); lastTab = state.tab;
 chrome();
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
