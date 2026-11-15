@@ -72,6 +72,12 @@ further model call. Breakdowns are shadow shorts: scored, never traded.
   cites 8 real cases and names no stock or date. At most 12 are active, every change is versioned, and
   the cost comes out of the same $6 monthly cap. Kept lessons are given to the next debates.
 
+**Off-switch.** A Judge that only says Avoid tells you nothing that "skip every signal" would not, for
+free. After its first 20 verdicts in a market regime (Weak or Healthy, counted apart), debates in that
+regime stop unless at least 10% of those verdicts were Go or Wait. Signals are then marked "not debated,
+treat as Avoid", no model is called, and the books keep scoring. A switch tripped in a Weak market does
+not carry over to a Healthy one.
+
 Eight cases is a low bar, and a lesson built on eight is a hypothesis. Each lesson changes the Judge, so
 the versions are counted as extra tries when the results are finally read.
 

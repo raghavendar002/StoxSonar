@@ -123,3 +123,7 @@ BRAIN_REVIEW_EVERY_DAYS = 7
 BRAIN_REVIEW_MIN_NEW = 4     # closed judged trades since the last review
 BRAIN_TEST_AT = 100          # judged trades closed before the pass test is read
 BRAIN_KILL_AT = 150
+
+# Off-switch: debates stop in a market regime once the Judge has shown it only says Avoid there
+DEBATE_OFF_AFTER = 20            # verdicts in that regime before the switch is read
+DEBATE_OFF_MIN_ACT_SHARE = 0.10  # at least this share must be Go or Wait

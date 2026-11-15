@@ -190,3 +190,22 @@ def test_a_debate_reaches_the_app_feed(tmp_path):
     assert cases["A"]["outcome"]["judge_book"] == "judge" and cases["A"]["bull"]
     assert cases["W"]["judge"]["verdict"] == "Wait" and "103" in cases["W"]["judge"]["wait"]
     assert {b["book"] for b in feed["books"]} >= {"debated", "judge"}
+
+
+def test_off_switch_stops_debates_when_the_judge_only_says_avoid(tmp_path):
+    n = C.DEBATE_OFF_AFTER
+    days = [str(d.date()) for d in pd.bdate_range("2026-01-05", periods=n + 2)]
+    evs = [event(f"S{i}.NS", date=days[i]) for i in range(n + 1)]
+    con, ev = setup(tmp_path, evs)
+    calls = []
+    for i in range(n):
+        debate.run_day(con, "NSE", ev[ev.symbol == f"S{i}.NS"], days[i],
+                       fake_caller(verdict(verdict="Go" if i == 0 else "Avoid"), cost=0.001, log=calls))
+    assert len(calls) == 3 * n and "1 of its first 20" in debate.switched_off(con, "NSE", "Healthy")
+    rows = debate.run_day(con, "NSE", ev[ev.symbol == f"S{n}.NS"], days[n], fake_caller(verdict(), log=calls))
+    assert rows[0]["status"] == "not_debated_switched_off" and len(calls) == 3 * n      # no model call
+    assert "switched off" in publish.debate_telegram_text(days[n], rows, [], [], 0.1)
+    assert debate.switched_off(con, "NSE", "Weak") is None       # another kind of market starts fresh
+    # two acting verdicts in the first 20 keep it on
+    con.execute("UPDATE mt_debates SET verdict='Wait' WHERE symbol='S1.NS'")
+    assert debate.switched_off(con, "NSE", "Healthy") is None

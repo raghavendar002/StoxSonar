@@ -347,6 +347,12 @@ def scoreboard(con, market: str) -> dict:
         right_pct=round(float((o["call"] == "right").mean() * 100), 0) if n else None,
         api_spend_usd=round(float(spend), 2),
     )
+    if _has(con, "mt_debates"):
+        v = pd.read_sql_query("SELECT verdict, COUNT(*) AS n FROM mt_debates WHERE market=? AND status='done' "
+                              "GROUP BY verdict", con, params=(market,))
+        board["verdicts"] = {r.verdict: int(r.n) for r in v.itertuples()}
+        board["off"] = con.execute("SELECT COUNT(*) FROM mt_debates WHERE market=? "
+                                   "AND status='not_debated_switched_off'", (market,)).fetchone()[0]
     ci = board["go_minus_avoid_ci90"]
     if n < C.BRAIN_TEST_AT:
         board["state"] = f"Too early: {n} of {C.BRAIN_TEST_AT} judged trades have closed."
