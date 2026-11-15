@@ -11,7 +11,7 @@ The rules follow the StoxSonar Stock Segregation Rules Spec. This is a fresh, st
 2. Labels each liquid stock (Rs 1 crore/day or more) with its Weinstein stage, its trend template score and its RS rank, and detects base breakouts and breakdowns, graded A/B/C (`sonar/engine.py`).
 3. Writes every new signal to an append-only ledger. A signal's grade is never changed afterwards and old signals are never back-inserted; only its status (Active, Extended, Confirmed, Failed, Faded) and its 5/21/63-session returns are updated (`sonar/ledger.py`).
 4. Publishes `site/index.html`, `site/data.json` and `site/ledger.csv`, and posts a summary to Telegram (`sonar/publish.py`).
-5. Sends a push alert to the installable app in `site/app/` on the owner's devices (`sonar/push.py`; setup in docs/GUIDE.md).
+5. Builds the feeds for the installable app in `site/app/` (`sonar/appfeed.py`: mid-term, intraday, debates and books for India and the US) and sends a push alert to the owner's devices (`sonar/push.py`; setup in docs/GUIDE.md).
 
 The page shows no raw prices. Charts open on TradingView.
 

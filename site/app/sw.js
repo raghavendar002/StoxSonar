@@ -1,8 +1,8 @@
 // StoxSonar app service worker: offline shell, fresh data first, and push alerts.
-const SHELL = "stoxsonar-shell-v1";
+const SHELL = "stoxsonar-shell-v2";
 const DATA = "stoxsonar-data";
-const SHELL_FILES = ["./", "index.html", "app.js", "app.css", "manifest.webmanifest",
-                     "vapid.json", "icon-192.png", "apple-touch-icon.png"];
+const SHELL_FILES = ["./", "index.html", "app.css", "manifest.webmanifest", "vapid.json", "icon-192.png", "apple-touch-icon.png",
+                     "js/main.js", "js/core.js", "js/charts.js", "js/views.js", "js/sim.js", "js/more.js"];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(SHELL).then((c) => c.addAll(SHELL_FILES)).then(() => self.skipWaiting()));

@@ -49,6 +49,10 @@ jobs:
           --mode "${{ github.event.inputs.mode || 'daily' }}"
           --site-url "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
           ${{ (github.event.inputs.mode || 'daily') == 'daily' && '--telegram' || '' }}
+      # The StoxSonar app (site/app/) reads these feeds: mid-term, intraday, debates, books.
+      # Cheap and deterministic, so it runs every time; it is only committed when the day published.
+      - name: Build app feeds
+        run: python -m sonar.appfeed
       # The ledger and page are committed every day, so git history is a public,
       # timestamped record that no signal was added or changed after the fact.
       - name: Commit ledger and page
