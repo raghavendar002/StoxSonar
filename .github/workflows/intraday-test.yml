@@ -18,6 +18,7 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           INTRA_MAX_DEBATE: "1"
+          INTRA_TEST_REPLAY: "1"
         run: |
           python paper/intraday.py scan --mkt in
           python paper/intraday.py settle --mkt in

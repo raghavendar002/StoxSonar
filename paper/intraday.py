@@ -408,7 +408,11 @@ def run_scan(mkt, no_debate=False):
     talks, judge_orders = ([], []) if no_debate else debate(mkt, s)
     if talks:
         (od / "debates.json").write_text(json.dumps(talks, indent=1, default=str))
-    orders = dict(decided=datetime.now(timezone.utc).isoformat(timespec="seconds"),
+    decided = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    if __import__("os").environ.get("INTRA_TEST_REPLAY"):      # tests on a past session: decide 10 min after the checkpoint
+        cp = s["meta"].get("checkpoint_et") or s["meta"].get("checkpoint")
+        decided = (pd.Timestamp(cp) + pd.Timedelta(minutes=10)).isoformat()
+    orders = dict(decided=decided,
                   note="Live paper day." + ("" if talks else " No debates ran (no candidates, cap or no key)."),
                   mechanical=mech, judge=judge_orders)
     (od / "orders.json").write_text(json.dumps(orders, indent=1))
