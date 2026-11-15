@@ -26,7 +26,7 @@ import pandas as pd
 
 from sonar import books
 from sonar import config as C
-from sonar import data, debate, engine, ledger, publish
+from sonar import brain, data, debate, engine, ledger, publish
 
 ROOT = Path(__file__).resolve().parent
 log = logging.getLogger("stoxsonar")
@@ -104,17 +104,20 @@ def run_books(con, market: str, prices, bench: pd.Series, res, as_of: str,
 def run_debates(con, market: str, as_of: str, site: Path, waits: list, telegram: bool) -> None:
     """Bull, Bear and Judge on today's candidates, after the day's signals have
     already gone out. Needs ANTHROPIC_API_KEY; without it, only Waits are reported."""
-    rows = []
+    rows, review = [], None
+    closed = brain.postmortems(con, market)      # judged trades that finished today, scored by code
     if debate.enabled():
         rows = debate.run_day(con, market, ledger.events_frame(con, market), as_of)
         log.info("debates: %s", [(r["symbol"], r.get("verdict") or r["status"]) for r in rows])
+        review = brain.review(con, market)       # at most weekly, and only once 8 judged trades have closed
     else:
         log.info("ANTHROPIC_API_KEY not set; no debates today")
     publish.write_debates(con, market, site)
-    if telegram and (rows or waits):
+    publish.write_brain(con, market, site)
+    if telegram and (rows or waits or closed or review):
         left = debate.budget_left(con)
         publish.send_telegram(publish.debate_telegram_text(as_of, rows, waits, debate.verdict_record(con, market),
-                                                           C.DEBATE_MONTHLY_CAP_USD - left))
+                                                           C.DEBATE_MONTHLY_CAP_USD - left, closed, review))
 
 
 def main(argv=None) -> int:

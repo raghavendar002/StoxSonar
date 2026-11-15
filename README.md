@@ -53,6 +53,28 @@ further model call. Breakdowns are shadow shorts: scored, never traded.
 - v0.2 has not passed its test, so treat every verdict as a logged experiment.
   The Judge is kept only if, at 100 judged picks, Go beats Avoid after costs.
 
+## The mid-term Brain
+
+`sonar/brain.py` is what the debates learn from. Three of its four jobs are plain code and cost nothing.
+
+- **Track record.** Before each debate it looks up how signals like this one ended: every earlier signal of
+  the same side and grade with a finished 21-session result, the same in the same kind of market, and the
+  25 most similar on RS rank, Mansfield, base depth, base length and volume. It adds the Judge's own closed
+  verdicts and the five closest past cases, without names. Only results finished before the signal day are
+  used. What the debate was shown is stored with the debate.
+- **Post-mortems.** When a judged paper trade closes, code marks the verdict right or wrong. A Go is right
+  if the trade made money. An Avoid, or a Wait that never triggered, is right if the trade lost.
+- **Scoreboard.** `site/brain.html` shows progress against the test fixed in advance: at 100 closed judged
+  trades, Go must beat Avoid with the whole 90% bootstrap range above zero, the Judge book must beat the
+  Twin, and conviction 4-5 must beat 1-2. At 150 without a pass, the Judge is switched off.
+- **Lessons.** Once 8 judged trades have closed, and then at most weekly when 4 more have, one Opus call
+  reads the anonymised cases and may propose up to three rules of thumb. Code keeps a lesson only if it
+  cites 8 real cases and names no stock or date. At most 12 are active, every change is versioned, and
+  the cost comes out of the same $6 monthly cap. Kept lessons are given to the next debates.
+
+Eight cases is a low bar, and a lesson built on eight is a hypothesis. Each lesson changes the Judge, so
+the versions are counted as extra tries when the results are finally read.
+
 ## Run it
 ```bash
 pip install -r requirements.txt
