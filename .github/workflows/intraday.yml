@@ -1,0 +1,70 @@
+name: Intraday paper trading
+
+# Called on time by an external scheduler (cron-job.org -> workflow_dispatch),
+# because GitHub's own schedule can start hours late:
+#   India scan   09:31 IST Mon-Fri   (market=in, mode=scan)
+#   India settle 15:45 IST Mon-Fri   (market=in, mode=settle)
+#   US scan      20:16 IST Mon-Fri   (19:16 in US summer time)
+#   US settle    02:40 IST Tue-Sat
+# The scheduled settles below are only a backstop: settling twice is harmless.
+on:
+  workflow_dispatch:
+    inputs:
+      market:
+        description: "in or us"
+        required: true
+        default: in
+      mode:
+        description: "scan or settle"
+        required: true
+        default: scan
+  schedule:
+    - cron: "30 10 * * 1-5"    # India settle backstop, 16:00 IST
+    - cron: "15 22 * * 1-5"    # US settle backstop, 03:45 IST
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: intraday-${{ github.event.inputs.market || 'settle' }}
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt anthropic
+      - name: Run
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            if [ "${{ github.event.schedule }}" = "30 10 * * 1-5" ]; then M=in; else M=us; fi
+            python paper/intraday.py settle --mkt $M || true
+          else
+            python paper/intraday.py ${{ github.event.inputs.mode }} --mkt ${{ github.event.inputs.market }}
+          fi
+      - name: Build app feeds
+        run: python -m sonar.appfeed
+      - name: Commit
+        run: |
+          git config user.name "stoxsonar-bot"
+          git config user.email "stoxsonar-bot@users.noreply.github.com"
+          git add paper site/app/feed
+          git diff --cached --quiet && exit 0
+          git commit -m "Intraday ${{ github.event.inputs.market || 'settle' }} ${{ github.event.inputs.mode || 'backstop' }}"
+          for i in 1 2 3; do git pull --rebase origin main && git push && break; sleep 5; done
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - uses: actions/deploy-pages@v4

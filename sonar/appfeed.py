@@ -330,7 +330,8 @@ def intraday_day(folder: Path, mkt: str) -> Optional[dict]:
         jo, mo = j_orders.get(sym), m_orders.get(sym) or c.get("mechanical")
         took = jo is not None
         debated = bool(t.get("bull") or t.get("judge_text"))
-        verdict = ("Long" if took else "No trade") if (debated or orders) else None
+        side = (jo or {}).get("side") or c.get("side") or "long"
+        verdict = ((side.capitalize()) if took else "No trade") if (debated or orders) else None
         stats = []
         for label, val in [("Rel. volume", f"{st['relvol']:.1f}x" if st.get("relvol") else None),
                            ("Today", f"{st['move_today'] * 100:+.1f}%" if st.get("move_today") is not None else None),
@@ -347,7 +348,7 @@ def intraday_day(folder: Path, mkt: str) -> Optional[dict]:
             jt = dict(status="passed")
         cases.append(dict(
             id=f"{cfg['code']}-intra-{date}-{sym}", market=cfg["code"], horizon="intra", symbol=sym,
-            name=t.get("name"), date=date, side="long", grade=None, headline=t.get("headline"),
+            name=t.get("name"), date=date, side=side, grade=None, headline=t.get("headline"),
             stats=stats, bull=t.get("bull"), bear=t.get("bear"),
             judge=dict(verdict=verdict, tone="go" if took else "avoid", title=t.get("judge_title") or verdict,
                        text=t.get("judge_text"), conviction=(jo or {}).get("conviction"),
@@ -358,7 +359,7 @@ def intraday_day(folder: Path, mkt: str) -> Optional[dict]:
             twin=dict(levels=dict(entry_low=mo["trigger"], entry_high=mo["trigger"], stop=mo["stop"],
                                   target=mo["target"])) if mo else None,
             outcome=dict(judge=jt, judge_book="judge", twin=_intra_trade(m_trades.get(sym))),
-            bars=dict(tf="5m", rows=c.get("bars_5m") or []), problems=None, cost_usd=None, models=None))
+            bars=dict(tf="5m", rows=c.get("bars_5m") or []), problems=t.get("problems") or None, cost_usd=t.get("cost_usd"), models=None))
     passed = {c["sym"] for c in scan.get("candidates") or []}
     return dict(
         date=date, status="dry_run" if "dry run" in (orders.get("note") or "").lower() else "live",
