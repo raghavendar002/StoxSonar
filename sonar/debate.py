@@ -335,6 +335,11 @@ def run_day(con, market: str, events: pd.DataFrame, as_of: str, call: Caller = a
             out.append(dict(row, status="not_debated_budget"))
             continue
         facts = dict(json.loads(f[0]), market_code=market)
+        off = switched_off(con, market, facts["market"]["regime"])
+        if off:
+            _save(con, market, ev, "not_debated_switched_off", cost_usd=0)
+            out.append(dict(row, status="not_debated_switched_off", why=off))
+            continue
         try:
             record = brain.context(con, market, facts)
         except Exception as e:  # the Brain is an extra; a debate without it is still a debate
@@ -369,6 +374,32 @@ def run_day(con, market: str, events: pd.DataFrame, as_of: str, call: Caller = a
                         regime=facts["market"]["regime"], close=facts["indicators"]["close"],
                         base_rate=brain.headline(record)))
     return out
+
+
+# ---------------------------------------------------------------------------
+# Off-switch: a Judge that only ever says Avoid is not worth paying for
+# ---------------------------------------------------------------------------
+
+def switched_off(con, market: str, regime: Optional[str]) -> Optional[str]:
+    """Why debates are off for this kind of market, or None when they are on.
+
+    After the first DEBATE_OFF_AFTER verdicts in a market regime, if fewer than
+    DEBATE_OFF_MIN_ACT_SHARE of them were Go or Wait, the Judge is adding
+    nothing over "skip every signal", so debates in that regime stop. Verdicts
+    are counted per regime: a Judge switched off in a Weak market starts fresh
+    when the market turns Healthy. The books keep scoring either way."""
+    rows = con.execute(
+        "SELECT d.verdict FROM mt_debates d JOIN mt_picks p ON p.market=d.market AND p.book='debated' "
+        "AND p.symbol=d.symbol AND p.direction=d.direction AND p.signal_date=d.signal_date "
+        "WHERE d.market=? AND d.status='done' AND p.regime IS ? ORDER BY d.signal_date, d.id LIMIT ?",
+        (market, regime, C.DEBATE_OFF_AFTER)).fetchall()
+    if len(rows) < C.DEBATE_OFF_AFTER:
+        return None
+    act = sum(r[0] in ("Go", "Wait") for r in rows)
+    if act >= C.DEBATE_OFF_MIN_ACT_SHARE * len(rows):
+        return None
+    return (f"the Judge said Go or Wait on {act} of its first {len(rows)} verdicts in a "
+            f"{regime} market, under the {C.DEBATE_OFF_MIN_ACT_SHARE:.0%} needed")
 
 
 # ---------------------------------------------------------------------------

@@ -431,7 +431,8 @@ DEBATE_NOTE = ("An experiment, not advice: the screen under these calls has not 
                "Judge has no track record yet. Every call is logged and scored.")
 SKIPPED = {"not_debated_daily_limit": "not debated (daily limit of 3)",
            "not_debated_budget": "not debated (monthly API budget reached)",
-           "no_fact_pack": "not debated (no data pack)", "error": "debate failed", "refused": "debate failed"}
+           "no_fact_pack": "not debated (no data pack)",
+           "not_debated_switched_off": "not debated, the Judge is switched off, treat as Avoid", "error": "debate failed", "refused": "debate failed"}
 
 
 def _px(x) -> str:
@@ -459,7 +460,8 @@ def debate_telegram_text(as_of: str, rows: list, waits: list, record: list, spen
         up = r["direction"] == "up"
         kind = "breakout" if up else "breakdown, SHADOW SHORT (logged, not traded)"
         if r["status"] != "done":
-            lines += [f"{name} · {r['grade']} {kind}: {SKIPPED.get(r['status'], r['status'])}", ""]
+            why = f" ({r['why']})" if r.get("why") else ""
+            lines += [f"{name} · {r['grade']} {kind}: {SKIPPED.get(r['status'], r['status'])}{why}", ""]
             continue
         v = r["v"]
         lines.append(f"{v['verdict'].upper()} · {name} · {r['grade']} {kind} · conviction {v['conviction']}/5")
@@ -561,6 +563,10 @@ def write_brain(con, market: str, out_dir: Path) -> None:
     f = lambda x, fmt="{:+.2f}R": "–" if x is None else fmt.format(x)  # noqa: E731
     ci = b["go_minus_avoid_ci90"]
     rows = [
+        ("Verdicts so far", " · ".join(f"{k} {n}" for k, n in (b.get("verdicts") or {}).items()) or "none"),
+        ("Off-switch", (f"ON: {b['off']} signals skipped without a debate" if b.get("off") else
+                        f"not tripped. Debates stop in a market regime if under "
+                        f"{C.DEBATE_OFF_MIN_ACT_SHARE:.0%} of its first {C.DEBATE_OFF_AFTER} verdicts are Go or Wait")),
         ("Judged trades closed", f"{b['judged_closed']} of {b['needed']} needed (stop line at {b['kill_at']})"),
         ("Verdicts that were right", f(b["right_pct"], "{:.0f}%")),
         ("Go", f"{b['go']['n']} closed, average {f(b['go']['avg_r'])}"),
