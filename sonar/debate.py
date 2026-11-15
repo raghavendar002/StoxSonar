@@ -326,7 +326,8 @@ def run_day(con, market: str, events: pd.DataFrame, as_of: str, call: Caller = a
         try:
             d = debate_one(facts, lessons, call)
         except Exception as e:  # one failed debate must not stop the others or the day
-            log.warning("debate failed for %s: %s", ev["symbol"], type(e).__name__)
+            log.warning("debate failed for %s: %s %s %s", ev["symbol"], type(e).__name__,
+                        getattr(e, "status_code", ""), str(e)[:300])
             _save(con, market, ev, "refused" if isinstance(e, Refused) else "error", cost_usd=0)
             out.append(dict(row, status="error"))
             continue

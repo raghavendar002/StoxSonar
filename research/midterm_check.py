@@ -36,9 +36,54 @@ def table(df: pd.DataFrame) -> str:
     return "\n".join(rows) + "\n"
 
 
+def real_debate(db: Path, tmp: Path) -> str:
+    """One real debate on the newest live A/B signal, against the ledger copy.
+    The key is put in place only for this call, so the replay above spends nothing."""
+    import os
+    from sonar import books, data, debate, engine, ledger, publish
+    out = ["\n## One real debate\n\n"]
+    key = os.environ.get("DEBATE_KEY")
+    if not key:
+        return out[0] + "No key given; skipped.\n"
+    try:
+        con = ledger.connect(db)
+        books.init(con)
+        ev = ledger.events_frame(con, "NSE")
+        prices, bench = data.load_cache(tmp / "NSE.pkl")
+        c = ev[(ev["source"] == "live") & ev["grade"].isin(["A", "B"]) & ev["symbol"].isin(list(prices))]
+        c = c.sort_values("trigger_date", ascending=False).head(1)
+        e = c.to_dict("records")[0]
+        f = engine.compute_features(prices[e["symbol"]], bench)
+        books.add_facts(con, "NSE", e, books.fact_pack(e, f, None, data.latest_vix("NSE"), None,
+                                                       data.next_results_date(e["symbol"], e["trigger_date"])))
+        os.environ["ANTHROPIC_API_KEY"] = key
+        rows = debate.run_day(con, "NSE", c, e["trigger_date"])
+        del os.environ["ANTHROPIC_API_KEY"]
+        d = pd.read_sql_query("SELECT * FROM mt_debates WHERE market='NSE'", con).to_dict("records")[0]
+        out.append(f"{e['symbol']} · {e['direction']} · grade {e['grade']} · signal {e['trigger_date']}\n\n"
+                   f"Status **{d['status']}** · input tokens {d['input_tokens']} · output tokens "
+                   f"{d['output_tokens']} · cost ${d['cost_usd']}\n\n")
+        if d["status"] == "done":
+            out.append(f"Levels used: {d['levels']} · problems: {d['level_problems']} · wait: {d['wait_status']}\n\n"
+                       "Telegram message as it would be sent:\n\n```\n"
+                       + publish.debate_telegram_text(e["trigger_date"], rows, [], [], d["cost_usd"]) + "\n```\n\n"
+                       f"Bull:\n\n> {d['bull']}\n\nBear:\n\n> {d['bear']}\n\n"
+                       "Judge:\n\n```json\n" + json.dumps(json.loads(d["judge"]), indent=1) + "\n```\n")
+            out.append("\nPicks written:\n\n" + table(pd.read_sql_query(
+                "SELECT book, symbol, verdict, conviction, levels, stop, target, horizon, max_buy FROM mt_picks "
+                "WHERE book IN ('debated','judge')", con)))
+    except Exception as ex:
+        # Never print the exception's own text for an API failure: keep the log to its type and status
+        out.append(f"Failed: {type(ex).__name__} {getattr(ex, 'status_code', '')}\n\n```\n"
+                   + traceback.format_exc()[-1500:].replace(key or "\0", "***") + "\n```\n")
+    return "".join(out)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--limit", type=int, default=0)
+    ap.add_argument("--debate", action="store_true",
+                    help="also run ONE real Bull/Bear/Judge debate (needs DEBATE_KEY; costs about $0.20)")
     a = ap.parse_args()
     tmp = Path(tempfile.mkdtemp())
     db = tmp / "check.db"
@@ -98,6 +143,8 @@ def main() -> int:
     out.append("Next results date from Yahoo: " + ", ".join(
         f"{t} {data.next_results_date(t, today)}" for t in
         ("RELIANCE.NS", "TCS.NS", "INFY.NS", "HDFCBANK.NS", "TATAMOTORS.NS", "AAPL")) + "\n")
+    if a.debate:
+        out.append(real_debate(db, tmp))
     site = tmp / "site" / "data.json"
     if site.exists():
         out.append("\n## Page summary rows\n\n```json\n"

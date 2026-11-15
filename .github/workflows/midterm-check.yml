@@ -25,7 +25,12 @@ jobs:
           cache: pip
       - run: pip install -r requirements.txt
       - run: python -m pytest -q tests
-      - run: python research/midterm_check.py 2>&1 | tail -n 200
+      # A request starting with "debate" also runs ONE real Bull/Bear/Judge debate (about $0.20)
+      - env:
+          DEBATE_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          flag=""; if grep -q '^debate' checks/request.txt; then flag="--debate"; fi
+          python research/midterm_check.py $flag 2>&1 | tail -n 200
       - run: |
           git config user.name "stoxsonar-bot"
           git config user.email "stoxsonar-bot@users.noreply.github.com"

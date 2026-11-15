@@ -58,6 +58,30 @@ GitHub's own schedule is best-effort and often starts the job hours late. To get
    - Request body: `{"ref":"main","inputs":{"mode":"daily"}}`
 3. Press "Test run". It should return status 204, and a new run appears under the repository's Actions tab.
 
+## The StoxSonar app on your iPhone and laptop (15 minutes, once)
+
+The app lives at `https://raghavendar002.github.io/StoxSonar/app/`. It is one place for everything: switch between **India** and **US**, and between **Mid-term** and **Intraday**, at the top.
+
+- **Today:** the market mood and new signals (mid-term), or the day's scan with the Judge's result against the fixed-rule Twin (intraday).
+- **Trades:** open signals and paper books, or every intraday paper trade.
+- **Debates:** every Bull, Bear and Judge exchange. Tap one for the chart with both books' levels, each side's argument, the Judge's ruling and what then happened.
+- **Simulator:** pick one of the last four weeks and a starting amount and replay it. It starts the `replay.yml` workflow on GitHub, which needs a token you save under More, then Simulator access (fine-grained, this repository only, Actions read and write). The replay engine is a separate piece; until it is merged the buttons stay off.
+- **More:** alerts, simulator access, light or dark, the track record.
+
+Screens fill in as their data starts: debates need the `ANTHROPIC_API_KEY` secret, and India intraday needs its scanner. The app reads `site/app/feed/*.json`, written by `python -m sonar.appfeed` at the end of each run. It also sends you an alert each evening after the NSE run. It is a web app you install, so there is no App Store and nothing to re-sign. The data is as public as the page; only the alerts are yours alone.
+
+**1. Give GitHub the signing key (once).** Open the file `app-setup/VAPID_PRIVATE_KEY.txt` in the project's files. In the repository go to Settings, then Secrets and variables, then Actions, then New repository secret. Name it `VAPID_PRIVATE_KEY` and paste the one line from that file. Then delete the file. The matching public key is already in `site/app/vapid.json`; if you ever replace one, replace both and every device must turn alerts on again.
+
+**2. Install on iPhone (iOS 16.4 or later).** Open the app link in **Safari**, tap Share, then **Add to Home Screen**, then Add. Open StoxSonar from the new icon (alerts only work from the icon, not from a Safari tab).
+
+**3. Install on Windows.** Open the link in Edge or Chrome and click the install icon in the address bar (or menu, then Apps, then Install). Alerts arrive while Edge or Chrome is allowed to run in the background, which is the default.
+
+**4. Turn on alerts on each device.** In the app, open Settings and tap **Turn on alerts**, then Allow. Name the device and tap **Copy code**. In the repository's Actions secrets create or edit `PUSH_SUBS` and paste the code as its own line (one line per device; GitHub won't show the old value, so keep a copy of all lines somewhere private and paste them all each time).
+
+**5. Test.** In the Actions tab run **Push test**. A test alert should arrive within a minute.
+
+If a device stops accepting alerts (the icon was deleted, or iOS dropped it), the next run posts a Telegram message saying which one. Repeat step 4 on that device. Telegram keeps posting as a backup until the alerts have proven reliable.
+
 ## Step 1: the repository
 
 Done: the code lives at https://github.com/raghavendar002/StoxSonar.

@@ -3,5 +3,9 @@ numpy>=1.26
 yfinance>=0.2.50
 requests>=2.31
 pytest>=8
+<<<<<<< HEAD
 lxml>=5.0
 anthropic>=1.0
+=======
+cryptography>=42
+>>>>>>> origin/main
