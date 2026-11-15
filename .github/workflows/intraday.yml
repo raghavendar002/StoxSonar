@@ -68,3 +68,18 @@ jobs:
         with:
           path: site
       - uses: actions/deploy-pages@v4
+      # Alert to the StoxSonar app on your own devices: the Judge's calls after a
+      # scan, both books' results after a settle. Sent after the deploy so tapping
+      # it opens fresh data. Skips quietly until the two secrets exist.
+      - name: Push alert to the app
+        continue-on-error: true
+        env:
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+          PUSH_SUBS: ${{ secrets.PUSH_SUBS }}
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            if [ "${{ github.event.schedule }}" = "30 10 * * 1-5" ]; then M=in; else M=us; fi
+          else
+            M="${{ github.event.inputs.market }}"
+          fi
+          python -m sonar.push intraday --mkt "$M"

@@ -157,7 +157,72 @@ def mid_case(d: dict, facts: Optional[dict], picks: dict) -> dict:
                      twin=_mid_trade(twin)),
         bars=dict(tf="1d", rows=(f.get("daily_bars") or [])[-90:]),
         problems=d.get("level_problems"), cost_usd=d.get("cost_usd"), models=json.loads(d["models"]) if d.get("models") else None,
+        base_rate=_base_rate(d.get("brain")),
     )
+
+
+def _base_rate(raw: Optional[str]) -> Optional[str]:
+    """The one-line track record the Bull, Bear and Judge were shown, if any."""
+    if not raw:
+        return None
+    try:
+        from . import brain
+        return brain.headline((json.loads(raw) or {}).get("record"))
+    except Exception:           # the track record is an extra; a case without it is still a case
+        return None
+
+
+SKIP_WHY = {
+    "not_debated_switched_off": "Debates are switched off in this kind of market, because the Judge almost only said Avoid.",
+    "not_debated_budget": "This month's API budget was already used.",
+    "not_debated_daily_limit": "Only the first few candidates each day are debated.",
+    "no_fact_pack": "No fact pack was stored for this signal.",
+    "refused": "The model declined to answer.",
+    "error": "The debate failed with an error.",
+}
+
+
+def _skipped(con, market: str) -> list:
+    """Candidates that were logged but never debated, with the reason."""
+    if not _has(con, "mt_debates"):
+        return []
+    rows = _rows(con, "SELECT symbol, direction, signal_date, grade, status FROM mt_debates "
+                      "WHERE market=? AND status!='done' ORDER BY signal_date DESC, id DESC LIMIT 60", (market,))
+    return [dict(symbol=r["symbol"].replace(".NS", ""), direction=r["direction"], date=r["signal_date"],
+                 grade=r["grade"], status=r["status"], why=SKIP_WHY.get(r["status"], r["status"])) for r in rows]
+
+
+def _brain(con, market: str) -> Optional[dict]:
+    """The Brain as the app shows it: the pass test so far, the off-switch, lessons and spend."""
+    if not (_has(con, "mt_debates") and _has(con, "mt_picks")):
+        return None
+    out = dict(scoreboard=None, lessons=[], last_review=None, switch=None, budget=None, outcomes=[])
+    try:
+        from . import brain, debate
+        from . import config as C
+        out["scoreboard"] = brain.scoreboard(con, market)
+        out["lessons"] = brain.active_lessons(con)
+        out["last_review"] = brain.last_review(con, market)
+        out["min_cases"] = C.BRAIN_MIN_CASES
+        run = con.execute("SELECT regime FROM runs WHERE market=? ORDER BY as_of DESC LIMIT 1",
+                          (market,)).fetchone() if _has(con, "runs") else None
+        regime = run[0] if run else None
+        why = debate.switched_off(con, market, regime) if regime else None
+        out["switch"] = dict(regime=regime, off=bool(why), why=why, after=C.DEBATE_OFF_AFTER,
+                             min_share_pct=round(C.DEBATE_OFF_MIN_ACT_SHARE * 100))
+        month = datetime.now(timezone.utc).strftime("%Y-%m")
+        out["budget"] = dict(month=month, spent_usd=round(debate.month_spend(con, month), 2),
+                             cap_usd=C.DEBATE_MONTHLY_CAP_USD, per_day=C.DEBATE_MAX_PER_DAY)
+        if _has(con, "mt_outcomes"):
+            out["outcomes"] = [
+                dict(symbol=o["symbol"].replace(".NS", ""), date=o["signal_date"], direction=o["direction"],
+                     verdict=o["verdict"], conviction=o["conviction"], r=o["r"], reason=o["exit_reason"],
+                     exit_t=o["exit_date"], call=o["call"])
+                for o in _rows(con, "SELECT * FROM mt_outcomes WHERE market=? ORDER BY exit_date DESC, "
+                                    "debate_id DESC LIMIT 100", (market,))]
+    except Exception as e:      # the feed must build even if the Brain cannot be read
+        log.warning("brain not added to the %s feed: %s %s", market, type(e).__name__, str(e)[:200])
+    return out
 
 
 def _book_rows(con, market: str) -> list:
@@ -231,7 +296,8 @@ def midterm(con, site: Path, market: str) -> dict:
     """market: 'NSE' or 'US'."""
     code = "IN" if market == "NSE" else "US"
     feed = dict(market=code, horizon="mid", currency="INR" if code == "IN" else "USD",
-                as_of=None, snapshot=None, history=[], books=[], picks=[], cases=[], signals=[], notes=[])
+                as_of=None, snapshot=None, history=[], books=[], picks=[], cases=[], signals=[], notes=[],
+                skipped=[], brain=None)
     if market == "NSE":
         if (site / "data.json").exists():
             feed["snapshot"] = _load(site / "data.json")
@@ -242,17 +308,21 @@ def midterm(con, site: Path, market: str) -> dict:
         last = con.execute("SELECT MAX(as_of) FROM runs WHERE market='US'").fetchone() if _has(con, "runs") else None
         feed["as_of"] = last[0] if last else None
         if not feed["as_of"]:
-            feed["notes"].append("The US shadow list has not run yet. It starts once the mid-term "
-                                 "Bull/Bear/Judge change (PR 9) is merged.")
+            feed["notes"].append("The US shadow list has not run yet. It fills in after the next evening run.")
     if _has(con, "mt_picks"):
         feed["books"] = _book_rows(con, market)
         feed["picks"] = _pick_rows(con, market)
     elif market == "NSE":
-        feed["notes"].append("Paper books start once the mid-term Bull/Bear/Judge change (PR 9) is merged.")
+        feed["notes"].append("Paper books fill in after the next evening run.")
     feed["cases"] = _mid_cases(con, market)
+    feed["skipped"] = _skipped(con, market)
+    feed["brain"] = _brain(con, market)
     if not feed["cases"] and market == "NSE":
-        feed["notes"].append("No debates yet. Bull, Bear and Judge run on the first evening after PR 9 is "
-                             "merged and the ANTHROPIC_API_KEY secret is set.")
+        off = (feed["brain"] or {}).get("switch") or {}
+        feed["notes"].append(
+            f"Debates are switched off while the market is {off.get('regime')}: {off.get('why')}." if off.get("off")
+            else "No debates yet. Bull, Bear and Judge argue over each new Grade A or B signal in the evening run, "
+                 "one stock at a time.")
     return feed
 
 
@@ -285,13 +355,34 @@ def parse_debate_md(text: str) -> dict:
     return out
 
 
+_HHMM = re.compile(r"(\d{2}:\d{2})")
+
+
+def _hhmm(s) -> Optional[str]:
+    """'2026-11-13T12:50:00-05:00', '2026-11-13 12:50' or '12:50' as '12:50'."""
+    if not s:
+        return None
+    m = _HHMM.search(str(s)[11:] if len(str(s)) > 11 else str(s))
+    return m.group(1) if m else None
+
+
 def _intra_trade(t: Optional[dict]) -> Optional[dict]:
     if not t:
         return None
-    hhmm = lambda s: s[11:16] if s else None
-    return dict(status=t.get("status"), entry=t.get("entry"), entry_t=hhmm(t.get("entry_t")), exit=t.get("exit"),
-                exit_t=hhmm(t.get("exit_t")), reason=t.get("reason"), qty=t.get("qty"), pnl=t.get("pnl"),
-                r=t.get("r_mult"))
+    return dict(status=t.get("status"), entry=t.get("entry"), entry_t=_hhmm(t.get("entry_t")), exit=t.get("exit"),
+                exit_t=_hhmm(t.get("exit_t")), reason=t.get("reason"), qty=t.get("qty"), pnl=t.get("pnl"),
+                r=t.get("r_mult", t.get("r")), side=t.get("side"), note=t.get("note"))
+
+
+def _side(*xs) -> str:
+    """long or short, from the first source that says."""
+    for x in xs:
+        v = str((x or {}).get("side") or (x or {}).get("action") or (x or {}).get("direction") or "").lower()
+        if v in ("short", "sell", "down"):
+            return "short"
+        if v in ("long", "buy", "up"):
+            return "long"
+    return "long"
 
 
 def _book(settle: dict, capital: float) -> dict:
@@ -324,14 +415,19 @@ def intraday_day(folder: Path, mkt: str) -> Optional[dict]:
     m_orders = {o["sym"]: o for o in orders.get("mechanical") or []}
     j_trades = {t["sym"]: t for t in (settle.get("judge") or {}).get("trades") or []}
     m_trades = {t["sym"]: t for t in (settle.get("mechanical") or {}).get("trades") or []}
+    capital = meta.get("capital") or cfg["capital"]
     cases = []
     for c in scan.get("candidates") or []:
         sym, st, t = c["sym"], c.get("stats") or {}, talk.get(c["sym"], {})
+        # The Judge's structured ruling: "verdict" in the live runs, "judge" in week replays
+        jv = next((t[k] for k in ("verdict", "judge") if isinstance(t.get(k), dict)), {})
         jo, mo = j_orders.get(sym), m_orders.get(sym) or c.get("mechanical")
         took = jo is not None
-        debated = bool(t.get("bull") or t.get("judge_text"))
-        side = (jo or {}).get("side") or c.get("side") or "long"
-        verdict = ((side.capitalize()) if took else "No trade") if (debated or orders) else None
+        side = _side(jo, {"side": jv.get("side_if_traded")}, mo, c)
+        j_title, j_text = t.get("judge_title") or jv.get("title"), t.get("judge_text") or jv.get("text")
+        debated = bool(t.get("bull") or j_text or jv)
+        not_debated = t.get("skipped") or (f"The debate failed: {t['error']}" if t.get("error") else None)
+        verdict = (side.capitalize() if took else "No trade") if (debated or (orders and not not_debated)) else None
         stats = []
         for label, val in [("Rel. volume", f"{st['relvol']:.1f}x" if st.get("relvol") else None),
                            ("Today", f"{st['move_today'] * 100:+.1f}%" if st.get("move_today") is not None else None),
@@ -346,31 +442,38 @@ def intraday_day(folder: Path, mkt: str) -> Optional[dict]:
         jt = _intra_trade(j_trades.get(sym))
         if jt is None and debated and not took:
             jt = dict(status="passed")
+        lv = jo or (jv if jv.get("trigger") else None)       # a pass still names the levels it would have used
+        problems = t.get("problems")
         cases.append(dict(
             id=f"{cfg['code']}-intra-{date}-{sym}", market=cfg["code"], horizon="intra", symbol=sym,
-            name=t.get("name"), date=date, side=side, grade=None, headline=t.get("headline"),
-            stats=stats, bull=t.get("bull"), bear=t.get("bear"),
-            judge=dict(verdict=verdict, tone="go" if took else "avoid", title=t.get("judge_title") or verdict,
-                       text=t.get("judge_text"), conviction=(jo or {}).get("conviction"),
+            name=t.get("name") or c.get("name"), date=date, side=side, grade=None,
+            headline=t.get("headline") or jv.get("headline") or c.get("headline"),
+            stats=stats, bull=t.get("bull"), bear=t.get("bear"), not_debated=not_debated,
+            judge=dict(verdict=verdict, tone="go" if took else "avoid", title=j_title or verdict,
+                       text=j_text, conviction=(jo or {}).get("conviction", jv.get("conviction")),
                        leverage=(jo or {}).get("leverage", 1 if took else None),
-                       reasons_for=[], reasons_against=[], invalidation=None, wait=None,
-                       levels=dict(entry_low=jo["trigger"], entry_high=jo["trigger"], stop=jo["stop"],
-                                   target=jo["target"], target_2=None) if took else None) if verdict else None,
-            twin=dict(levels=dict(entry_low=mo["trigger"], entry_high=mo["trigger"], stop=mo["stop"],
-                                  target=mo["target"])) if mo else None,
+                       reasons_for=jv.get("reasons_for") or [], reasons_against=jv.get("reasons_against") or [],
+                       invalidation=jv.get("invalidation"), wait=None, levels_if_traded=not took and lv is not None,
+                       levels=dict(entry_low=lv["trigger"], entry_high=lv["trigger"], stop=lv.get("stop"),
+                                   target=lv.get("target"), target_2=None) if lv else None) if verdict else None,
+            twin=dict(levels=dict(entry_low=mo["trigger"], entry_high=mo["trigger"], stop=mo.get("stop"),
+                                  target=mo.get("target"))) if mo and mo.get("trigger") else None,
             outcome=dict(judge=jt, judge_book="judge", twin=_intra_trade(m_trades.get(sym))),
-            bars=dict(tf="5m", rows=c.get("bars_5m") or []), problems=t.get("problems") or None, cost_usd=t.get("cost_usd"), models=None))
+            bars=dict(tf="5m", rows=c.get("bars_5m") or []),
+            problems=("; ".join(map(str, problems)) if isinstance(problems, list) else problems) or None,
+            cost_usd=t.get("cost_usd"), models=t.get("models")))
     passed = {c["sym"] for c in scan.get("candidates") or []}
     return dict(
         date=date, status="dry_run" if "dry run" in (orders.get("note") or "").lower() else "live",
-        note=orders.get("note"), checkpoint=(meta.get("checkpoint_et") or meta.get("checkpoint") or "")[11:16] or None,
+        note=orders.get("note"), checkpoint=_hhmm(meta.get("checkpoint_et") or meta.get("checkpoint")),
         tz=cfg["tz"], index=dict(name=cfg["index"], move_pct=_pct(meta.get("spy_move_today", meta.get("index_move")), 2)),
         universe=meta.get("universe"), signals=meta.get("signals"),
-        near_misses=[dict(symbol=n["sym"], relvol=round(n["relvol"], 2), move_pct=_pct(n.get("move_today"), 2),
+        near_misses=[dict(symbol=n["sym"], relvol=round(n.get("relvol") or 0, 2), move_pct=_pct(n.get("move_today"), 2),
                           dist_pct=_pct(n.get("dist_or_hi"), 2), passed=n["sym"] in passed)
                      for n in meta.get("near_misses") or []],
-        books=dict(twin=_book(settle.get("mechanical") or {}, cfg["capital"]),
-                   judge=_book(settle.get("judge") or {}, cfg["capital"])) if settle else None,
+        capital=capital, cost_usd=round(sum(t.get("cost_usd") or 0 for t in talk.values()), 2) or None,
+        books=dict(twin=_book(settle.get("mechanical") or {}, capital),
+                   judge=_book(settle.get("judge") or {}, capital)) if settle else None,
         cases=cases)
 
 
@@ -381,11 +484,19 @@ def intraday(paper: Path, mkt: str) -> dict:
     folders = [p for p in (paper / mkt).glob("*") if p.is_dir() and DAY.match(p.name)] if (paper / mkt).is_dir() else []
     if mkt == "us" and paper.is_dir():
         folders += [p for p in paper.glob("*") if p.is_dir() and DAY.match(p.name)]
-    days = [d for d in (intraday_day(p, mkt) for p in sorted(folders, key=lambda p: p.name, reverse=True)) if d]
+    days = []
+    for p in sorted(folders, key=lambda p: p.name, reverse=True):
+        try:
+            d = intraday_day(p, mkt)
+        except Exception as e:      # one unreadable day must not empty the whole feed
+            log.warning("skipped %s: %s %s", p, type(e).__name__, str(e)[:200])
+            d = None
+        if d:
+            days.append(d)
     notes = []
     if not days:
-        notes.append("India intraday paper trading is not built yet: the scanner and its fixed-rule twin come first."
-                     if mkt == "in" else "No US intraday days yet.")
+        notes.append(f"No {'India' if mkt == 'in' else 'US'} intraday days yet. Each paper session appears here "
+                     "once its morning scan has run.")
     elif all(d["status"] == "dry_run" for d in days):
         notes.append("Dry run only so far: one test day with the Judge played by hand, to prove the plumbing. "
                      "Daily paper trading has not started.")

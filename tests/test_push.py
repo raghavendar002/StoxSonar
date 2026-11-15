@@ -104,3 +104,20 @@ def test_daily_message_grade_a():
             "breakouts": [{"symbol": "X", "grade": "A"}, {"symbol": "Y", "grade": "B"}],
             "breakdowns": [], "closed_today": [{"symbol": "Z", "status": "Confirmed"}], "open_signals": []}
     assert push.daily_message(snap)["body"] == "1 Grade A breakout: X. Closed: Z confirmed."
+
+
+def test_intraday_message_before_and_after_the_close():
+    case = lambda sym, tone, verdict, lv=None: dict(symbol=sym, judge=dict(tone=tone, verdict=verdict, levels=lv))  # noqa: E731
+    day = dict(date="2026-11-16", books=None,
+               cases=[case("TRENT", "go", "Long", dict(entry_low=6510.0, stop=6470.0)), case("SBIN", "avoid", "No trade"),
+                      dict(symbol="DLF", judge=None)])
+    feed = dict(market="IN", currency="INR", days=[day])
+    m = push.intraday_message(feed)
+    assert m["title"] == "StoxSonar · India intraday calls · 16 Nov" and m["url"] == "./?v=IN-intra"
+    assert m["body"] == "Judge: Long TRENT at 6510, stop 6470. Passed on SBIN."
+    day["books"] = dict(judge=dict(pnl=-120.0, trades=1), twin=dict(pnl=451.5, trades=2))
+    m2 = push.intraday_message(feed)
+    assert m2["body"] == "The Twin beat the Judge. Judge −₹120 (1 trade), Twin +₹452 (2 trades)."
+    assert m2["tag"] != m["tag"]                      # the results alert does not replace the morning one
+    assert push.intraday_message(dict(market="US", days=[dict(date="2026-11-16", books=None, cases=[])]))["body"].startswith("No candidates")
+    assert push.intraday_message(dict(market="US", days=[])) is None

@@ -77,6 +77,8 @@ export function day(iso, long) {
   return d.toLocaleDateString("en-GB", long ? { weekday: "long", day: "numeric", month: "long" } : { weekday: "short", day: "numeric", month: "short" });
 }
 export const shortDay = (iso) => new Date(String(iso).slice(0, 10) + "T00:00:00").toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+// A signal's result so far: a breakdown gains when the price falls
+export const gain = (move, direction) => (ok(move) ? (direction === "up" ? move : -move) : null);
 export const tv = (sym, m = state.market) => "https://www.tradingview.com/chart/?symbol=" + (m === "IN" ? "NSE:" : "") + encodeURIComponent(sym);
 
 // ---------------------------------------------------------------- icons
@@ -126,6 +128,8 @@ export function tradeLine(t, cur) {
   if (t.status === "not_triggered") return "Never triggered";
   if (t.status === "skipped") return "Skipped";
   if (t.status === "pending") return "Waiting to enter";
+  if (t.status === "stale") return "Order came too late";
+  if (t.status === "no_data") return "No price data";
   if (t.status === "open") return `Open from ${px(t.entry)}`;
   const why = { stop: "stopped", target: "target hit", time: "time exit", close: "closed at the bell", eod: "closed at the bell" }[t.reason] || t.reason || "closed";
   return `${px(t.entry)} → ${px(t.exit)}, ${why}`;
