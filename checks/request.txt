@@ -1,1 +1,1 @@
-debate: run 3, one real Bull/Bear/Judge debate with the new key
+debate: run 4, one real Bull/Bear/Judge debate with the new key (merge with main fixed)

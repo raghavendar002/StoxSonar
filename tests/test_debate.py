@@ -173,3 +173,20 @@ def test_message_and_page(tmp_path):
     publish.write_debates(con, "NSE", tmp_path / "site")
     html = (tmp_path / "site" / "debates.html").read_text()
     assert "Bull's case" in html and "shadow short" in html and "Not started yet." in html
+
+
+def test_a_debate_reaches_the_app_feed(tmp_path):
+    from sonar import appfeed
+    con, ev = setup(tmp_path, [event("A.NS"), event("W.NS")])
+    debate.run_day(con, "NSE", ev[ev.symbol == "A.NS"], "2026-01-05", call=fake_caller(verdict()))
+    debate.run_day(con, "NSE", ev[ev.symbol == "W.NS"], "2026-01-05", call=fake_caller(
+        verdict(verdict="Wait", wait_kind="close_above", wait_level=103.0, wait_within_sessions=5)))
+    con.commit()
+    con.close()
+    appfeed.build(tmp_path / "l.db", tmp_path / "site", tmp_path / "paper")
+    feed = json.loads((tmp_path / "site" / "app" / "feed" / "mid-in.json").read_text())
+    cases = {c["symbol"]: c for c in feed["cases"]}
+    assert cases["A"]["judge"]["verdict"] == "Go" and cases["A"]["judge"]["levels"]["stop"] == 94.0
+    assert cases["A"]["outcome"]["judge_book"] == "judge" and cases["A"]["bull"]
+    assert cases["W"]["judge"]["verdict"] == "Wait" and "103" in cases["W"]["judge"]["wait"]
+    assert {b["book"] for b in feed["books"]} >= {"debated", "judge"}
