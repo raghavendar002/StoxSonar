@@ -46,6 +46,69 @@ def load_universe(local_csv: Path | None = None) -> List[str]:
     return sorted(s + ".NS" for s in df["Symbol"].astype(str).str.strip())
 
 
+SP500_LIST = "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
+
+
+def load_us_universe(local_csv: Path | None = None) -> List[str]:
+    """Today's S&P 500 members as Yahoo tickers (BRK.B -> BRK-B). The list is
+    saved to `local_csv` whenever it loads, so a later failed fetch falls back
+    to the last good copy. Today's members only: firms that left the index are
+    missing, which flatters any look back, so only the forward record counts."""
+    syms = None
+    try:
+        import requests
+        r = requests.get(SP500_LIST, headers={"User-Agent": "Mozilla/5.0"}, timeout=30)
+        r.raise_for_status()
+        t = pd.read_html(io.StringIO(r.text))[0]
+        syms = sorted(t["Symbol"].astype(str).str.strip().str.replace(".", "-", regex=False))
+        if len(syms) < 450:
+            raise ValueError(f"only {len(syms)} symbols")
+        if local_csv is not None:
+            pd.DataFrame({"Symbol": syms}).to_csv(local_csv, index=False)
+    except Exception as e:
+        log.warning("S&P 500 list unavailable (%s); using local list", e)
+        syms = None
+    if syms is None:
+        if local_csv is None or not Path(local_csv).exists():
+            raise RuntimeError("No US universe: list unreachable and no local CSV given")
+        syms = sorted(pd.read_csv(local_csv)["Symbol"].astype(str).str.strip())
+    return syms
+
+
+def next_results_date(ticker: str, after: str):
+    """The next results (earnings) date on or after `after`, as YYYY-MM-DD, or
+    None. Best effort from Yahoo, which often has nothing for NSE stocks."""
+    try:
+        import yfinance as yf
+        cal = yf.Ticker(ticker).calendar or {}
+        dates = cal.get("Earnings Date") or []
+        ok = sorted(str(d) for d in dates if str(d) >= after)
+        return ok[0] if ok else None
+    except Exception as e:
+        log.info("no results date for %s (%s)", ticker, type(e).__name__)
+        return None
+
+
+def load_sectors(path: Path) -> Dict[str, str]:
+    """Bare symbol -> sector name, from universe/sectors_nse.json."""
+    import json
+    try:
+        return json.loads(Path(path).read_text(encoding="utf-8"))
+    except Exception as e:
+        log.warning("sector list unavailable (%s)", e)
+        return {}
+
+
+def latest_vix(market: str = "NSE"):
+    """The last close of the market's volatility index, or None."""
+    try:
+        s = fetch_benchmark_symbol(C.VIX[market], period="1mo")
+        return float(s.iloc[-1]) if len(s) else None
+    except Exception as e:
+        log.warning("VIX unavailable (%s)", e)
+        return None
+
+
 def fetch_prices(tickers: List[str], period: str = C.FETCH_PERIOD,
                  batch: int = 200) -> Dict[str, pd.DataFrame]:
     """Adjusted daily OHLCV per ticker."""
@@ -85,27 +148,32 @@ def fetch_benchmark_symbol(t: str, period: str = C.FETCH_PERIOD) -> pd.Series:
     return s.dropna()
 
 
-def fetch_benchmark(period: str = C.FETCH_PERIOD) -> pd.Series:
-    for t in (C.BENCHMARK, C.BENCHMARK_FALLBACK):
+def _bench_symbols(market: str):
+    return (C.US_BENCHMARK, C.US_BENCHMARK_FALLBACK) if market == "US" else (C.BENCHMARK, C.BENCHMARK_FALLBACK)
+
+
+def fetch_benchmark(period: str = C.FETCH_PERIOD, market: str = "NSE") -> pd.Series:
+    for t in _bench_symbols(market):
         s = fetch_benchmark_symbol(t, period)
         if len(s):
             return s
     raise RuntimeError("Benchmark unavailable")
 
 
-def extend_benchmark(bench: pd.Series, to: pd.Timestamp) -> pd.Series:
+def extend_benchmark(bench: pd.Series, to: pd.Timestamp, market: str = "NSE") -> pd.Series:
     """Carry the benchmark forward to `to` using the fallback index's daily
     returns, or flat if that is missing too. Logged, since it is an estimate."""
     missing_from = bench.index.max()
     try:
-        alt = fetch_benchmark_symbol(C.BENCHMARK_FALLBACK)
+        fallback = _bench_symbols(market)[1]
+        alt = fetch_benchmark_symbol(fallback)
     except Exception:
         alt = pd.Series(dtype=float)
     ext = bench.copy()
     if len(alt) and missing_from in alt.index and to in alt.index:
         rel = alt.loc[missing_from:to] / alt.loc[missing_from]
         ext = pd.concat([bench, rel.iloc[1:] * bench.iloc[-1]])
-        how = C.BENCHMARK_FALLBACK + " returns"
+        how = fallback + " returns"
     else:
         ext.loc[to] = bench.iloc[-1]
         how = "the last value"
