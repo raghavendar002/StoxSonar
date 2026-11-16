@@ -349,6 +349,18 @@ def run(w: dict, bench: pd.Series, vix: Optional[pd.Series], out_dir: Path) -> s
         x = monthly_excess_cash(res_chk[v]["equity"]["equity"])
         sr_trials.append(x.mean() / x.std(ddof=1) if len(x) > 2 and x.std(ddof=1) > 0 else 0.0)
     dsr = deflated_sharpe(monthly_excess_cash(eq), sr_trials)
+    # Each variant against the bar on 2019 on, and its fit-period drawdown (shown, not used to choose)
+    ahead, dsrs, fit_dd = [], [], fit_df["max_dd_pct"].tolist()
+    for v in variants:
+        y = yearly(res_chk[v]["equity"]["equity"], bench)
+        y = y.loc[[k for k in y.index if 2019 <= k <= 2025]]
+        ahead.append(int((y["excess"] > 0).sum()))
+        dsrs.append(round(deflated_sharpe(monthly_excess_cash(res_chk[v]["equity"]["equity"]), sr_trials), 2))
+    chk_df["years_ahead_of_7"] = ahead
+    chk_df["deflated_sharpe"] = dsrs
+    chk_df["fit_max_dd_pct"] = fit_dd
+    chk_df["passes_bar_2019_on"] = (chk_df["edge_pts"] >= 5) & (chk_df["max_dd_pct"] > -25) & \
+        (chk_df["years_ahead_of_7"] >= 5) & (chk_df["deflated_sharpe"] >= 0.95)
     bar = [("CAGR >= Nifty 500 + 5 pts", f"{m['cagr_pct']}% vs {m['bench_cagr_pct']}% + 5", m["edge_pts"] >= 5),
            ("Max drawdown < 25%", f"{m['max_dd_pct']}%", m["max_dd_pct"] > -25),
            ("Ahead of the index in >= 5 of 7 years (2019-2025)", f"{years_ahead} of {len(full)}", years_ahead >= 5),
