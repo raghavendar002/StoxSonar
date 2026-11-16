@@ -1,0 +1,65 @@
+name: Missed-run check
+
+# Did all four books (India and US, intraday and mid-term) run on every market
+# day, and did each feed its own Brain? Repairs what it can, tells Telegram
+# about anything missed, repaired or failed, and writes paper/health.json for
+# the app's Brain tab. See sonar/watchdog.py.
+#
+# Triggered three ways, so no single scheduler can silence it:
+#   - at the end of every daily.yml run (cron-job.org starts those on time, 16:45/18:45/20:45 IST);
+#   - GitHub's own schedule below (can be late; that's fine for a check);
+#   - by hand (Actions > Missed-run check > Run workflow).
+on:
+  schedule:
+    - cron: "40 11 * * 1-5"    # 17:10 IST: India intraday done
+    - cron: "15 17 * * 1-5"    # 22:45 IST: India mid-term done, US scan done
+    - cron: "45 1 * * 2-6"     # 07:15 IST: US intraday settled, US mid-term picked up
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write     # to start daily.yml again when an evening run never went through
+  pages: write
+  id-token: write
+
+# Shares the intraday queue: a repair scan can never overlap a live one.
+concurrency:
+  group: intraday
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt anthropic
+      - name: Check and repair
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python -m sonar.watchdog --telegram
+      - name: Build app feeds
+        run: python -m sonar.appfeed
+      - name: Commit
+        run: |
+          git config user.name "stoxsonar-bot"
+          git config user.email "stoxsonar-bot@users.noreply.github.com"
+          git add paper ledger site
+          if git diff --cached --quiet; then echo "CHANGED=0" >> "$GITHUB_ENV"; exit 0; fi
+          git commit -m "Missed-run check"
+          for i in 1 2 3; do git pull --rebase origin main && git push && break; sleep 5; done
+      - uses: actions/upload-pages-artifact@v3
+        if: env.CHANGED != '0'
+        with:
+          path: site
+      - uses: actions/deploy-pages@v4
+        if: env.CHANGED != '0'

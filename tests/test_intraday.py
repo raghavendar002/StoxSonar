@@ -72,3 +72,50 @@ def test_debate_with_fake_caller(tmp_path, monkeypatch):
     talks, orders = I.debate("in", scan, caller=fake)
     assert orders[0]["side"] == "long" and orders[0]["leverage"] == 2
     assert json.loads((tmp_path / "spend.json").read_text())
+
+
+def fake_5m(days, n=75, spike_day=None):
+    """n 5-minute bars a day from 09:15; volume spikes and price breaks out on spike_day's open."""
+    frames = []
+    for d in days:
+        idx = pd.date_range(f"{d} 09:15", periods=n, freq="5min", tz=TZ)
+        up = 1.0 if d == spike_day else 0.0
+        close = [100 + up * (0.2 * min(i, 2) + 5 * (i >= 3)) for i in range(n)]   # big move only after the checkpoint
+        frames.append(pd.DataFrame(dict(Open=close, High=[c + 0.05 for c in close], Low=[c - 0.05 for c in close],
+                                        Close=close, Volume=[(5000 if up and i < 3 else 1000) for i in range(n)]),
+                                   index=idx))
+    return pd.concat(frames)
+
+
+def test_a_replayed_scan_sees_only_what_an_on_time_scan_saw(monkeypatch):
+    days = [str(d.date()) for d in pd.bdate_range("2026-10-15", "2026-11-17")]
+    data = fake_5m(days, spike_day="2026-11-17")
+
+    def bars(tickers, period, interval, tz):
+        if interval == "1d":
+            return {}
+        return {t: data for t in tickers}
+    monkeypatch.setattr(I, "bars", bars)
+    monkeypatch.setitem(I.MKT, "in", dict(I.MKT["in"], tickers=["AAA.NS"]))
+    s = I.scan_market("in", day="2026-11-17")
+    assert s["meta"]["date"] == "2026-11-17" and s["meta"]["checkpoint"].startswith("2026-11-17 09:30")
+    c = s["candidates"][0]
+    assert [b[0] for b in c["bars_5m"]] == ["09:15", "09:20", "09:25"]      # nothing after the checkpoint
+    assert c["stats"]["last"] < 101                                            # the later +5 move is invisible
+    # a holiday or a day with no bars is refused, never rescanned from an older session
+    try:
+        I.scan_market("in", day="2026-11-18")
+        assert False
+    except I.NoSession:
+        pass
+
+
+def test_late_scans_replay_and_done_days_are_not_redone(tmp_path, monkeypatch):
+    early = pd.Timestamp("2026-11-17 09:40", tz=TZ).tz_convert("UTC")
+    late = pd.Timestamp("2026-11-17 09:50", tz=TZ).tz_convert("UTC")
+    assert I.late_day("in", early) is None and str(I.late_day("in", late)) == "2026-11-17"
+    monkeypatch.setattr(I, "OUT", tmp_path)
+    (tmp_path / "in" / "2026-11-17").mkdir(parents=True)
+    (tmp_path / "in" / "2026-11-17" / "orders.json").write_text("{}")
+    monkeypatch.setattr(I, "scan_market", lambda *a, **k: (_ for _ in ()).throw(AssertionError("rescanned")))
+    assert I.run_scan("in", day="2026-11-17") is None
