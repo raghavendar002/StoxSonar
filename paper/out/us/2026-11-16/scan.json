@@ -1,0 +1,141 @@
+{
+ "meta": {
+  "date": "2026-11-16",
+  "market": "us",
+  "checkpoint_et": "2026-11-16 09:50:00-05:00",
+  "spy_move_today": -0.0023343916744806847,
+  "universe": 100,
+  "signals": 1,
+  "near_misses": [
+   {
+    "sym": "NVDA",
+    "relvol": 2.7007,
+    "dist_or_hi": -0.011,
+    "move_today": 0.0111
+   },
+   {
+    "sym": "FDX",
+    "relvol": 1.623,
+    "dist_or_hi": -0.0004,
+    "move_today": 0.0
+   },
+   {
+    "sym": "TGT",
+    "relvol": 1.5713,
+    "dist_or_hi": -0.0161,
+    "move_today": -0.0136
+   },
+   {
+    "sym": "PG",
+    "relvol": 1.5445,
+    "dist_or_hi": -0.0055,
+    "move_today": 0.0013
+   },
+   {
+    "sym": "INTU",
+    "relvol": 1.353,
+    "dist_or_hi": -0.0093,
+    "move_today": -0.0041
+   },
+   {
+    "sym": "CL",
+    "relvol": 1.3245,
+    "dist_or_hi": -0.0049,
+    "move_today": 0.0065
+   },
+   {
+    "sym": "PEP",
+    "relvol": 1.3241,
+    "dist_or_hi": -0.0062,
+    "move_today": -0.0026
+   },
+   {
+    "sym": "DIS",
+    "relvol": 1.3029,
+    "dist_or_hi": -0.0039,
+    "move_today": -0.0039
+   },
+   {
+    "sym": "AVGO",
+    "relvol": 1.2564,
+    "dist_or_hi": -0.0095,
+    "move_today": -0.0036
+   },
+   {
+    "sym": "AMD",
+    "relvol": 1.2244,
+    "dist_or_hi": -0.0099,
+    "move_today": 0.0348
+   }
+  ]
+ },
+ "candidates": [
+  {
+   "sym": "FDX",
+   "side": "long",
+   "stats": {
+    "sym": "FDX",
+    "last": 325.015,
+    "or_hi": 325.13,
+    "or_lo": 323.0005,
+    "relvol": 1.623,
+    "atr5": 1.4658,
+    "vwap": 324.0918,
+    "gap": 0.0027,
+    "day_hi": 325.66,
+    "day_lo": 323.0005,
+    "open": 325.0,
+    "prev_close": 324.14,
+    "prev_hi": 324.43,
+    "prev_lo": 319.35,
+    "dma20": 311.0885,
+    "move_today": 0.0,
+    "dist_or_hi": -0.0004,
+    "dist_or_lo": 0.0062,
+    "side": "long"
+   },
+   "mechanical": {
+    "side": "long",
+    "trigger": 325.29,
+    "stop": 323.0,
+    "target": 329.88,
+    "latest_entry": "14:30",
+    "cutoff": "15:50"
+   },
+   "bars_5m": [
+    [
+     "09:30",
+     325.0,
+     325.0,
+     323.01,
+     323.01,
+     41820
+    ],
+    [
+     "09:35",
+     323.0,
+     324.44,
+     323.0,
+     324.18,
+     26115
+    ],
+    [
+     "09:40",
+     324.53,
+     325.13,
+     324.18,
+     324.64,
+     32346
+    ],
+    [
+     "09:45",
+     324.43,
+     325.66,
+     324.17,
+     325.02,
+     27334
+    ]
+   ]
+  }
+ ]
+}
