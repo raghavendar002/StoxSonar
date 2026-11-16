@@ -1,4 +1,5 @@
 import json
+import shutil
 import sqlite3
 from pathlib import Path
 
@@ -116,7 +117,11 @@ def test_build_writes_every_feed_as_strict_json(tmp_path):
     site = tmp_path / "site"
     site.mkdir()
     (site / "data.json").write_text('{"as_of": "2026-11-13", "track": [{"confirmed_pct": NaN}]}')
-    meta = appfeed.build(tmp_path / "missing.db", site, ROOT / "paper" / "out")
+    # A copy of the one frozen dry-run day, never the live paper folder: that grows with every
+    # intraday run, and a count taken from it would fail the daily run the day after it passed.
+    paper = tmp_path / "paper"
+    shutil.copytree(DRY, paper / DRY.name)
+    meta = appfeed.build(tmp_path / "missing.db", site, paper)
     names = {p.name for p in (site / "app" / "feed").iterdir()}
     assert names == {"mid-in.json", "mid-us.json", "intra-in.json", "intra-us.json", "meta.json"}
     for n in names:
