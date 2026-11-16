@@ -280,16 +280,50 @@ def _mid_cases(con, market: str) -> list:
 
 
 def _us_signals(con) -> list:
-    """The US shadow list: A/B signals from the last 60 calendar days, newest first."""
+    """The US shadow list: A/B signals of the last 60 calendar days, newest first.
+
+    The first US run loads past signals as 'replay' so the record has a base;
+    they are shown too, marked, because for weeks they are all there is."""
     if not _has(con, "events"):
         return []
-    rows = _rows(con, "SELECT * FROM events WHERE market='US' AND grade IN ('A','B') AND source!='replay' "
-                      "ORDER BY trigger_date DESC LIMIT 200")
+    last = con.execute("SELECT MAX(trigger_date) FROM events WHERE market='US'").fetchone()[0]
+    if not last:
+        return []
+    rows = _rows(con, "SELECT * FROM events WHERE market='US' AND grade IN ('A','B') "
+                      "AND trigger_date >= date(?, '-60 day') ORDER BY trigger_date DESC, grade, symbol LIMIT 200", (last,))
     return [dict(symbol=r["symbol"], grade=r["grade"], direction=r["direction"], trigger_date=r["trigger_date"],
                  status=r["status"], sessions=int(r["sessions"] or 0), score=r["score"], rs_rank=r["rs_rank"],
-                 regime=r["regime"],
+                 regime=r["regime"], source=r["source"], template=_int(r["template"]), base_len=_int(r["base_len"]),
+                 depth_pct=_pct(r["depth"]), vol_ratio=r["vol_ratio"], stage=r["stage"],
                  stop_pct=round((r["stop"] / r["entry"] - 1) * 100, 1) if r["stop"] and r["entry"] else None,
-                 ret_21_pct=_pct(r["ret_21"])) for r in rows]
+                 ret_5_pct=_pct(r["ret_5"]), ret_21_pct=_pct(r["ret_21"])) for r in rows]
+
+
+def _int(x) -> Optional[int]:
+    try:
+        return int(float(x))
+    except (TypeError, ValueError):
+        return None
+
+
+def _us_record(con) -> Optional[dict]:
+    """Per-grade results of the US list, live and replayed, in the page's own track-record shape."""
+    if not _has(con, "events"):
+        return None
+    try:
+        from . import ledger
+        ev = ledger.events_frame(con, "US")
+        if not len(ev):
+            return None
+        live = ["live", "late", "bootstrap"]
+        rec = lambda src, d: ledger.track_record(ev, src, d).to_dict("records")  # noqa: E731
+        return dict(replay_up=rec(["replay"], "up"), replay_down=rec(["replay"], "down"),
+                    live_up=rec(live, "up"), live_down=rec(live, "down"),
+                    replayed=int((ev["source"] == "replay").sum()), live=int(ev["source"].isin(live).sum()),
+                    first=str(ev["trigger_date"].min())[:10])
+    except Exception as e:
+        log.warning("no US record in the feed: %s %s", type(e).__name__, str(e)[:200])
+        return None
 
 
 def midterm(con, site: Path, market: str) -> dict:
@@ -307,6 +341,9 @@ def midterm(con, site: Path, market: str) -> dict:
         feed["signals"] = _us_signals(con)
         last = con.execute("SELECT MAX(as_of) FROM runs WHERE market='US'").fetchone() if _has(con, "runs") else None
         feed["as_of"] = last[0] if last else None
+        feed["record"] = _us_record(con)
+        first = con.execute("SELECT MIN(created_utc) FROM runs WHERE market='US'").fetchone() if _has(con, "runs") else None
+        feed["started"] = first[0][:10] if first and first[0] else None
         if not feed["as_of"]:
             feed["notes"].append("The US shadow list has not run yet. It fills in after the next evening run.")
     if _has(con, "mt_picks"):

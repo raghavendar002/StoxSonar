@@ -3,9 +3,10 @@ import { state, store, loadFeeds, feed, esc, icon, logo, day } from "./core.js";
 import * as views from "./views.js";
 import * as sim from "./sim.js";
 import * as more from "./more.js";
+import { brain } from "./brain.js";
 
-const TABS = [["today", "Today"], ["trades", "Trades"], ["debates", "Debates"], ["sim", "Simulator"], ["more", "More"]];
-const SCREENS = { today: views.today, trades: views.trades, debates: views.debates, sim: sim.simulator, more: more.more };
+const TABS = [["today", "Today"], ["trades", "Trades"], ["debates", "Debates"], ["brain", "Brain"], ["sim", "Simulator"], ["more", "More"]];
+const SCREENS = { today: views.today, trades: views.trades, debates: views.debates, brain, sim: sim.simulator, more: more.more };
 const $ = (id) => document.getElementById(id);
 const desktop = () => matchMedia("(min-width: 980px)").matches;
 

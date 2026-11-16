@@ -4,6 +4,7 @@ import sqlite3
 from pathlib import Path
 
 from sonar import appfeed
+from sonar.config import ENGINE_VERSION as ENGINE
 
 ROOT = Path(__file__).resolve().parent.parent
 DRY = ROOT / "paper" / "out" / "2026-11-13"
@@ -199,3 +200,32 @@ def test_intraday_reads_a_live_india_day_with_shorts(tmp_path):
     assert s["outcome"]["judge"] == {"status": "passed"} and s["outcome"]["twin"]["entry_t"] == "09:52"
     assert s["problems"] == "stop on the wrong side" and s["cost_usd"] == 0.2
     assert c["DLF"]["judge"] is None and c["DLF"]["not_debated"] == "monthly intraday debate cap reached"
+
+
+def test_us_midterm_shows_replayed_signals_and_their_record(tmp_path):
+    con = sqlite3.connect(":memory:")
+    con.executescript("""
+    CREATE TABLE runs (as_of TEXT, market TEXT, regime TEXT, created_utc TEXT);
+    CREATE TABLE events (id INTEGER PRIMARY KEY, engine_version TEXT, market TEXT, symbol TEXT, direction TEXT, trigger_date TEXT, grade TEXT,
+      stage TEXT, template TEXT, rs_rank REAL, regime TEXT, entry REAL, base_len TEXT, depth REAL, vol_ratio REAL, source TEXT,
+      status TEXT, sessions REAL, ret_5 REAL, ret_21 REAL, bench_21 REAL, r_21 REAL, stop REAL, score REAL);
+    INSERT INTO runs VALUES ('2026-11-13', 'US', 'Healthy', '2026-11-16T11:21:10+00:00');
+    """)
+    add = lambda sym, d, date, grade, status, sessions, r5, r21, b21: con.execute(  # noqa: E731
+        "INSERT INTO events (engine_version, market, symbol, direction, trigger_date, grade, stage, template, rs_rank, regime, "
+        "entry, base_len, depth, vol_ratio, source, status, sessions, ret_5, ret_21, bench_21, r_21, stop, score) VALUES "
+        "(?,'US',?,?,?,?,'2','8',88.0,'Healthy',100.0,'51',0.16,1.6,'replay',?,?,?,?,?,?,92.0,0.5)",
+        (ENGINE, sym, d, date, grade, status, sessions, r5, r21, b21, None if r21 is None else r21 / 0.08))
+    add("BEN", "up", "2026-11-09", "B", "Active", 4, None, None, None)
+    add("GNRC", "down", "2026-11-05", "A", "Active", 6, 0.076, None, None)
+    add("OLD", "up", "2026-06-01", "A", "Confirmed", 60, 0.02, 0.10, 0.03)       # too old for the list, still in the record
+    add("CCC", "up", "2026-11-10", "C", "Active", 3, None, None, None)           # C grades stay off the list
+    f = appfeed.midterm(con, tmp_path, "US")
+    assert f["as_of"] == "2026-11-13" and f["started"] == "2026-11-16" and not f["notes"]
+    assert [(s["symbol"], s["source"]) for s in f["signals"]] == [("BEN", "replay"), ("GNRC", "replay")]
+    assert f["signals"][1]["ret_5_pct"] == 7.6 and f["signals"][0]["template"] == 8 and f["signals"][0]["stop_pct"] == -8.0
+    r = f["record"]
+    assert r["replayed"] == 4 and r["live"] == 0 and r["first"] == "2026-06-01"
+    a = [x for x in r["replay_up"] if x["grade"] == "A"][0]
+    assert a["signals"] == 1 and a["measured_21"] == 1 and a["avg_excess_21_pct"] == 7.0
+    assert f["brain"] is None and f["picks"] == []
