@@ -1,0 +1,62 @@
+name: PR 8 momentum study
+
+# Builds survivorship-free history from NSE's daily files back to 2006, then
+# runs the ranked-momentum-with-crash-brake study (research/momentum.py).
+# Research only: it never touches the live ledger or the site.
+on:
+  push:
+    branches: [claude/project-thread-qhpown]
+    paths: [research/momentum.py, .github/workflows/pr8-momentum.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pr8-momentum
+  cancel-in-progress: true
+
+jobs:
+  momentum:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: python -m pytest -q tests/test_momentum.py tests/test_portfolio.py
+      - uses: actions/cache/restore@v4
+        with:
+          path: cache/nse_panel.pkl
+          key: nse-panel-v2-${{ github.run_id }}
+          restore-keys: nse-panel-v2-
+      - name: NSE daily files from 2006
+        run: |
+          python - <<'PY'
+          import logging
+          from datetime import date
+          from pathlib import Path
+          from backtest import nse_prices
+          logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
+          nse_prices("2006-01-01", date.today(), Path("cache/nse_panel.pkl"))
+          PY
+      - uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: cache/nse_panel.pkl
+          key: nse-panel-v2-${{ github.run_id }}
+      - name: Momentum study
+        run: |
+          python research/momentum.py cache/nse_panel.pkl > reports/momentum.md
+          cat reports/momentum.md
+      - name: Commit the report
+        run: |
+          git config user.name "stoxsonar-bot"
+          git config user.email "stoxsonar-bot@users.noreply.github.com"
+          git add reports/momentum.md reports/momentum/
+          git commit --quiet -m "PR 8 momentum report $(date -u +%F)"
+          git pull --rebase --quiet origin "$GITHUB_REF_NAME"
+          git push --quiet origin HEAD:"$GITHUB_REF_NAME"
