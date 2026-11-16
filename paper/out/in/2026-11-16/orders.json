@@ -1,0 +1,25 @@
+{
+ "decided": "2026-11-16T04:04:38+00:00",
+ "note": "Live paper day.",
+ "mechanical": [
+  {
+   "sym": "GRASIM",
+   "side": "long",
+   "trigger": 3047.42,
+   "stop": 3012.3,
+   "target": 3117.67,
+   "latest_entry": "14:00",
+   "cutoff": "15:15"
+  },
+  {
+   "sym": "COALINDIA",
+   "side": "short",
+   "trigger": 397.9,
+   "stop": 403.0,
+   "target": 387.7,
+   "latest_entry": "14:00",
+   "cutoff": "15:15"
+  }
+ ],
+ "judge": []
+}
