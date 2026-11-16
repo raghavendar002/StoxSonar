@@ -65,6 +65,7 @@ The app lives at `https://raghavendar002.github.io/StoxSonar/app/`. It is one pl
 - **Today:** the market mood and new signals (mid-term), or the day's scan with the Judge's result against the fixed-rule Twin (intraday).
 - **Trades:** open signals and paper books, or every intraday paper trade.
 - **Debates:** every Bull, Bear and Judge exchange. Tap one for the chart with both books' levels, each side's argument, the Judge's ruling and what then happened.
+- **Brain:** what the Judge has done so far and what it has learned. Mid-term shows the lessons, every verdict and the pass test; intraday shows the Judge's calls scored against the Twin. It follows the India/US and Mid-term/Intraday switches.
 - **Simulator:** pick one of the last four weeks and a starting amount and replay it. It starts the `replay.yml` workflow on GitHub, which needs a token you save under More, then Simulator access (fine-grained, this repository only, Actions read and write). The replay engine is a separate piece; until it is merged the buttons stay off.
 - **More:** alerts, simulator access, light or dark, the track record.
 

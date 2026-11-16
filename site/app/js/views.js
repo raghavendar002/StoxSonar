@@ -5,8 +5,8 @@ import { breadthBar, breadthHistory, caseChart, ladder } from "./charts.js";
 
 const ui = (k, d) => (state.ui[k] === undefined ? d : state.ui[k]);
 const sigId = (r) => `${r.symbol}|${r.direction}|${r.trigger_date}`;
-const section = (title, right = "") => `<div class="section"><h2>${esc(title)}</h2>${right}</div>`;
-const kpi = (label, v, s = "", cls = "") => `<div class="kpi"><div class="eyebrow">${esc(label)}</div><div class="v ${cls}">${v}</div><div class="s">${s}</div></div>`;
+export const section = (title, right = "") => `<div class="section"><h2>${esc(title)}</h2>${right}</div>`;
+export const kpi = (label, v, s = "", cls = "") => `<div class="kpi"><div class="eyebrow">${esc(label)}</div><div class="v ${cls}">${v}</div><div class="s">${s}</div></div>`;
 const notes = (f) => (f && f.notes ? f.notes.map((n) => note(n, "info")).join("") : "");
 const marketName = () => (state.market === "IN" ? "India" : "US");
 
@@ -24,12 +24,11 @@ function pickLine(p) {
 }
 // The move since the signal, counted the way the signal bets: a breakdown wins when the price falls
 function resultOf(r) {
-  const move = r.move_pct != null ? r.move_pct : r.ret_21_pct;
+  const [move, basis] = r.move_pct != null ? [r.move_pct, "since signal"] : r.ret_21_pct != null ? [r.ret_21_pct, "after 21 days"]
+    : r.ret_5_pct != null ? [r.ret_5_pct, "first 5 days"] : [null, ""];
   if (move == null) return null;
   const up = r.direction === "up", g = gain(move, r.direction);
-  const label = r.move_pct == null ? (up ? "after 21 days" : `price ${move >= 0 ? "rose" : "fell"} ${Math.abs(move).toFixed(1)}%`)
-    : up ? "since signal" : `price ${move >= 0 ? "rose" : "fell"} ${Math.abs(move).toFixed(1)}%`;
-  return { g, move, label, against: g < 0 };
+  return { g, move, basis, label: up ? basis : `price ${move >= 0 ? "rose" : "fell"} ${Math.abs(move).toFixed(1)}%`, against: g < 0 };
 }
 
 function signalRow(r) {
@@ -40,12 +39,12 @@ function signalRow(r) {
     <span class="grade ${esc(r.grade)}">${esc(r.grade)}</span>
     <span class="grow"><span class="row"><span class="sym">${esc(r.symbol)}</span>
       ${r.status ? `<span class="chip ${r.status === "Active" ? "info" : r.status === "Failed" ? "avoid" : r.status === "Confirmed" ? "go" : ""}">${esc(r.status)}</span>` : ""}</span>
-      <span class="sub"><span class="${upDir ? "up" : "down"}">${upDir ? "▲ Breakout" : "▼ Breakdown"}</span> · ${esc(shortDay(r.trigger_date))} · day ${r.sessions || 0} of 21${r.rs_rank != null ? ` · RS ${Math.round(r.rs_rank)}` : ""}${twin && twin.status === "closed" ? ` · <b class="${sign(twin.r)}">Twin ${esc(pickLine(twin))}</b>` : ""}</span>
+      <span class="sub"><span class="${upDir ? "up" : "down"}">${upDir ? "▲ Breakout" : "▼ Breakdown"}</span> · ${esc(shortDay(r.trigger_date))} · day ${Math.min(r.sessions || 0, 21)} of 21${r.rs_rank != null ? ` · RS ${Math.round(r.rs_rank)}` : ""}${r.source === "replay" ? " · replayed" : ""}${twin && twin.status === "closed" ? ` · <b class="${sign(twin.r)}">Twin ${esc(pickLine(twin))}</b>` : ""}</span>
       <span class="meter"><span style="width:${prog}%"></span></span></span>
     <span class="end">${res ? `<span class="big ${sign(res.g)}">${pct(res.g)}</span><div class="dim" style="font-size:11.5px">${esc(res.label)}</div>` : ""}</span></button>`;
 }
 
-function caseRow(c, cur) {
+export function caseRow(c, cur) {
   const oj = c.outcome && c.outcome.judge, ot = c.outcome && c.outcome.twin;
   const sub = c.horizon === "intra"
     ? `${c.market === "IN" ? `<span class="${c.side === "short" ? "down" : "up"}">${c.side === "short" ? "▼ Short" : "▲ Long"}</span> · ` : ""}Judge: ${esc(c.not_debated ? "not debated" : tradeLine(oj))} · Twin: ${esc(tradeLine(ot))}`
@@ -130,11 +129,44 @@ function todayMidIN(f) {
     ${f.books.length ? section("Paper books") + booksTable(f.books) : ""}`;
 }
 
+function recordTable(rows) {
+  if (!rows || !rows.some((r) => r.signals)) return `<div class="card muted">No signals yet.</div>`;
+  return `<div class="card scroll"><table><thead><tr><th>Grade</th><th>Signals</th><th>Closed</th><th>Held</th><th>Failed</th><th>21d</th><th>Vs index</th><th>Wins</th><th>Avg</th></tr></thead><tbody>
+    ${rows.map((r) => `<tr><td><span class="grade ${esc(r.grade)}" style="width:26px;height:26px;font-size:12px">${esc(r.grade)}</span></td><td>${r.signals}</td><td>${r.closed}</td>
+      <td>${r.confirmed_pct == null ? "–" : num(r.confirmed_pct, 0) + "%"}</td><td>${r.failed_pct == null ? "–" : num(r.failed_pct, 0) + "%"}</td><td>${r.measured_21}</td>
+      <td class="${sign(r.avg_excess_21_pct)}">${pct(r.avg_excess_21_pct)}</td><td>${r.win_pct_21 == null ? "–" : num(r.win_pct_21, 0) + "%"}</td><td class="${sign(r.avg_r_21)}">${rfmt(r.avg_r_21)}</td></tr>`).join("")}</tbody></table></div>`;
+}
+
 function todayMidUS(f) {
-  if (!f || !f.signals.length) return notes(f) + empty("No US shadow list yet", "S&P 500 breakouts will be logged and scored here. They are never suggestions.");
-  return `${note("Logged and scored only. US grade cut-offs are still India's until refitted, so nothing here is a suggestion.", "info")}
-    ${section("US shadow list")}<div class="list">${f.signals.slice(0, 30).map(signalRow).join("")}</div>
-    ${f.books.length ? section("Paper books") + booksTable(f.books) : ""}`;
+  const sig = (f && f.signals) || [], rec = f && f.record;
+  if (!f || (!sig.length && !rec)) return notes(f) + empty("No US shadow list yet", "S&P 500 breakouts and breakdowns will be logged and scored here after the next US run. They are never suggestions.");
+  const running = sig.filter((r) => r.ret_21_pct == null && r.status !== "Failed" && r.status !== "Faded");
+  const done = sig.filter((r) => !running.includes(r));
+  const live = rec ? rec.live : sig.filter((r) => r.source !== "replay").length;
+  return `
+    <div class="hero" style="--glow:var(--accent)">
+      <div class="row"><span class="status"><span class="pulse"></span>US shadow list</span>
+        <span class="grow"></span><span class="chip">Close of ${esc(day(f.as_of))}</span></div>
+      <h1>${live ? `${live} live signal${live === 1 ? "" : "s"} logged` : "Watching, nothing live yet"}</h1>
+      <p>S&P 500, same rules as India · ${running.length} signal${running.length === 1 ? "" : "s"} still running · never a suggestion</p>
+    </div>
+    <div style="margin-top:10px">${note(live
+      ? "Logged and scored only. US grade cut-offs are still India's until refitted, so nothing here is a suggestion."
+      : `The US list ${f.started ? "started on " + day(f.started) : "has just started"}. Its first run replayed ${rec ? rec.replayed : "the past year of"} past signals so there is a record to compare with. No new A or B signal has triggered on a run day since, so nothing is live yet. The rows marked "replayed" below were found looking back, not on the day.`, "info")}</div>
+    <div class="grid k4">
+      ${kpi("Still running", running.length, "inside 21 sessions")}
+      ${kpi("Live signals", live, "logged on the day")}
+      ${kpi("Replayed", rec ? rec.replayed : "–", rec ? `since ${esc(shortDay(rec.first))} ${esc(String(rec.first).slice(0, 4))}` : "")}
+      ${kpi("Paper books", f.picks.length, f.picks.length ? "picks" : "start with live signals")}
+    </div>
+    ${running.length ? section("Still running", `<a class="more" href="#/trades">All ${sig.length}</a>`) + `<div class="list">${running.map(signalRow).join("")}</div>` : ""}
+    ${done.length ? section("Recently finished") + `<div class="list">${done.slice(0, 12).map(signalRow).join("")}</div>` : ""}
+    ${f.books.length ? section("Paper books") + booksTable(f.books) : ""}
+    ${rec ? `${section("Record of the replay")}
+      <p class="muted" style="margin:0 2px 10px;font-size:13px">The same rules run over the past year of S&P 500 data. A hint, not proof: it was not logged live, and the grades use India's cut-offs.</p>
+      <div class="eyebrow" style="margin:0 2px 8px">Breakouts</div>${recordTable(rec.replay_up)}
+      <div class="eyebrow" style="margin:14px 2px 8px">Breakdowns (shadow shorts)</div>${recordTable(rec.replay_down)}
+      ${rec.live ? `<div class="eyebrow" style="margin:14px 2px 8px">Live breakouts</div>${recordTable(rec.live_up)}<div class="eyebrow" style="margin:14px 2px 8px">Live breakdowns</div>${recordTable(rec.live_down)}` : ""}` : ""}`;
 }
 
 function pickDay(f) {
@@ -257,36 +289,12 @@ export function howItWorks(intra) {
     <p><b>One day proves nothing.</b> The Judge is kept only if it beats the Twin over about 100 trades, after costs and API fees.</p></details>`;
 }
 
-function brainCard(f) {
-  const b = f && f.brain, sb = b && b.scoreboard;
-  if (!b || !sb) return "";
-  const r2 = (x) => (x == null ? "–" : rfmt(x));
-  const v = sb.verdicts || {}, sw = b.switch, bud = b.budget;
-  const prog = Math.min(100, (sb.judged_closed / (sb.needed || 100)) * 100);
-  const line = (l, val) => `<div><span>${l}</span><b>${val}</b></div>`;
-  return `${section("The Brain", `<a class="more" href="../brain.html" target="_blank" rel="noopener">Full page</a>`)}
-    <div class="card"><div class="row"><span class="grade" style="color:var(--judge);background:var(--judge-soft)">${icon("judge")}</span>
-        <div class="grow"><b>${esc(sb.state || "")}</b><div class="sub">The Judge passes only if Go beats Avoid, the Judge book beats the Twin book, and high conviction beats low.</div></div></div>
-      <span class="meter" style="margin-top:12px"><span style="width:${prog}%;background:var(--judge)"></span></span>
-      <div class="facts" style="margin-top:12px">
-        ${line("Verdicts so far", `Go ${v.Go || 0} · Wait ${v.Wait || 0} · Avoid ${v.Avoid || 0}`)}
-        ${line("Verdicts right", sb.right_pct == null ? "–" : num(sb.right_pct, 0) + "%")}
-        ${line(`Go · ${sb.go.n} closed`, `<span class="${sign(sb.go.avg_r)}">${r2(sb.go.avg_r)}</span>`)}
-        ${line(`Avoid, as if taken · ${sb.avoid.n}`, `<span class="${sign(sb.avoid.avg_r)}">${r2(sb.avoid.avg_r)}</span>`)}
-        ${line(`Judge book · ${sb.judge_book.n} closed`, `<span class="${sign(sb.judge_book.avg_r)}">${r2(sb.judge_book.avg_r)}</span>`)}
-        ${line(`Twin book · ${sb.twin_book.n} closed`, `<span class="${sign(sb.twin_book.avg_r)}">${r2(sb.twin_book.avg_r)}</span>`)}
-        ${bud ? line("API spend this month", `$${num(bud.spent_usd, 2)} of $${num(bud.cap_usd, 0)}`) : ""}
-        ${sw ? line(`Debates in a ${esc(sw.regime || "")} market`, sw.off ? `<span class="down">Switched off</span>` : `<span class="up">On</span>`) : ""}
-      </div>
-      ${sw && sw.off ? `<p class="muted" style="margin:10px 0 0;font-size:13px">Off because ${esc(sw.why)}. The books keep scoring every signal, and debates restart when the market type changes.</p>`
-        : sw ? `<p class="dim" style="margin:10px 0 0;font-size:12px">Debates stop in a market type if under ${sw.min_share_pct}% of the Judge's first ${sw.after} verdicts there are Go or Wait.</p>` : ""}
-      <div class="eyebrow" style="margin-top:14px">Lessons the Judge is given</div>
-      ${b.lessons && b.lessons.length ? `<ol class="steps">${b.lessons.map((x) => `<li>${esc(x.text)} <span class="dim">(${x.n_cases} cases)</span></li>`).join("")}</ol>`
-        : `<p class="muted" style="margin:6px 0 0;font-size:13px">None yet. A lesson needs at least ${b.min_cases || 8} closed judged trades behind it.</p>`}
-    </div>`;
-}
+const brainLink = () => `<a class="item" href="#/brain" style="margin-top:10px;border:1px solid var(--line);border-radius:var(--r-lg);background:var(--card)">
+    <span class="grade" style="color:var(--judge);background:var(--judge-soft)">${icon("brain")}</span>
+    <span class="grow"><span class="sym">The Brain</span><span class="sub">What the Judge has done so far and what it has learned</span></span>
+    <span class="end">${icon("chev")}</span></a>`;
 
-function skippedList(f) {
+export function skippedList(f) {
   const rows = (f && f.skipped) || [];
   if (!rows.length) return "";
   return `${section("Not debated")}<div class="list">${rows.slice(0, 20).map((x) => `<div class="item" style="cursor:default">
@@ -305,7 +313,7 @@ export function debates() {
   const f = feed(), cases = allCases(f);
   const how = howItWorks(state.horizon === "intra");
   if (!cases.length) return notes(f) + empty("No debates yet", "When a Bull, a Bear and the Judge argue over a pick, the whole exchange lands here.", "debates")
-    + `<div style="margin-top:10px">${how}</div>` + (state.horizon === "mid" ? brainCard(f) + skippedList(f) : "");
+    + `<div style="margin-top:10px">${how}</div>` + brainLink() + (state.horizon === "mid" ? skippedList(f) : "");
   const cur = f.currency, flt = ui("dflt", "all");
   const tests = { all: () => true, go: (c) => c.judge && c.judge.tone === "go", wait: (c) => c.judge && c.judge.tone === "wait", avoid: (c) => c.judge && c.judge.tone === "avoid" };
   const rows = cases.filter(tests[flt]);
@@ -316,10 +324,10 @@ export function debates() {
   } else if (f.books.length) board = booksTable(f.books.filter((b) => b.book === "judge" || b.book === "twin" || b.book === "debated"));
   const count = (k) => cases.filter(tests[k]).length;
   const labels = state.horizon === "intra" ? [["all", "All"], ["go", "Took the trade"], ["avoid", "Passed"]] : [["all", "All"], ["go", "Go"], ["wait", "Wait"], ["avoid", "Avoid"]];
-  return `${notes(f)}${board}<div style="margin-top:10px">${how}</div>
+  return `${notes(f)}${board}<div style="margin-top:10px">${how}</div>${brainLink()}
     <div class="chips" style="margin:14px 0 12px">${labels.map(([k, l]) => `<button class="chip ${k === flt ? "on" : ""}" data-act="set" data-k="dflt" data-v="${k}">${l} · ${count(k)}</button>`).join("")}</div>
     ${rows.length ? `<div class="list">${rows.map((c) => caseRow(c, cur)).join("")}</div>` : empty("Nothing matches", "Try another filter.")}
-    ${state.horizon === "mid" ? brainCard(f) + skippedList(f) : ""}`;
+    ${state.horizon === "mid" ? skippedList(f) : ""}`;
 }
 
 // ---------------------------------------------------------------- Detail: a debate case
@@ -406,18 +414,19 @@ export function signalDetail(id) {
     <div class="row wrap" style="margin-top:8px"><span class="chip ${upDir ? "go" : "avoid"}">${upDir ? "Breakout" : "Breakdown"}</span><span class="chip">Grade ${esc(r.grade)}</span>
       ${r.status ? `<span class="chip info">${esc(r.status)}</span>` : ""}</div></div>`;
   const buys = s ? s.buys_allowed !== false : false;
-  const plan = !upDir ? `<div class="card"><div class="eyebrow">Shadow short</div><p class="muted" style="margin:6px 0 0">Logged and scored, never traded: stock futures are too large for a ₹1 lakh account.</p></div>`
+  const plan = state.market === "US" ? `<div class="card"><div class="eyebrow">US shadow list${r.source === "replay" ? " · replayed" : ""}</div><p class="muted" style="margin:6px 0 0">Logged and scored, never a suggestion.${r.source === "replay" ? " This one was found by replaying past data on the list's first run, not logged on the day." : ""}</p></div>`
+    : !upDir ? `<div class="card"><div class="eyebrow">Shadow short</div><p class="muted" style="margin:6px 0 0">Logged and scored, never traded: stock futures are too large for a ₹1 lakh account.</p></div>`
     : !p ? ""
     : `<div class="card"><div class="eyebrow">Plan for a ₹1 lakh account</div>${buys ? "" : `<div style="margin-top:8px"><span class="chip warn">No buys while the market is weak</span></div>`}
         <div class="facts" style="margin-top:10px">${fact("Buy", `${p.qty} shares`)}${fact("Only below", "₹" + px(p.max_buy))}${fact("Stop", "₹" + px(p.stop))}${fact("Sell by", esc(shortDay(p.exit_by)))}
           ${fact("Position", money(p.value_rs, "INR", 0))}${fact("Risk", money(p.risk_rs, "INR", 0))}${fact("Worst case", money(p.worst_risk_rs, "INR", 0))}${fact("Stop distance", pct(p.stop_pct))}</div></div>`;
   const res = resultOf(r), picks = bookPicks(r);
   const skip = ((f && f.skipped) || []).find((x) => x.symbol === r.symbol && x.date === r.trigger_date && x.direction === r.direction);
-  const against = res && !upDir && res.against ? note(`This is a breakdown: the signal bets on a fall. The price has risen ${Math.abs(res.move).toFixed(1)}% since, so the shadow short is losing by that much.`, "warn") : "";
+  const against = res && !upDir && res.against ? note(`This is a breakdown: the signal bets on a fall. The price rose ${Math.abs(res.move).toFixed(1)}% ${res.basis === "since signal" ? "since" : res.basis === "after 21 days" ? "over the 21 days after" : "in the first 5 days"}, so the shadow short is down by that much.`, "warn") : "";
   const books = picks.length ? section("In the paper books") + `<div class="card" style="display:grid;gap:10px">${picks.map((p) =>
     `<div class="row"><span class="grow muted">${esc(BOOK_NAMES[p.book] || p.book)}</span><b class="num ${p.status === "closed" ? sign(p.r) : ""}">${esc(pickLine(p))}</b></div>`).join("")}</div>` : "";
   const body = `
-    <div class="grid k2">${kpi("Result since the signal", res ? pct(res.g) : "–", `${res && !upDir ? esc(res.label) + " · " : ""}day ${r.sessions || 0} of 21`, res ? sign(res.g) : "")}${kpi("Momentum score", num(r.score, 2), r.rs_rank != null ? `RS rank ${Math.round(r.rs_rank)}` : "")}</div>
+    <div class="grid k2">${kpi("Result since the signal", res ? pct(res.g) : "–", `${res && !upDir ? esc(res.label) + " · " : ""}${res && res.basis !== "since signal" ? esc(res.basis) + " · " : ""}day ${Math.min(r.sessions || 0, 21)} of 21`, res ? sign(res.g) : "")}${kpi("Momentum score", num(r.score, 2), r.rs_rank != null ? `RS rank ${Math.round(r.rs_rank)}` : "")}</div>
     ${against ? `<div style="margin-top:10px">${against}</div>` : ""}
     <div style="margin-top:10px">${plan}</div>${books}
     ${section("Why it was flagged")}
@@ -434,10 +443,7 @@ export function signalDetail(id) {
 export function recordTables() {
   const f = feed("IN", "mid"), s = f && f.snapshot;
   if (!s) return "";
-  const table = (rows) => (!rows || !rows.length ? `<div class="card muted">No signals yet.</div>` : `<div class="card scroll"><table><thead><tr><th>Grade</th><th>Signals</th><th>Closed</th><th>Held</th><th>Failed</th><th>21d</th><th>Vs index</th><th>Wins</th><th>Avg</th></tr></thead><tbody>
-    ${rows.map((r) => `<tr><td><span class="grade ${esc(r.grade)}" style="width:26px;height:26px;font-size:12px">${esc(r.grade)}</span></td><td>${r.signals}</td><td>${r.closed}</td>
-      <td>${r.confirmed_pct == null ? "–" : num(r.confirmed_pct, 0) + "%"}</td><td>${r.failed_pct == null ? "–" : num(r.failed_pct, 0) + "%"}</td><td>${r.measured_21}</td>
-      <td class="${sign(r.avg_excess_21_pct)}">${pct(r.avg_excess_21_pct)}</td><td>${r.win_pct_21 == null ? "–" : num(r.win_pct_21, 0) + "%"}</td><td class="${sign(r.avg_r_21)}">${rfmt(r.avg_r_21)}</td></tr>`).join("")}</tbody></table></div>`);
+  const table = recordTable;
   return `${section("Track record · India mid-term")}
     <p class="muted" style="margin:0 2px 10px;font-size:13px">Held and Failed are shares of closed signals within 10 sessions. The 21d columns measure 21 sessions after entry against the Nifty 500.</p>
     <div class="eyebrow" style="margin:0 2px 8px">Live</div>${table(s.track_record_live)}

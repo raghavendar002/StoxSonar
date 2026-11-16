@@ -299,3 +299,4 @@ details.how p:last-child { margin-bottom: 16px; }
 details.how p b { color: var(--text); }
 .note.warn svg { color: var(--warn); }
 .duel .amt { white-space: nowrap; font-size: clamp(19px, 6vw, 26px); }
+.tabbar a { min-width: 0; }
