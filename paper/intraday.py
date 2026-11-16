@@ -267,6 +267,17 @@ def check(v, last, mkt):
     return bad
 
 
+def judge_memory(mkt, cand, scan):
+    """The Judge's own track record on similar setups, and any lessons; None on day one or on any error."""
+    from sonar import intrabrain
+    try:
+        return intrabrain.memory_block(mkt, dict(cand, index_move=scan["meta"].get(MKT[mkt]["meta_move"])),
+                                       scan["meta"]["date"], out=OUT)
+    except Exception as e:                                        # memory is a help, never a reason to skip a day
+        print(f"no memory for {cand['sym']}: {type(e).__name__} {e}", flush=True)
+        return None
+
+
 def debate(mkt, scan, caller=None):
     from sonar import debate as D
     from sonar import config as C
@@ -285,11 +296,13 @@ def debate(mkt, scan, caller=None):
         pack = json.dumps(dict(market=cfg["name"], symbol=c["sym"], scanner_side=c["side"], stats=c["stats"],
                                rule_based_plan=c["mechanical"], index_move_today=scan["meta"].get(cfg["meta_move"]),
                                bars_5m_today=c["bars_5m"]), default=str)
+        memory = judge_memory(mkt, c, scan)
         try:
             bull = caller(C.DEBATE_MODEL_ARGUE, pack, BULL, "low", system=system)
             bear = caller(C.DEBATE_MODEL_ARGUE, pack, BEAR + "\n\nThe Bull said:\n" + bull.text, "low", system=system)
             judge = caller(C.DEBATE_MODEL_JUDGE, pack,
                            JUDGE.format(noshort="" if cfg["shorts"] else " (logged only: this account cannot short)")
+                           + (f"\n\n{memory}" if memory else "")
                            + "\n\nBULL:\n" + bull.text + "\n\nBEAR:\n" + bear.text, "medium",
                            schema=SCHEMA, system=system)
         except Exception as e:                                    # one stock failing never stops the day
@@ -309,7 +322,7 @@ def debate(mkt, scan, caller=None):
         talks.append(dict(sym=c["sym"], name=None, headline=v["headline"], bull=bull.text, bear=bear.text,
                           judge_title=v["title"] if traded else f"No trade: {v['title']}",
                           judge_text=v["text"] + (f" (Order not placed: {'; '.join(problems)}.)" if problems else ""),
-                          verdict=v, problems=problems, cost_usd=round(cost, 4),
+                          verdict=v, problems=problems, cost_usd=round(cost, 4), memory=memory,
                           decided_utc=datetime.now(timezone.utc).isoformat(timespec="seconds")))
         print(c["sym"], v["decision"], problems, f"${cost:.3f}", flush=True)
     return talks, judge_orders
@@ -381,16 +394,62 @@ def settle_book(mkt, orders, b1, start):
     return dict(trades=out, end_cash=round(cash, 2))
 
 
-def settle(mkt, day):
+def shadow(mkt, scan, talks, b1, start):
+    """Score every candidate twice, whatever the books did: the scanner's rule plan
+    (the Twin's trade) and the Judge's own levels (a No trade still names them).
+    One position each, so a full book never hides a result. sonar/intrabrain.py
+    turns these into the Judge's track record."""
+    cfg = MKT[mkt]
+    out = []
+    for c in scan.get("candidates") or []:
+        rule = dict(sym=c["sym"], **c["mechanical"])
+        row = dict(sym=c["sym"], side=c["side"], rule=settle_book(mkt, [rule], b1, start)["trades"][0])
+        v = (talks.get(c["sym"]) or {}).get("verdict") or {}
+        if v.get("trigger") and v.get("stop") and v.get("target"):
+            side = {"LONG": "long", "SHORT": "short"}.get(v.get("decision"), v.get("side_if_traded") or c["side"])
+            o = dict(sym=c["sym"], side=side, trigger=v["trigger"], stop=v["stop"], target=v["target"],
+                     latest_entry=cfg["latest"], cutoff=cfg["cutoff"])
+            risk = (o["trigger"] - o["stop"]) * (1 if side == "long" else -1)
+            if risk > 0 and (o["target"] - o["trigger"]) * (1 if side == "long" else -1) > 0:
+                row["judge_levels"] = settle_book(mkt, [o], b1, start)["trades"][0]
+            else:
+                row["judge_levels"] = dict(status="bad_levels", side=side)
+        out.append(row)
+    return out
+
+
+def settle(mkt, day, caller=None):
     cfg = MKT[mkt]
     od = OUT / mkt / day
     orders = json.loads((od / "orders.json").read_text())
-    syms = sorted({ticker(o["sym"], mkt) for o in orders["mechanical"] + orders["judge"]})
+    scan = json.loads((od / "scan.json").read_text()) if (od / "scan.json").exists() else {}
+    talks = {t["sym"]: t for t in json.loads((od / "debates.json").read_text())} if (od / "debates.json").exists() else {}
+    syms = sorted({ticker(o["sym"], mkt) for o in orders["mechanical"] + orders["judge"]}
+                  | {ticker(c["sym"], mkt) for c in scan.get("candidates") or []})
     b1 = bars(syms, "5d", "1m", cfg["tz"]) if syms else {}
     start = pd.Timestamp(orders["decided"]).tz_convert(cfg["tz"])
     res = {book: settle_book(mkt, orders[book], b1, start) for book in ("mechanical", "judge")}
+    res["shadow"] = shadow(mkt, scan, talks, b1, start)
     (od / "settle.json").write_text(json.dumps(res, indent=1, default=str))
     print(json.dumps(res, indent=1, default=str))
+    lessons_review(mkt, caller)
+
+
+def lessons_review(mkt, caller=None):
+    """At most weekly, once enough calls are scored: one Opus call that may add or drop lessons."""
+    from sonar import intrabrain
+    import os
+    if not os.environ.get("ANTHROPIC_API_KEY") and caller is None:
+        return
+    try:
+        _, _, spent = month_spend()
+        row = intrabrain.review(mkt, MONTHLY_CAP_USD - spent, call=caller)
+    except Exception as e:                                        # never fails the settle
+        print(f"lessons review skipped: {type(e).__name__} {e}", flush=True)
+        return
+    if row:
+        add_spend(row.get("cost_usd") or 0)
+        print("lessons review:", json.dumps(row, default=str), flush=True)
 
 
 # ---------------------------------------------------------------------------

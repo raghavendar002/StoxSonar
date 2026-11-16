@@ -389,12 +389,14 @@ def review_due(con, market: str, now: datetime) -> bool:
     return age >= timedelta(days=C.BRAIN_REVIEW_EVERY_DAYS) and n - (last[1] or 0) >= C.BRAIN_REVIEW_MIN_NEW
 
 
-def check_lesson(text: str, case_ids: List[int], known_ids: set, names: set, current: List[str]) -> Optional[str]:
+def check_lesson(text: str, case_ids: List[int], known_ids: set, names: set, current: List[str],
+                 min_cases: Optional[int] = None) -> Optional[str]:
     """None when the lesson can be kept, else why not."""
+    need = C.BRAIN_MIN_CASES if min_cases is None else min_cases
     text = " ".join(str(text).split())
     ids = {int(i) for i in case_ids}
-    if len(ids & known_ids) < C.BRAIN_MIN_CASES:
-        return f"cites {len(ids & known_ids)} real cases, needs {C.BRAIN_MIN_CASES}"
+    if len(ids & known_ids) < need:
+        return f"cites {len(ids & known_ids)} real cases, needs {need}"
     if not 20 <= len(text) <= 320:
         return "not one or two sentences"
     for name in names:

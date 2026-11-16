@@ -84,7 +84,7 @@ function midBrain(f) {
     <p class="foot"><a href="../brain.html" target="_blank" rel="noopener">The same record as a plain web page</a></p>`;
 }
 
-// ---------------------------------------------------------------- intraday: a record, no lessons memory
+// ---------------------------------------------------------------- intraday: the record the Judge reads, and its lessons
 function intraBrain(f) {
   const days = ((f && f.days) || []).filter((d) => d.status !== "dry_run");
   const name = state.market === "IN" ? "India" : "US", cur = f ? f.currency : "INR";
@@ -96,11 +96,22 @@ function intraBrain(f) {
   const settled = days.filter((d) => d.books);
   const sum = (k) => settled.reduce((a, d) => a + (d.books[k].pnl || 0), 0);
   const cost = days.reduce((a, d) => a + (d.cost_usd || 0), 0);
-  // A pass is right when the Twin took the same stock and lost, wrong when the Twin won
-  const cmp = passed.map((c) => c.outcome && c.outcome.twin).filter((t) => t && t.r != null);
-  const passRight = cmp.filter((t) => t.r <= -0.1).length, passWrong = cmp.filter((t) => t.r >= 0.1).length, passFlat = cmp.length - passRight - passWrong;
-  const tk = took.map((c) => c.outcome && c.outcome.judge).filter((t) => t && t.r != null);
-  const tkWon = tk.filter((t) => t.r > 0).length;
+  // Each call is scored by code after the close. A pass is scored against the rule plan's trade on the
+  // same stock (the Twin's trade), even when the Twin's two slots were full. Older days without that
+  // shadow score fall back to the Twin book's own trade.
+  const callOf = (c) => {
+    const o = c.outcome || {};
+    if (o.call) return o.call;
+    if (c.judge.tone === "go") { const t = o.judge; return t && t.r != null ? (t.r > 0 ? "right" : "wrong") : null; }
+    const t = o.twin; if (!t || t.r == null) return null;
+    return t.r <= -0.1 ? "right" : t.r >= 0.1 ? "wrong" : "flat";
+  };
+  const passCalls = passed.map(callOf).filter((x) => x && x !== "no fill");
+  const passRight = passCalls.filter((x) => x === "right").length, passWrong = passCalls.filter((x) => x === "wrong").length, passFlat = passCalls.length - passRight - passWrong;
+  const tkCalls = took.map(callOf).filter((x) => x === "right" || x === "wrong");
+  const tkWon = tkCalls.filter((x) => x === "right").length;
+  const ib = (f && f.brain) || {}, rec = ib.record || {}, lessons = ib.lessons || [];
+  const need = ib.review_at || 20, scored = rec.scored || 0, perLesson = ib.min_cases || 8;
   const head = !took.length ? `${plural(judged.length, "call")} so far, no trade taken yet`
     : `${plural(judged.length, "call")}, ${plural(took.length, "trade")} taken`;
   const allPass = judged.length >= 4 && !took.length;
@@ -110,7 +121,7 @@ function intraBrain(f) {
       <h1>${esc(head)}</h1>
       <p>${plural(days.length, "live day")} since ${esc(day(days[days.length - 1].date))} · paper money only</p>
     </div>
-    ${allPass ? `<div style="margin-top:10px">${note(`The Judge has said No trade on every candidate so far. That can be discipline or it can be a Judge that never acts. The passes below show which: each one is scored against what the Twin made on the same stock.`, "warn")}</div>` : ""}
+    ${allPass ? `<div style="margin-top:10px">${note(`The Judge has said No trade on every candidate so far. That can be discipline or it can be a Judge that never acts. The passes below show which: each one is scored against what the rule trade made on the same stock.`, "warn")}</div>` : ""}
     <div class="grid k4" style="margin-top:10px">
       ${kpi("Calls", judged.length, `${longs} long · ${shorts} short · ${passed.length} no trade`)}
       ${kpi("Judge book", settled.length ? (sum("judge") > 0 ? "+" : "") + money(sum("judge"), cur, cur === "INR" ? 0 : 2) : "–", plural(settled.length, "settled day"), settled.length ? sign(sum("judge")) : "")}
@@ -120,14 +131,19 @@ function intraBrain(f) {
 
     ${section("Were its calls right?")}
     <div class="card"><div class="facts">
-      ${line("Trades it took", tk.length ? `${tkWon} won · ${tk.length - tkWon} lost` : took.length ? "not settled yet" : "none")}
-      ${line("Passes the Twin took", cmp.length ? `<span class="${passRight >= passWrong ? "up" : "down"}">${passRight} right · ${passWrong} wrong</span>${passFlat ? ` · ${passFlat} flat` : ""}` : "none to compare")}
+      ${line("Trades it took", tkCalls.length ? `${tkWon} won · ${tkCalls.length - tkWon} lost` : took.length ? "not settled yet" : "none")}
+      ${line("No-trade calls", passCalls.length ? `<span class="${passRight >= passWrong ? "up" : "down"}">${passRight} right · ${passWrong} wrong</span>${passFlat ? ` · ${passFlat} flat` : ""}` : "none scored yet")}
+      ${rec.passed && rec.passed.rule_avg_r != null ? line("Rule trades it refused, on average", `<span class="${sign(rec.passed.rule_avg_r)}">${rfmt(rec.passed.rule_avg_r)}</span>`) : ""}
+      ${rec.rule_plan && rec.rule_plan.n ? line(`Rule plan on every candidate · ${rec.rule_plan.n}`, `<span class="${sign(rec.rule_plan.avg_r)}">${rfmt(rec.rule_plan.avg_r)}</span> · ${rec.rule_plan.win_pct}% won`) : ""}
     </div>
-    <p class="dim" style="margin:10px 0 0;font-size:12px">A pass counts as right when the Twin traded the same stock and lost, as wrong when the Twin made money on it, and as flat when the Twin ended within a tenth of its risk. Passes the Twin also skipped cannot be scored.</p></div>
+    <p class="dim" style="margin:10px 0 0;font-size:12px">After each close, code plays the scanner's rule trade on every candidate, whether or not the Twin had room for it. A No trade is right when that trade lost, wrong when it made money, and flat when it ended within a tenth of its risk. A trade the Judge took is right when its own levels made money.</p></div>
 
     ${section("What it has learned")}
-    <div class="card"><b>Nothing: the intraday Judge has no memory yet.</b>
-      <p class="muted" style="margin:8px 0 0;font-size:14px;line-height:1.55">Each morning it gets the same fixed instructions and that day's numbers. Unlike the mid-term Brain, no lessons are fed back to it. This screen keeps its record so that step can be judged on evidence instead of on a handful of days.</p></div>
+    ${lessons.length ? `<div class="card"><ol class="steps" style="margin:0">${lessons.map((x) => `<li>${esc(x.text)} <span class="dim">(${x.n_cases} calls behind it, added ${esc(shortDay(x.added))})</span></li>`).join("")}</ol></div>`
+      : `<div class="card"><b>No lessons yet: ${scored} of ${need} calls scored.</b>
+          <p class="muted" style="margin:8px 0 0;font-size:14px;line-height:1.55">Before every call the Judge now reads its own record: how its calls and the rule plan did so far, and the five most similar past setups with what happened in each. Lessons come later. Once ${need} calls are scored, a weekly review may add a rule of thumb, and code keeps it only if ${perLesson} real calls back it and it names no stock or date.</p></div>`}
+    ${ib.last_review ? `<div class="card" style="margin-top:10px"><div class="eyebrow">Last review · ${esc(shortDay(String(ib.last_review.created_utc).slice(0, 10)))}</div><p style="margin:6px 0 0">${esc(ib.last_review.summary || "")}</p>
+        <p class="dim" style="margin:8px 0 0;font-size:12px">${ib.last_review.n_scored} calls read · ${ib.last_review.added || 0} lessons added · ${ib.last_review.dropped || 0} dropped</p></div>` : ""}
 
     ${section("Every call so far", `<a class="more" href="#/debates">Debates</a>`)}
     ${judged.length ? `<div class="list">${days.flatMap((d) => d.cases.filter((c) => c.judge).map((c) => caseRow(c, cur))).join("")}</div>` : empty("No calls yet", "", "debates")}

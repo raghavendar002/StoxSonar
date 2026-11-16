@@ -432,6 +432,15 @@ def _book(settle: dict, capital: float) -> dict:
                 ret_pct=round((settle["end_cash"] / capital - 1) * 100, 2) if settle.get("end_cash") else None)
 
 
+def _intra_call(decision, sh: Optional[dict]) -> Optional[str]:
+    """right / wrong / flat / no fill, scored by sonar/intrabrain.py's rule, once the day has shadow results."""
+    if not sh or not decision:
+        return None
+    from . import intrabrain
+    r = lambda t: t.get("r_mult") if t and t.get("status") == "closed" else None  # noqa: E731
+    return intrabrain.call_of(decision, r(sh.get("rule")), r(sh.get("judge_levels")))
+
+
 def intraday_day(folder: Path, mkt: str) -> Optional[dict]:
     """One day's scan.json, orders.json, settle.json and debate.md (or debates.json) as a day with cases."""
     cfg = INTRADAY[mkt]
@@ -452,6 +461,7 @@ def intraday_day(folder: Path, mkt: str) -> Optional[dict]:
     m_orders = {o["sym"]: o for o in orders.get("mechanical") or []}
     j_trades = {t["sym"]: t for t in (settle.get("judge") or {}).get("trades") or []}
     m_trades = {t["sym"]: t for t in (settle.get("mechanical") or {}).get("trades") or []}
+    shadow = {x["sym"]: x for x in settle.get("shadow") or []}
     capital = meta.get("capital") or cfg["capital"]
     cases = []
     for c in scan.get("candidates") or []:
@@ -495,7 +505,10 @@ def intraday_day(folder: Path, mkt: str) -> Optional[dict]:
                                    target=lv.get("target"), target_2=None) if lv else None) if verdict else None,
             twin=dict(levels=dict(entry_low=mo["trigger"], entry_high=mo["trigger"], stop=mo.get("stop"),
                                   target=mo.get("target"))) if mo and mo.get("trigger") else None,
-            outcome=dict(judge=jt, judge_book="judge", twin=_intra_trade(m_trades.get(sym))),
+            outcome=dict(judge=jt, judge_book="judge", twin=_intra_trade(m_trades.get(sym)),
+                         rule_plan=_intra_trade((shadow.get(sym) or {}).get("rule")),
+                         judge_plan=_intra_trade((shadow.get(sym) or {}).get("judge_levels")),
+                         call=_intra_call(jv.get("decision"), shadow.get(sym))),
             bars=dict(tf="5m", rows=c.get("bars_5m") or []),
             problems=("; ".join(map(str, problems)) if isinstance(problems, list) else problems) or None,
             cost_usd=t.get("cost_usd"), models=t.get("models")))
@@ -537,8 +550,15 @@ def intraday(paper: Path, mkt: str) -> dict:
     elif all(d["status"] == "dry_run" for d in days):
         notes.append("Dry run only so far: one test day with the Judge played by hand, to prove the plumbing. "
                      "Daily paper trading has not started.")
+    brain = None
+    try:
+        from . import intrabrain
+        brain = intrabrain.summary(mkt, out=paper, brain=paper.parent / "brain")
+        brain.pop("calls", None)                 # each case already carries its own call
+    except Exception as e:
+        log.warning("intraday brain not added to the %s feed: %s %s", mkt, type(e).__name__, str(e)[:200])
     return dict(market=cfg["code"], horizon="intra", currency=cfg["currency"], capital=cfg["capital"],
-                as_of=days[0]["date"] if days else None, days=days, notes=notes)
+                as_of=days[0]["date"] if days else None, days=days, notes=notes, brain=brain)
 
 
 # ---------------------------------------------------------------------------
