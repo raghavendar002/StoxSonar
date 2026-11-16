@@ -1,0 +1,39 @@
+{
+ "mechanical": {
+  "trades": [
+   {
+    "status": "closed",
+    "entry": 3050.5245,
+    "entry_t": "2026-11-16 09:35:00+05:30",
+    "exit": 3077.4605,
+    "exit_t": "2026-11-16 15:15:00+05:30",
+    "reason": "time",
+    "sym": "GRASIM",
+    "side": "long",
+    "qty": 14.0,
+    "costs": 45.53,
+    "pnl": 331.57,
+    "r_mult": 0.67
+   },
+   {
+    "status": "closed",
+    "entry": 397.70105,
+    "entry_t": "2026-11-16 10:46:00+05:30",
+    "exit": 397.2485127868652,
+    "exit_t": "2026-11-16 15:15:00+05:30",
+    "reason": "time",
+    "sym": "COALINDIA",
+    "side": "short",
+    "qty": 98.0,
+    "costs": 41.3,
+    "pnl": 3.05,
+    "r_mult": 0.01
+   }
+  ],
+  "end_cash": 100334.62
+ },
+ "judge": {
+  "trades": [],
+  "end_cash": 100000.0
+ }
+}
