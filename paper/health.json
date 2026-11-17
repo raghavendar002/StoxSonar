@@ -1,5 +1,5 @@
 {
- "checked_utc": "2026-11-17T19:26:37+00:00",
+ "checked_utc": "2026-11-17T22:53:35+00:00",
  "categories": {
   "in-intra": {
    "name": "India intraday",
@@ -39,13 +39,16 @@
      "scanned": true,
      "replayed": true,
      "candidates": 3,
-     "settled": false,
-     "state": "not_settled"
+     "settled": true,
+     "scored": 3,
+     "twin_trades": 2,
+     "judge_trades": 2,
+     "state": "learned"
     }
    ],
    "calendar": "exchange",
-   "last_ok": "2026-11-16",
-   "last_learned": "2026-11-16"
+   "last_ok": "2026-11-17",
+   "last_learned": "2026-11-17"
   },
   "in-mid": {
    "name": "India mid-term",
@@ -77,21 +80,34 @@
      "closed": 0,
      "late": false,
      "state": "no_candidates"
+    },
+    {
+     "date": "2026-11-16",
+     "ran": true,
+     "candidates": 0,
+     "debated": 0,
+     "twin": 0,
+     "closed": 0,
+     "late": false,
+     "state": "no_candidates"
     }
    ],
    "calendar": "exchange",
-   "last_ok": "2026-11-13",
+   "last_ok": "2026-11-16",
    "last_learned": null
   }
  },
  "alerts": [
-  "US intraday 2026-11-17: the scan had not run; replayed it as of 15 minutes after the open"
+  "US intraday 2026-11-17: the day had not been settled; settled it",
+  "intraday.yml failed at 2026-11-17 22:39 UTC: https://github.com/raghavendar002/StoxSonar/actions/runs/44192199643"
  ],
  "tries": {
   "in-intra:2026-11-17:scan": 1,
-  "us-intra:2026-11-17:scan": 1
+  "us-intra:2026-11-17:scan": 1,
+  "us-intra:2026-11-17:settle": 1
  },
  "reported_runs": [
-  43894348405
+  43894348405,
+  44192199643
  ]
 }

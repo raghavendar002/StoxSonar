@@ -1,0 +1,166 @@
+{
+ "mechanical": {
+  "trades": [
+   {
+    "status": "closed",
+    "entry": 130.2060286743164,
+    "entry_t": "2026-11-17 09:48:00-05:00",
+    "exit": 130.04399332275392,
+    "exit_t": "2026-11-17 15:50:00-05:00",
+    "reason": "time",
+    "sym": "DUK",
+    "side": "long",
+    "qty": 3.842,
+    "costs": 0.0145,
+    "pnl": -0.64,
+    "r_mult": -0.17
+   },
+   {
+    "status": "closed",
+    "entry": 335.067,
+    "entry_t": "2026-11-17 09:47:00-05:00",
+    "exit": 332.253536,
+    "exit_t": "2026-11-17 10:37:00-05:00",
+    "reason": "stop",
+    "sym": "JPM",
+    "side": "long",
+    "qty": 1.4929,
+    "costs": 0.014,
+    "pnl": -4.21,
+    "r_mult": -1.09
+   }
+  ],
+  "end_cash": 995.15
+ },
+ "judge": {
+  "trades": [
+   {
+    "status": "closed",
+    "entry": 130.2060286743164,
+    "entry_t": "2026-11-17 09:48:00-05:00",
+    "exit": 130.92381,
+    "exit_t": "2026-11-17 10:30:00-05:00",
+    "reason": "target",
+    "sym": "DUK",
+    "side": "long",
+    "qty": 3.842,
+    "costs": 0.0146,
+    "pnl": 2.74,
+    "r_mult": 1.32
+   },
+   {
+    "status": "closed",
+    "entry": 335.067,
+    "entry_t": "2026-11-17 09:47:00-05:00",
+    "exit": 333.23334,
+    "exit_t": "2026-11-17 10:19:00-05:00",
+    "reason": "stop",
+    "sym": "JPM",
+    "side": "long",
+    "qty": 1.4929,
+    "costs": 0.0141,
+    "pnl": -2.75,
+    "r_mult": -1.14
+   }
+  ],
+  "end_cash": 999.99
+ },
+ "shadow": [
+  {
+   "sym": "DUK",
+   "side": "long",
+   "rule": {
+    "status": "closed",
+    "entry": 130.2060286743164,
+    "entry_t": "2026-11-17 09:48:00-05:00",
+    "exit": 130.04399332275392,
+    "exit_t": "2026-11-17 15:50:00-05:00",
+    "reason": "time",
+    "sym": "DUK",
+    "side": "long",
+    "qty": 3.842,
+    "costs": 0.0145,
+    "pnl": -0.64,
+    "r_mult": -0.17
+   },
+   "judge_levels": {
+    "status": "closed",
+    "entry": 130.2060286743164,
+    "entry_t": "2026-11-17 09:48:00-05:00",
+    "exit": 130.92381,
+    "exit_t": "2026-11-17 10:30:00-05:00",
+    "reason": "target",
+    "sym": "DUK",
+    "side": "long",
+    "qty": 3.842,
+    "costs": 0.0146,
+    "pnl": 2.74,
+    "r_mult": 1.32
+   }
+  },
+  {
+   "sym": "JPM",
+   "side": "long",
+   "rule": {
+    "status": "closed",
+    "entry": 335.067,
+    "entry_t": "2026-11-17 09:47:00-05:00",
+    "exit": 332.253536,
+    "exit_t": "2026-11-17 10:37:00-05:00",
+    "reason": "stop",
+    "sym": "JPM",
+    "side": "long",
+    "qty": 1.4929,
+    "costs": 0.014,
+    "pnl": -4.21,
+    "r_mult": -1.09
+   },
+   "judge_levels": {
+    "status": "closed",
+    "entry": 335.067,
+    "entry_t": "2026-11-17 09:47:00-05:00",
+    "exit": 333.23334,
+    "exit_t": "2026-11-17 10:19:00-05:00",
+    "reason": "stop",
+    "sym": "JPM",
+    "side": "long",
+    "qty": 1.4929,
+    "costs": 0.0141,
+    "pnl": -2.75,
+    "r_mult": -1.14
+   }
+  },
+  {
+   "sym": "EMR",
+   "side": "long",
+   "rule": {
+    "status": "closed",
+    "entry": 162.292452,
+    "entry_t": "2026-11-17 09:50:00-05:00",
+    "exit": 160.497894,
+    "exit_t": "2026-11-17 10:41:00-05:00",
+    "reason": "stop",
+    "sym": "EMR",
+    "side": "long",
+    "qty": 2.8902,
+    "costs": 0.0134,
+    "pnl": -5.2,
+    "r_mult": -1.04
+   },
+   "judge_levels": {
+    "status": "closed",
+    "entry": 162.292452,
+    "entry_t": "2026-11-17 09:50:00-05:00",
+    "exit": 161.16776,
+    "exit_t": "2026-11-17 10:18:00-05:00",
+    "reason": "stop",
+    "sym": "EMR",
+    "side": "long",
+    "qty": 3.0815,
+    "costs": 0.0143,
+    "pnl": -3.48,
+    "r_mult": -1.07
+   }
+  }
+ ]
+}
