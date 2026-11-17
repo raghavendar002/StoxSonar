@@ -1,5 +1,5 @@
 {
- "checked_utc": "2026-11-17T22:53:35+00:00",
+ "checked_utc": "2026-11-17T23:51:15+00:00",
  "categories": {
   "in-intra": {
    "name": "India intraday",
@@ -97,10 +97,7 @@
    "last_learned": null
   }
  },
- "alerts": [
-  "US intraday 2026-11-17: the day had not been settled; settled it",
-  "intraday.yml failed at 2026-11-17 22:39 UTC: https://github.com/raghavendar002/StoxSonar/actions/runs/44192199643"
- ],
+ "alerts": [],
  "tries": {
   "in-intra:2026-11-17:scan": 1,
   "us-intra:2026-11-17:scan": 1,
