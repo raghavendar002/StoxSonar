@@ -201,7 +201,7 @@ def _brain(con, market: str) -> Optional[dict]:
         from . import brain, debate
         from . import config as C
         out["scoreboard"] = brain.scoreboard(con, market)
-        out["lessons"] = brain.active_lessons(con)
+        out["lessons"] = brain.active_lessons(con, market)
         out["last_review"] = brain.last_review(con, market)
         out["min_cases"] = C.BRAIN_MIN_CASES
         run = con.execute("SELECT regime FROM runs WHERE market=? ORDER BY as_of DESC LIMIT 1",
@@ -565,6 +565,17 @@ def intraday(paper: Path, mkt: str) -> dict:
 # Build
 # ---------------------------------------------------------------------------
 
+def health(path: Path) -> Optional[dict]:
+    """The missed-run check's last result (sonar/watchdog.py), trimmed for the Brain tab."""
+    try:
+        h = json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+    return dict(checked_utc=h.get("checked_utc"), alerts=h.get("alerts") or [],
+                categories={k: dict(name=c["name"], last_learned=c.get("last_learned"), last_ok=c.get("last_ok"),
+                                    days=c.get("days", [])[-5:]) for k, c in (h.get("categories") or {}).items()})
+
+
 def build(db: Path, site: Path, paper: Path) -> dict:
     con = sqlite3.connect(db) if db.exists() else None
     out = site / "app" / "feed"
@@ -576,6 +587,7 @@ def build(db: Path, site: Path, paper: Path) -> dict:
         meta["feeds"][name] = dict(as_of=feed.get("as_of"), cases=len(feed.get("cases") or [])
                                    + sum(len(d["cases"]) for d in feed.get("days") or []),
                                    days=len(feed.get("days") or feed.get("history") or []))
+    meta["health"] = health(paper.parent / "health.json")
     _write(out / "meta.json", meta)
     if con is not None:
         con.close()

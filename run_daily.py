@@ -112,12 +112,14 @@ def run_debates(con, market: str, as_of: str, site: Path, waits: list, telegram:
         review = brain.review(con, market)       # at most weekly, and only once 8 judged trades have closed
     else:
         log.info("ANTHROPIC_API_KEY not set; no debates today")
-    publish.write_debates(con, market, site)
-    publish.write_brain(con, market, site)
+    if market == "NSE":         # the public pages are India's; the app shows both markets
+        publish.write_debates(con, market, site)
+        publish.write_brain(con, market, site)
     if telegram and (rows or waits or closed or review):
         left = debate.budget_left(con)
         publish.send_telegram(publish.debate_telegram_text(as_of, rows, waits, debate.verdict_record(con, market),
-                                                           C.DEBATE_MONTHLY_CAP_USD - left, closed, review))
+                                                           C.DEBATE_MONTHLY_CAP_USD - left, closed, review,
+                                                           market=market))
 
 
 def main(argv=None) -> int:
@@ -216,6 +218,12 @@ def main(argv=None) -> int:
         if a.telegram:
             publish.send_telegram(publish.us_telegram_text(ledger.events_frame(con, market), as_of, book_rows))
         _output(published="true", as_of=f"US {as_of}")
+        if books_ok:
+            # Bull/Bear/Judge on the US list too, with its own Brain (lessons never mix with India's)
+            try:
+                run_debates(con, market, as_of, a.site, waits, a.telegram)
+            except Exception:
+                log.exception("US debate step failed; the US list is already logged")
         return 0
     events = ledger.events_frame(con, "NSE")
 

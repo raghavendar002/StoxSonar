@@ -46,6 +46,18 @@ SYSTEM = (
     "figure you cite, and treat a small n as weak evidence."
 )
 
+US_ACCOUNT = ("a small US cash account ($1,000, risk 0.5% per trade, holding one to three months, "
+              "long only; a breakdown is scored as a shadow short, never traded)")
+
+
+def system_for(market: str) -> str:
+    """The shared system text, with the account of the market being judged."""
+    if market != "US":
+        return SYSTEM
+    return SYSTEM.replace("a small Indian retail account "
+                          "(Rs 1 lakh, risk 0.5% per trade, holding one to three months, delivery only)", US_ACCOUNT)
+
+
 BULL = (
     "You are the Bull. Make the strongest honest case that acting on this signal is worth the risk: "
     "for a breakout, buying it; for a breakdown, shorting it. Cover trend and stage, the quality of "
@@ -274,10 +286,13 @@ def debate_one(facts: dict, lessons: List[str], call: Caller = api_call, record:
     shared = shared_text(facts, lessons, record)
     kind = "breakout (a long)" if facts["direction"] == "up" else "breakdown (a shadow short)"
     head = f"The signal is a {kind} in {facts['symbol']} on {facts['signal_date']}.\n\n"
-    bull = call(C.DEBATE_MODEL_ARGUE, shared, head + BULL, "medium")
-    bear = call(C.DEBATE_MODEL_ARGUE, shared, head + BEAR, "medium")
+    market = facts.get("market_code", "NSE")
+    kw = {} if market == "NSE" else {"system": system_for(market)}
+    bull = call(C.DEBATE_MODEL_ARGUE, shared, head + BULL, "medium", **kw)
+    bear = call(C.DEBATE_MODEL_ARGUE, shared, head + BEAR, "medium", **kw)
     judge = call(C.DEBATE_MODEL_JUDGE, shared,
-                 f"{head}BULL'S CASE\n{bull.text}\n\nBEAR'S CASE\n{bear.text}\n\n{JUDGE}", "high", VERDICT_SCHEMA)
+                 f"{head}BULL'S CASE\n{bull.text}\n\nBEAR'S CASE\n{bear.text}\n\n{JUDGE}", "high", VERDICT_SCHEMA,
+                 **kw)
     v = json.loads(judge.text)
     v["conviction"] = min(5, max(1, int(v["conviction"])))
     v["horizon_sessions"] = 63 if int(v["horizon_sessions"]) > 42 else 21
@@ -302,8 +317,9 @@ def _save(con, market: str, ev: dict, status: str, **kw) -> None:
     con.commit()
 
 
-def lessons_now(con) -> List[str]:
-    return [r[0] for r in con.execute("SELECT text FROM mt_lessons WHERE dropped IS NULL ORDER BY id")]
+def lessons_now(con, market: str) -> List[str]:
+    """Only this market's lessons: India and US mid-term never share a Brain."""
+    return [x["text"] for x in brain.active_lessons(con, market)]
 
 
 def run_day(con, market: str, events: pd.DataFrame, as_of: str, call: Caller = api_call,
@@ -313,7 +329,7 @@ def run_day(con, market: str, events: pd.DataFrame, as_of: str, call: Caller = a
     out = []
     cands = candidates(events, as_of)
     brain.init(con)
-    lessons = lessons_now(con)
+    lessons = lessons_now(con, market)
     for n, ev in enumerate(cands):
         key = (market, ev["symbol"], ev["direction"], ev["trigger_date"])
         if con.execute("SELECT 1 FROM mt_debates WHERE market=? AND symbol=? AND direction=? AND signal_date=?",
@@ -322,7 +338,7 @@ def run_day(con, market: str, events: pd.DataFrame, as_of: str, call: Caller = a
         row = dict(symbol=ev["symbol"], direction=ev["direction"], grade=ev["grade"])
         f = con.execute("SELECT facts FROM mt_facts WHERE market=? AND symbol=? AND direction=? AND signal_date=?",
                         key).fetchone()
-        if n >= C.DEBATE_MAX_PER_DAY:
+        if n >= C.DEBATE_MAX_PER_DAY_BY_MARKET.get(market, C.DEBATE_MAX_PER_DAY):
             _save(con, market, ev, "not_debated_daily_limit", cost_usd=0)
             out.append(dict(row, status="not_debated_daily_limit"))
             continue

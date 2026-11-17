@@ -150,9 +150,41 @@ function intraBrain(f) {
     <div style="margin-top:10px">${howItWorks(true)}</div>`;
 }
 
+// ---------------------------------------------------------------- all four: did each Brain get fed today?
+const CATS = [["in-intra", "India intraday", "IN", "intra"], ["in-mid", "India mid-term", "IN", "mid"],
+  ["us-intra", "US intraday", "US", "intra"], ["us-mid", "US mid-term", "US", "mid"]];
+function dayWord(d) {
+  const s = d.state;
+  if (s === "learned") return d.scored != null ? `${plural(d.scored, "call")} scored` : `${plural(d.debated || 0, "debate")}, ${d.twin || 0} in the Twin`;
+  if (s === "no_candidates") return "no candidates, nothing to learn";
+  if (s === "not_settled") return "waiting for the close";
+  if (s === "holiday") return "market shut";
+  if (s === "debates_missing") return "debates missing";
+  return "missed";
+}
+function feedCard() {
+  const h = state.meta && state.meta.health;
+  if (!h) return "";
+  const rows = CATS.map(([k, name, m, hz]) => {
+    const c = (h.categories || {})[k];
+    if (!c) return "";
+    const last = (c.days || [])[c.days.length - 1];
+    const ok = last && ["learned", "no_candidates", "holiday", "not_settled"].includes(last.state);
+    const here = state.market === m && state.horizon === hz;
+    return `<div style="display:flex;justify-content:space-between;gap:10px;padding:6px 0;${here ? "font-weight:600" : ""}">
+      <span>${ok ? "✓" : "⚠"} ${esc(name)}</span>
+      <span class="${ok ? "muted" : "down"}" style="text-align:right">${last ? `${esc(shortDay(last.date))}: ${esc(dayWord(last))}` : "no market day yet"}${c.last_learned ? ` · last learned ${esc(shortDay(c.last_learned))}` : " · not learned yet"}</span></div>`;
+  }).join("");
+  const alerts = (h.alerts || []).length ? `<p class="dim" style="margin:8px 0 0;font-size:12px">${h.alerts.map(esc).join("<br>")}</p>` : "";
+  return `${section("Did every Brain learn today?")}<div class="card">${rows}
+    <p class="dim" style="margin:8px 0 0;font-size:12px">Each of the four keeps its own Brain; lessons never cross between them. A day with no candidates is logged as such: nothing was forced. Checked ${esc(String(h.checked_utc || "").slice(0, 16).replace("T", " "))} UTC; a missed run is re-run and reported on Telegram.</p>${alerts}</div>`;
+}
+
 export function brain() {
   const f = feed();
-  if (state.horizon === "intra") return intraBrain(f);
-  if (state.market === "US") return empty("No Brain for US mid-term", "US mid-term signals are only logged and scored. No Bull, Bear or Judge runs on them, so there is nothing to learn from yet. Switch to India, or to Intraday, at the top.", "brain");
-  return midBrain(f);
+  const top = feedCard();
+  if (state.horizon === "intra") return top + intraBrain(f);
+  if (state.market === "US" && !(f && f.brain && f.brain.scoreboard && (f.cases || []).length))
+    return top + empty("US mid-term Brain starts with its first debate", "From 17 Nov, Grade A/B signals on the US list get Bull, Bear and Judge (at most 2 a day), and the US Brain learns from them on its own. None yet: the US list has had about 8 such signals a month.", "brain");
+  return top + midBrain(f);
 }
