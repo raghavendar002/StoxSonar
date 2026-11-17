@@ -31,6 +31,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
+from . import momentum
+
 log = logging.getLogger("stoxsonar.appfeed")
 ROOT = Path(__file__).resolve().parent.parent
 DAY = re.compile(r"^\d{4}-\d{2}-\d{2}$")
@@ -351,6 +353,9 @@ def midterm(con, site: Path, market: str) -> dict:
         feed["picks"] = _pick_rows(con, market)
     elif market == "NSE":
         feed["notes"].append("Paper books fill in after the next evening run.")
+    if market == "NSE":
+        book = site.parent / "ledger" / "momentum_book.json"
+        feed["momentum"] = momentum.summary(momentum.load(book)) if book.exists() else None
     feed["cases"] = _mid_cases(con, market)
     feed["skipped"] = _skipped(con, market)
     feed["brain"] = _brain(con, market)

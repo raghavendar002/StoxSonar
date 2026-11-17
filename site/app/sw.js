@@ -1,5 +1,5 @@
 // StoxSonar app service worker: offline shell, fresh data first, and push alerts.
-const SHELL = "stoxsonar-shell-v4";
+const SHELL = "stoxsonar-shell-v5";
 const DATA = "stoxsonar-data";
 const SHELL_FILES = ["./", "index.html", "app.css", "manifest.webmanifest", "vapid.json", "icon-192.png", "apple-touch-icon.png",
                      "js/main.js", "js/core.js", "js/charts.js", "js/views.js", "js/sim.js", "js/more.js", "js/brain.js"];

@@ -26,7 +26,7 @@ import pandas as pd
 
 from sonar import books
 from sonar import config as C
-from sonar import brain, data, debate, engine, ledger, publish
+from sonar import brain, data, debate, engine, ledger, momentum, publish
 
 ROOT = Path(__file__).resolve().parent
 log = logging.getLogger("stoxsonar")
@@ -124,7 +124,7 @@ def run_debates(con, market: str, as_of: str, site: Path, waits: list, telegram:
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--mode", choices=["daily", "replay", "check", "page"], default="daily")
+    ap.add_argument("--mode", choices=["daily", "replay", "check", "page", "momentum"], default="daily")
     ap.add_argument("--market", choices=["NSE", "US"], default="NSE",
                     help="US = the S&P 500 shadow list: logged and scored, no page")
     ap.add_argument("--db", type=Path, default=ROOT / "ledger" / "stoxsonar.db")
@@ -140,7 +140,7 @@ def main(argv=None) -> int:
     us = a.market == "US"
     a.cache = a.cache or ROOT / "cache" / ("prices_us.pkl" if us else "prices_india.pkl")
     a.universe_csv = a.universe_csv or ROOT / "universe" / ("sp500.csv" if us else "nse_sec_list.csv")
-    if us and a.mode in ("page", "replay"):
+    if us and a.mode in ("page", "replay", "momentum"):
         ap.error("the US shadow list has no page and bootstraps itself on its first daily run")
 
     _output(published="false")
@@ -153,6 +153,20 @@ def main(argv=None) -> int:
     market = a.market
     prev = ledger.last_run(con, market)
     done = last_complete_day(datetime.now(timezone.utc), market)
+    if a.mode == "momentum":     # catch the momentum paper book up on the newest close, nothing else
+        bench = data.fetch_benchmark(market=market)
+        prices = data.fetch_prices(data.load_universe(a.universe_csv))
+        prices = {s: df.loc[:done] for s, df in prices.items()}
+        as_of = latest_session(prices)
+        bench = bench.loc[:as_of]
+        if bench.index.max() < pd.Timestamp(as_of):
+            bench = data.extend_benchmark(bench, pd.Timestamp(as_of), market=market)
+        path = a.db.parent / "momentum_book.json"
+        mb = momentum.step(momentum.load(path), prices, bench, as_of)
+        momentum.save(path, mb)
+        log.info("momentum book %s: equity %.0f, pending %s", as_of, mb["equity"][-1]["equity"], mb.get("pending"))
+        _output(published="true", as_of=f"momentum book {as_of}")
+        return 0
     if a.mode == "daily" and prev is not None and prev >= done:
         log.info("%s is the newest finished session and is already published", prev)
         return 0
@@ -213,6 +227,15 @@ def main(argv=None) -> int:
             books_ok = True
         except Exception:  # the books must never stop the day's signals going out
             log.exception("mid-term books failed; signals publish without them")
+    if a.mode == "daily" and not us:
+        try:     # momentum paper book (sonar/momentum.py): code only, never blocks the signals
+            path = a.db.parent / "momentum_book.json"
+            mb = momentum.step(momentum.load(path), prices, bench, as_of)
+            momentum.save(path, mb)
+            log.info("momentum book %s: equity %.0f, %d held, %s", as_of, mb["equity"][-1]["equity"],
+                     len(mb["holdings"]), mb["last_log"] or "no fills")
+        except Exception:
+            log.exception("momentum paper book failed; signals publish without it")
     if us:
         log.info("US shadow %s: %d new signals", as_of, new)
         if a.telegram:
