@@ -18,6 +18,7 @@ on:
 
 permissions:
   contents: write
+  actions: write     # to start the missed-run check at the end
   pages: write
   id-token: write
 
@@ -51,7 +52,7 @@ jobs:
           --mode "${{ github.event.inputs.mode || 'daily' }}"
           --site-url "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
           ${{ (github.event.inputs.mode || 'daily') == 'daily' && '--telegram' || '' }}
-      # US shadow list (S&P 500): logged and scored, no page. The US close
+      # US list (S&P 500): logged, scored and debated, no public page (the app shows it). The US close
       # lands around 02:30 IST, so only the morning attempts find a new session;
       # every other attempt exits in seconds. It never blocks the NSE run.
       - name: US shadow list
@@ -61,6 +62,8 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          # Bull/Bear/Judge on the US list (at most 2 a day, inside the shared $6 mid-term cap)
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: python run_daily.py --market US --telegram
       # The StoxSonar app (site/app/) reads these feeds: mid-term, intraday, debates, books.
       # Cheap and deterministic, so it runs every time; it is only committed when the day published.
@@ -95,3 +98,12 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python -m sonar.push daily --site site
+      # Every run, published or not, ends by starting the missed-run check
+      # (watchdog.yml): cron-job.org starts this workflow on time, so the check
+      # rides on that and does not depend on GitHub's own late schedule.
+      - name: Start the missed-run check
+        if: always() && (github.event.inputs.mode || 'daily') == 'daily'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run watchdog.yml --repo "${{ github.repository }}" --ref main

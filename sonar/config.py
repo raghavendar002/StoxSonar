@@ -107,6 +107,9 @@ DEBATE_CACHE_WRITE = 1.25    # a cache write costs this many times the input pri
 DEBATE_MONTHLY_CAP_USD = 6.0
 DEBATE_RESERVE_USD = 0.60    # a candidate is debated only if this much of the cap is left
 DEBATE_MAX_PER_DAY = 3
+# The US list (S&P 500) has had about 8 Grade A/B signals a month, so 2 a day is ~$1/month.
+# Both markets share the $6 mid-term cap above.
+DEBATE_MAX_PER_DAY_BY_MARKET = {"NSE": 3, "US": 2}
 DEBATE_GRADES = ("A", "B")
 WAIT_MAX_SESSIONS = 10       # a Wait is watched this long, by code, then expires
 JUDGE_ENTRY_MAX_ATR = 1.0    # the entry zone must sit within 1 ATR of the signal close

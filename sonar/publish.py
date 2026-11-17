@@ -453,8 +453,9 @@ def _wait_line(v: dict) -> str:
 
 
 def debate_telegram_text(as_of: str, rows: list, waits: list, record: list, spent_usd: float,
-                         closed: Optional[list] = None, review: Optional[dict] = None) -> str:
-    lines = [f"StoxSonar · Bull/Bear/Judge · NSE close {as_of}", ""]
+                         closed: Optional[list] = None, review: Optional[dict] = None,
+                         market: str = "NSE") -> str:
+    lines = [f"StoxSonar · Bull/Bear/Judge · {'US (S&P 500)' if market == 'US' else 'NSE'} close {as_of}", ""]
     for r in rows:
         name = r["symbol"].replace(".NS", "")
         up = r["direction"] == "up"
@@ -580,7 +581,7 @@ def write_brain(con, market: str, out_dir: Path) -> None:
         ("API spend so far", f"${b['api_spend_usd']:.2f}"),
     ]
     table = "".join(f"<tr><td>{_e(k)}</td><td>{_e(v)}</td></tr>" for k, v in rows)
-    lessons = brain.active_lessons(con)
+    lessons = brain.active_lessons(con, market)
     les = ("<ol>" + "".join(f"<li>{_e(x['text'])} <span class=\"note\">(version {x['version']}, "
                             f"{x['n_cases']} cases, added {_e(x['added'])})</span></li>" for x in lessons) + "</ol>"
            if lessons else f"<p class=\"empty\">None yet. A lesson needs at least {C.BRAIN_MIN_CASES} closed "

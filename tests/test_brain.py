@@ -150,9 +150,9 @@ def test_lessons_are_kept_only_when_they_pass_the_checks(tmp_path):
     r = brain.review(con, "NSE", call=review_caller(out, seen), now=NOW)
     assert r["added"] == [good] and r["version"] == 1 and len(r["rejected"]) == 2
     assert any("names a stock" in x for x in r["rejected"]) and any("cites 5" in x for x in r["rejected"])
-    assert seen[0][0] == C.DEBATE_MODEL_JUDGE and seen[0][2] == brain.REVIEW_SYSTEM
+    assert seen[0][0] == C.DEBATE_MODEL_JUDGE and seen[0][2] == brain.review_system("NSE")
     assert "S3.NS" not in seen[0][1] and '"case_id"' in seen[0][1]       # the model sees ids, not names
-    assert debate.lessons_now(con) == [good]
+    assert debate.lessons_now(con, "NSE") == [good]
     # the next debate is given the lesson
     e2 = event("N.NS", date="2026-03-02")
     books.add_facts(con, "NSE", e2, dict(FACTS, symbol="N.NS", signal_date="2026-03-02"))
@@ -164,7 +164,7 @@ def test_lessons_are_kept_only_when_they_pass_the_checks(tmp_path):
     lid = con.execute("SELECT id FROM mt_lessons").fetchone()[0]
     r2 = brain.review(con, "NSE", call=review_caller(dict(lessons_to_add=[], lesson_ids_to_drop=[lid],
                                                          summary="No longer holds.")), now=NOW)
-    assert r2["dropped"] == 1 and r2["version"] == 2 and debate.lessons_now(con) == []
+    assert r2["dropped"] == 1 and r2["version"] == 2 and debate.lessons_now(con, "NSE") == []
 
 
 def test_a_failed_review_is_logged_and_changes_nothing(tmp_path):
@@ -174,7 +174,7 @@ def test_a_failed_review_is_logged_and_changes_nothing(tmp_path):
         raise RuntimeError("503")
     assert brain.review(con, "NSE", call=boom, now=NOW) is None
     assert con.execute("SELECT status FROM mt_reviews").fetchone()[0] == "error"
-    assert debate.lessons_now(con) == []
+    assert debate.lessons_now(con, "NSE") == []
 
 
 def test_brain_page_and_message(tmp_path):
@@ -187,3 +187,36 @@ def test_brain_page_and_message(tmp_path):
     text = publish.debate_telegram_text("2026-03-02", [], [], [], 0.5, closed,
                                         dict(version=1, n_cases=9, summary="Go has lost.", added=["Rule."], dropped=0))
     assert "CLOSED · S0" in text and "The verdict was right" in text and "New lesson: Rule." in text
+
+
+def test_india_and_us_lessons_never_mix(tmp_path):
+    con, ids = nine(tmp_path)
+    good = "When the close is more than 20% above the 50-day average, the Go verdicts lost; ask for a Wait."
+    r = brain.review(con, "NSE", call=review_caller(dict(lessons_to_add=[dict(text=good, case_ids=ids[:8])],
+                                                         lesson_ids_to_drop=[], summary="s")), now=NOW)
+    assert r["added"] == [good]
+    assert debate.lessons_now(con, "NSE") == [good]
+    assert debate.lessons_now(con, "US") == []            # the US Judge never reads an India lesson
+    assert brain.active_lessons(con, "US") == []
+    assert "US cash account" in brain.review_system("US") and "Indian" not in brain.review_system("US")
+
+
+def test_old_lessons_without_a_market_are_india_s(tmp_path):
+    import sqlite3
+    con = sqlite3.connect(tmp_path / "old.db")
+    con.executescript("CREATE TABLE mt_lessons (id INTEGER PRIMARY KEY, version INTEGER, text TEXT, cases TEXT, "
+                      "n_cases INTEGER, added TEXT, dropped TEXT); CREATE TABLE mt_debates (id INTEGER PRIMARY KEY, brain TEXT);"
+                      "INSERT INTO mt_lessons (version, text, n_cases, added) VALUES (1, 'old lesson', 8, '2026-01-01');")
+    assert [x["text"] for x in brain.active_lessons(con, "NSE")] == ["old lesson"]
+    assert brain.active_lessons(con, "US") == []
+
+
+def test_us_debate_uses_the_us_account(tmp_path):
+    seen = []
+
+    def call(model, shared, instruction, effort, schema=None, system=None):
+        seen.append(system)
+        return debate.Reply(json.dumps(verdict()) if schema else "case", 100, 10, 0.01)
+    debate.debate_one(dict(FACTS, market_code="US"), [], call)
+    assert all(s and "US cash account" in s and "Rs 1 lakh" not in s for s in seen)
+    assert "Rs 1 lakh" in debate.system_for("NSE")

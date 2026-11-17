@@ -1,0 +1,120 @@
+{
+ "mechanical": {
+  "trades": [
+   {
+    "status": "closed",
+    "entry": 134.49720767211915,
+    "entry_t": "2026-11-17 09:32:00+05:30",
+    "exit": 133.93300000000002,
+    "exit_t": "2026-11-17 15:15:00+05:30",
+    "reason": "time",
+    "sym": "CANBK",
+    "side": "long",
+    "qty": 230.0,
+    "costs": 32.72,
+    "pnl": -162.49,
+    "r_mult": -0.33
+   },
+   {
+    "status": "closed",
+    "entry": 7736.726429999999,
+    "entry_t": "2026-11-17 12:35:00+05:30",
+    "exit": 7795.60025,
+    "exit_t": "2026-11-17 15:15:00+05:30",
+    "reason": "time",
+    "sym": "EICHERMOT",
+    "side": "long",
+    "qty": 5.0,
+    "costs": 41.21,
+    "pnl": 253.16,
+    "r_mult": 0.58
+   }
+  ],
+  "end_cash": 100090.67
+ },
+ "judge": {
+  "trades": [
+   {
+    "status": "closed",
+    "entry": 134.49720767211915,
+    "entry_t": "2026-11-17 09:32:00+05:30",
+    "exit": 135.5322,
+    "exit_t": "2026-11-17 09:42:00+05:30",
+    "reason": "target",
+    "sym": "CANBK",
+    "side": "long",
+    "qty": 372.0,
+    "costs": 53.3,
+    "pnl": 331.72,
+    "r_mult": 1.16
+   }
+  ],
+  "end_cash": 100331.72
+ },
+ "shadow": [
+  {
+   "sym": "CANBK",
+   "side": "long",
+   "rule": {
+    "status": "closed",
+    "entry": 134.49720767211915,
+    "entry_t": "2026-11-17 09:32:00+05:30",
+    "exit": 133.93300000000002,
+    "exit_t": "2026-11-17 15:15:00+05:30",
+    "reason": "time",
+    "sym": "CANBK",
+    "side": "long",
+    "qty": 230.0,
+    "costs": 32.72,
+    "pnl": -162.49,
+    "r_mult": -0.33
+   },
+   "judge_levels": {
+    "status": "closed",
+    "entry": 134.49720767211915,
+    "entry_t": "2026-11-17 09:32:00+05:30",
+    "exit": 135.5322,
+    "exit_t": "2026-11-17 09:42:00+05:30",
+    "reason": "target",
+    "sym": "CANBK",
+    "side": "long",
+    "qty": 372.0,
+    "costs": 53.3,
+    "pnl": 331.72,
+    "r_mult": 1.16
+   }
+  },
+  {
+   "sym": "EICHERMOT",
+   "side": "long",
+   "rule": {
+    "status": "closed",
+    "entry": 7736.726429999999,
+    "entry_t": "2026-11-17 12:35:00+05:30",
+    "exit": 7795.60025,
+    "exit_t": "2026-11-17 15:15:00+05:30",
+    "reason": "time",
+    "sym": "EICHERMOT",
+    "side": "long",
+    "qty": 5.0,
+    "costs": 41.21,
+    "pnl": 253.16,
+    "r_mult": 0.58
+   },
+   "judge_levels": {
+    "status": "closed",
+    "entry": 7736.866499999999,
+    "entry_t": "2026-11-17 12:35:00+05:30",
+    "exit": 7796.1,
+    "exit_t": "2026-11-17 13:59:00+05:30",
+    "reason": "target",
+    "sym": "EICHERMOT",
+    "side": "long",
+    "qty": 6.0,
+    "costs": 49.45,
+    "pnl": 305.95,
+    "r_mult": 1.55
+   }
+  }
+ ]
+}

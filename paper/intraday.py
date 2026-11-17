@@ -110,20 +110,61 @@ def costs(mkt, entry, exit_, qty):
 # Scan
 # ---------------------------------------------------------------------------
 
-def scan_market(mkt, wait=True):
+class NoSession(Exception):
+    """The market did not trade on the day asked for (weekend, holiday) or it has not opened yet."""
+
+
+LATE_AFTER_MIN = 30      # a live scan started later than open + this many minutes replays the open instead
+OR_BARS = 3              # the 15-minute opening range, in 5-minute bars
+
+
+def _cut(d, day, n=OR_BARS):
+    """Bars before `day`, plus only the first n bars of `day`: what an on-time scan saw."""
+    return pd.concat([d[d.index.date < day], d[d.index.date == day].iloc[:n]])
+
+
+def late_day(mkt, now=None):
+    """Today's date when a scan starting `now` is too late to be live, else None."""
+    cfg = MKT[mkt]
+    now = (now or pd.Timestamp.now(tz="UTC")).tz_convert(cfg["tz"])
+    hh, mm = map(int, cfg["open"].split(":"))
+    opened = now.normalize() + pd.Timedelta(hours=hh, minutes=mm)
+    return now.date() if now > opened + pd.Timedelta(minutes=LATE_AFTER_MIN) else None
+
+
+def scan_market(mkt, wait=True, day=None):
+    """The 15-minute opening-range scan. With `day`, the scan is replayed from that
+    day's 5-minute bars exactly as it stood at the checkpoint (open + 15 min), so a
+    run that started late, or a missed day, gets the same facts an on-time run had."""
     cfg = MKT[mkt]
     tz = cfg["tz"]
-    for attempt in range(15):
-        idx = bars([cfg["index"]], "5d", "5m", tz).get(cfg["index"])
+    if day is not None:
+        day = pd.Timestamp(day).date()
+        idx = bars([cfg["index"]], "60d", "5m", tz).get(cfg["index"])
         if idx is None or not len(idx):
             raise SystemExit("no index data")
-        today = idx.index[-1].date()
-        it = idx[idx.index.date == today]
-        if len(it) >= 3 or not wait:
-            break
-        print(f"opening range not complete yet ({len(it)} bars), waiting 60s", flush=True)
-        time.sleep(60)
+        it = idx[idx.index.date == day].iloc[:OR_BARS]
+        if len(it) < OR_BARS:
+            raise NoSession(f"{cfg['name']} has no opening range on {day} (holiday, weekend or too old)")
+        today = day
+    else:
+        for attempt in range(15):
+            idx = bars([cfg["index"]], "5d", "5m", tz).get(cfg["index"])
+            if idx is None or not len(idx):
+                raise SystemExit("no index data")
+            today = idx.index[-1].date()
+            it = idx[idx.index.date == today]
+            if len(it) >= 3 or not wait:
+                break
+            print(f"opening range not complete yet ({len(it)} bars), waiting 60s", flush=True)
+            time.sleep(60)
+        local_today = pd.Timestamp.now(tz=tz).date()
+        if wait and today != local_today:
+            # The newest bars are an earlier session: today is a holiday. Never rescan that session.
+            raise NoSession(f"{cfg['name']} has not traded today ({local_today}); newest bars are {today}")
     b5 = bars(cfg["tickers"], "60d", "5m", tz)
+    if day is not None:
+        b5 = {t: _cut(d, day) for t, d in b5.items()}
     daily = bars(cfg["tickers"], "3mo", "1d", tz)
     index_move = it["Close"].iloc[-1] / it["Open"].iloc[0] - 1
     rows, packs = [], {}
@@ -267,6 +308,17 @@ def check(v, last, mkt):
     return bad
 
 
+def judge_memory(mkt, cand, scan):
+    """The Judge's own track record on similar setups, and any lessons; None on day one or on any error."""
+    from sonar import intrabrain
+    try:
+        return intrabrain.memory_block(mkt, dict(cand, index_move=scan["meta"].get(MKT[mkt]["meta_move"])),
+                                       scan["meta"]["date"], out=OUT)
+    except Exception as e:                                        # memory is a help, never a reason to skip a day
+        print(f"no memory for {cand['sym']}: {type(e).__name__} {e}", flush=True)
+        return None
+
+
 def debate(mkt, scan, caller=None):
     from sonar import debate as D
     from sonar import config as C
@@ -285,11 +337,13 @@ def debate(mkt, scan, caller=None):
         pack = json.dumps(dict(market=cfg["name"], symbol=c["sym"], scanner_side=c["side"], stats=c["stats"],
                                rule_based_plan=c["mechanical"], index_move_today=scan["meta"].get(cfg["meta_move"]),
                                bars_5m_today=c["bars_5m"]), default=str)
+        memory = judge_memory(mkt, c, scan)
         try:
             bull = caller(C.DEBATE_MODEL_ARGUE, pack, BULL, "low", system=system)
             bear = caller(C.DEBATE_MODEL_ARGUE, pack, BEAR + "\n\nThe Bull said:\n" + bull.text, "low", system=system)
             judge = caller(C.DEBATE_MODEL_JUDGE, pack,
                            JUDGE.format(noshort="" if cfg["shorts"] else " (logged only: this account cannot short)")
+                           + (f"\n\n{memory}" if memory else "")
                            + "\n\nBULL:\n" + bull.text + "\n\nBEAR:\n" + bear.text, "medium",
                            schema=SCHEMA, system=system)
         except Exception as e:                                    # one stock failing never stops the day
@@ -309,7 +363,7 @@ def debate(mkt, scan, caller=None):
         talks.append(dict(sym=c["sym"], name=None, headline=v["headline"], bull=bull.text, bear=bear.text,
                           judge_title=v["title"] if traded else f"No trade: {v['title']}",
                           judge_text=v["text"] + (f" (Order not placed: {'; '.join(problems)}.)" if problems else ""),
-                          verdict=v, problems=problems, cost_usd=round(cost, 4),
+                          verdict=v, problems=problems, cost_usd=round(cost, 4), memory=memory,
                           decided_utc=datetime.now(timezone.utc).isoformat(timespec="seconds")))
         print(c["sym"], v["decision"], problems, f"${cost:.3f}", flush=True)
     return talks, judge_orders
@@ -381,25 +435,88 @@ def settle_book(mkt, orders, b1, start):
     return dict(trades=out, end_cash=round(cash, 2))
 
 
-def settle(mkt, day):
+def shadow(mkt, scan, talks, b1, start):
+    """Score every candidate twice, whatever the books did: the scanner's rule plan
+    (the Twin's trade) and the Judge's own levels (a No trade still names them).
+    One position each, so a full book never hides a result. sonar/intrabrain.py
+    turns these into the Judge's track record."""
+    cfg = MKT[mkt]
+    out = []
+    for c in scan.get("candidates") or []:
+        rule = dict(sym=c["sym"], **c["mechanical"])
+        row = dict(sym=c["sym"], side=c["side"], rule=settle_book(mkt, [rule], b1, start)["trades"][0])
+        v = (talks.get(c["sym"]) or {}).get("verdict") or {}
+        if v.get("trigger") and v.get("stop") and v.get("target"):
+            side = {"LONG": "long", "SHORT": "short"}.get(v.get("decision"), v.get("side_if_traded") or c["side"])
+            o = dict(sym=c["sym"], side=side, trigger=v["trigger"], stop=v["stop"], target=v["target"],
+                     latest_entry=cfg["latest"], cutoff=cfg["cutoff"])
+            risk = (o["trigger"] - o["stop"]) * (1 if side == "long" else -1)
+            if risk > 0 and (o["target"] - o["trigger"]) * (1 if side == "long" else -1) > 0:
+                row["judge_levels"] = settle_book(mkt, [o], b1, start)["trades"][0]
+            else:
+                row["judge_levels"] = dict(status="bad_levels", side=side)
+        out.append(row)
+    return out
+
+
+def settle(mkt, day, caller=None):
     cfg = MKT[mkt]
     od = OUT / mkt / day
     orders = json.loads((od / "orders.json").read_text())
-    syms = sorted({ticker(o["sym"], mkt) for o in orders["mechanical"] + orders["judge"]})
-    b1 = bars(syms, "5d", "1m", cfg["tz"]) if syms else {}
+    scan = json.loads((od / "scan.json").read_text()) if (od / "scan.json").exists() else {}
+    talks = {t["sym"]: t for t in json.loads((od / "debates.json").read_text())} if (od / "debates.json").exists() else {}
+    syms = sorted({ticker(o["sym"], mkt) for o in orders["mechanical"] + orders["judge"]}
+                  | {ticker(c["sym"], mkt) for c in scan.get("candidates") or []})
+    b1 = bars(syms, "7d", "1m", cfg["tz"]) if syms else {}    # Yahoo keeps 1-minute bars about a week
     start = pd.Timestamp(orders["decided"]).tz_convert(cfg["tz"])
     res = {book: settle_book(mkt, orders[book], b1, start) for book in ("mechanical", "judge")}
+    res["shadow"] = shadow(mkt, scan, talks, b1, start)
     (od / "settle.json").write_text(json.dumps(res, indent=1, default=str))
     print(json.dumps(res, indent=1, default=str))
+    lessons_review(mkt, caller)
+
+
+def lessons_review(mkt, caller=None):
+    """At most weekly, once enough calls are scored: one Opus call that may add or drop lessons."""
+    from sonar import intrabrain
+    import os
+    if not os.environ.get("ANTHROPIC_API_KEY") and caller is None:
+        return
+    try:
+        _, _, spent = month_spend()
+        row = intrabrain.review(mkt, MONTHLY_CAP_USD - spent, call=caller)
+    except Exception as e:                                        # never fails the settle
+        print(f"lessons review skipped: {type(e).__name__} {e}", flush=True)
+        return
+    if row:
+        add_spend(row.get("cost_usd") or 0)
+        print("lessons review:", json.dumps(row, default=str), flush=True)
 
 
 # ---------------------------------------------------------------------------
 
-def run_scan(mkt, no_debate=False):
+def run_scan(mkt, no_debate=False, day=None, force=False):
+    """One scan. A live scan that starts late, or `day` given, replays the open
+    as it stood at the checkpoint. A day that already has orders is never redone
+    (no double spend when two schedulers fire) unless `force`."""
     cfg = MKT[mkt]
-    s = scan_market(mkt)
+    replay = day or late_day(mkt)
+    if replay and not force and (OUT / mkt / str(replay) / "orders.json").exists():
+        print(f"{cfg['name']} {replay} already scanned; nothing to do", flush=True)
+        return None
+    try:
+        s = scan_market(mkt, day=replay)
+    except NoSession as e:
+        print(str(e), flush=True)
+        return None
     day = s["meta"]["date"]
     od = OUT / mkt / day
+    if not force and (od / "orders.json").exists():
+        print(f"{cfg['name']} {day} already scanned; nothing to do", flush=True)
+        return None
+    if replay:
+        s["meta"]["replayed"] = True
+        s["meta"]["ran_utc"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
     od.mkdir(parents=True, exist_ok=True)
     (od / "scan.json").write_text(json.dumps(s, indent=1, default=str))
     print(json.dumps(s["meta"], indent=1, default=str), flush=True)
@@ -409,14 +526,20 @@ def run_scan(mkt, no_debate=False):
     if talks:
         (od / "debates.json").write_text(json.dumps(talks, indent=1, default=str))
     decided = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    cp = s["meta"].get("checkpoint_et") or s["meta"].get("checkpoint")
     if __import__("os").environ.get("INTRA_TEST_REPLAY"):      # tests on a past session: decide 10 min after the checkpoint
-        cp = s["meta"].get("checkpoint_et") or s["meta"].get("checkpoint")
         decided = (pd.Timestamp(cp) + pd.Timedelta(minutes=10)).isoformat()
+    elif replay:
+        # Orders go in when an on-time run's would have: two minutes after the checkpoint
+        decided = (pd.Timestamp(cp) + pd.Timedelta(minutes=2)).tz_convert("UTC").isoformat()
+    note = ("Late run: the open was replayed from the day's 5-minute bars as it stood at the checkpoint, "
+            "and orders start two minutes after it." if replay else "Live paper day.")
     orders = dict(decided=decided,
-                  note="Live paper day." + ("" if talks else " No debates ran (no candidates, cap or no key)."),
-                  mechanical=mech, judge=judge_orders)
+                  note=note + ("" if talks else " No debates ran (no candidates, cap or no key)."),
+                  mechanical=mech, judge=judge_orders, replayed=bool(replay))
     (od / "orders.json").write_text(json.dumps(orders, indent=1))
     print(json.dumps(orders, indent=1))
+    return day
 
 
 def last_day(mkt):
@@ -430,9 +553,10 @@ if __name__ == "__main__":
     ap.add_argument("--mkt", choices=["in", "us"], required=True)
     ap.add_argument("--day")
     ap.add_argument("--no-debate", action="store_true")
+    ap.add_argument("--force", action="store_true", help="redo a day that already has orders")
     a = ap.parse_args()
     if a.mode == "scan":
-        run_scan(a.mkt, a.no_debate)
+        run_scan(a.mkt, a.no_debate, day=a.day, force=a.force)
     else:
         d = a.day or last_day(a.mkt)
         if not d:

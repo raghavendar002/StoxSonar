@@ -6,7 +6,11 @@ name: Intraday paper trading
 #   India settle 15:45 IST Mon-Fri   (market=in, mode=settle)
 #   US scan      20:16 IST Mon-Fri   (19:16 in US summer time)
 #   US settle    02:40 IST Tue-Sat
-# The scheduled settles below are only a backstop: settling twice is harmless.
+# GitHub's own schedule below is a backstop for all four steps. A scan that
+# starts more than 30 minutes after the open replays the open from the day's
+# 5-minute bars as it stood at the checkpoint, and a day that already has
+# orders is never scanned twice, so a late or doubled trigger is harmless.
+# The missed-run check (watchdog.yml) repairs anything still missing.
 on:
   workflow_dispatch:
     inputs:
@@ -19,7 +23,10 @@ on:
         required: true
         default: scan
   schedule:
+    - cron: "1 4 * * 1-5"      # India scan backstop, 09:31 IST
     - cron: "30 10 * * 1-5"    # India settle backstop, 16:00 IST
+    - cron: "46 13 * * 1-5"    # US scan backstop, 09:46 New York in summer time
+    - cron: "46 14 * * 1-5"    # US scan backstop, 09:46 New York in winter (the other one finds no session)
     - cron: "15 22 * * 1-5"    # US settle backstop, 03:45 IST
 
 permissions:
@@ -27,8 +34,10 @@ permissions:
   pages: write
   id-token: write
 
+# One queue for every intraday step and the missed-run check, so two triggers
+# can never scan the same day at once (and pay for the debates twice).
 concurrency:
-  group: intraday-${{ github.event.inputs.market || 'settle' }}
+  group: intraday
   cancel-in-progress: false
 
 jobs:
@@ -49,11 +58,18 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
           if [ "${{ github.event_name }}" = "schedule" ]; then
-            if [ "${{ github.event.schedule }}" = "30 10 * * 1-5" ]; then M=in; else M=us; fi
-            python paper/intraday.py settle --mkt $M || true
+            case "${{ github.event.schedule }}" in
+              "1 4 * * 1-5")   M=in; MODE=scan ;;
+              "30 10 * * 1-5") M=in; MODE=settle ;;
+              "15 22 * * 1-5") M=us; MODE=settle ;;
+              *)               M=us; MODE=scan ;;
+            esac
           else
-            python paper/intraday.py ${{ github.event.inputs.mode }} --mkt ${{ github.event.inputs.market }}
+            M="${{ github.event.inputs.market }}"; MODE="${{ github.event.inputs.mode }}"
           fi
+          echo "M=$M" >> "$GITHUB_ENV"; echo "MODE=$MODE" >> "$GITHUB_ENV"
+          if [ "$MODE" = settle ]; then python paper/intraday.py settle --mkt $M || true
+          else python paper/intraday.py scan --mkt $M; fi
       - name: Build app feeds
         run: python -m sonar.appfeed
       - name: Commit
@@ -61,8 +77,8 @@ jobs:
           git config user.name "stoxsonar-bot"
           git config user.email "stoxsonar-bot@users.noreply.github.com"
           git add paper site/app/feed
-          git diff --cached --quiet && exit 0
-          git commit -m "Intraday ${{ github.event.inputs.market || 'settle' }} ${{ github.event.inputs.mode || 'backstop' }}"
+          if git diff --cached --quiet; then echo "CHANGED=0" >> "$GITHUB_ENV"; exit 0; fi
+          git commit -m "Intraday $M $MODE"
           for i in 1 2 3; do git pull --rebase origin main && git push && break; sleep 5; done
       - uses: actions/upload-pages-artifact@v3
         with:
@@ -72,14 +88,9 @@ jobs:
       # scan, both books' results after a settle. Sent after the deploy so tapping
       # it opens fresh data. Skips quietly until the two secrets exist.
       - name: Push alert to the app
+        if: env.CHANGED != '0'      # a run that found the day already done sends nothing twice
         continue-on-error: true
         env:
           VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
           PUSH_SUBS: ${{ secrets.PUSH_SUBS }}
-        run: |
-          if [ "${{ github.event_name }}" = "schedule" ]; then
-            if [ "${{ github.event.schedule }}" = "30 10 * * 1-5" ]; then M=in; else M=us; fi
-          else
-            M="${{ github.event.inputs.market }}"
-          fi
-          python -m sonar.push intraday --mkt "$M"
+        run: python -m sonar.push intraday --mkt "$M"

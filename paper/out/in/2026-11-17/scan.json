@@ -1,0 +1,176 @@
+{
+ "meta": {
+  "date": "2026-11-17",
+  "market": "in",
+  "checkpoint": "2026-11-17 09:30:00+05:30",
+  "index_move": 0.0017644134459200433,
+  "universe": 78,
+  "signals": 2,
+  "near_misses": [
+   {
+    "sym": "DABUR",
+    "relvol": 2.6689,
+    "dist_or_hi": -0.0044,
+    "move_today": 0.0181
+   },
+   {
+    "sym": "PNB",
+    "relvol": 2.5275,
+    "dist_or_hi": -0.0048,
+    "move_today": 0.022
+   },
+   {
+    "sym": "CANBK",
+    "relvol": 1.7624,
+    "dist_or_hi": -0.0027,
+    "move_today": 0.0124
+   },
+   {
+    "sym": "EICHERMOT",
+    "relvol": 1.6156,
+    "dist_or_hi": -0.0016,
+    "move_today": 0.0071
+   },
+   {
+    "sym": "ASIANPAINT",
+    "relvol": 1.4086,
+    "dist_or_hi": -0.0089,
+    "move_today": -0.0034
+   },
+   {
+    "sym": "HINDUNILVR",
+    "relvol": 1.2202,
+    "dist_or_hi": -0.0038,
+    "move_today": 0.003
+   },
+   {
+    "sym": "BANKBARODA",
+    "relvol": 1.2182,
+    "dist_or_hi": -0.0029,
+    "move_today": 0.0045
+   }
+  ],
+  "replayed": true,
+  "ran_utc": "2026-11-17T12:00:25+00:00"
+ },
+ "candidates": [
+  {
+   "sym": "CANBK",
+   "side": "long",
+   "stats": {
+    "sym": "CANBK",
+    "last": 133.94,
+    "or_hi": 134.3,
+    "or_lo": 132.2,
+    "relvol": 1.7624,
+    "atr5": 0.8333,
+    "vwap": 134.071,
+    "gap": -0.0008,
+    "day_hi": 134.3,
+    "day_lo": 132.2,
+    "open": 132.3,
+    "prev_close": 132.4,
+    "prev_hi": 133.89,
+    "prev_lo": 131.11,
+    "dma20": 122.268,
+    "move_today": 0.0124,
+    "dist_or_hi": -0.0027,
+    "dist_or_lo": 0.0132,
+    "side": "long"
+   },
+   "mechanical": {
+    "side": "long",
+    "trigger": 134.37,
+    "stop": 132.2,
+    "target": 138.7,
+    "latest_entry": "14:00",
+    "cutoff": "15:15"
+   },
+   "bars_5m": [
+    [
+     "09:15",
+     132.3,
+     133.7,
+     132.2,
+     133.7,
+     0.0
+    ],
+    [
+     "09:20",
+     133.9,
+     134.15,
+     133.65,
+     134.15,
+     1825529.0
+    ],
+    [
+     "09:25",
+     134.2,
+     134.3,
+     133.8,
+     133.94,
+     1100777.0
+    ]
+   ]
+  },
+  {
+   "sym": "EICHERMOT",
+   "side": "long",
+   "stats": {
+    "sym": "EICHERMOT",
+    "last": 7716.5,
+    "or_hi": 7729.0,
+    "or_lo": 7645.5,
+    "relvol": 1.6156,
+    "atr5": 48.0,
+    "vwap": 7713.4701,
+    "gap": 0.0083,
+    "day_hi": 7729.0,
+    "day_lo": 7645.5,
+    "open": 7662.0,
+    "prev_close": 7599.0,
+    "prev_hi": 7947.0,
+    "prev_lo": 7534.0,
+    "dma20": 7372.575,
+    "move_today": 0.0071,
+    "dist_or_hi": -0.0016,
+    "dist_or_lo": 0.0093,
+    "side": "long"
+   },
+   "mechanical": {
+    "side": "long",
+    "trigger": 7732.86,
+    "stop": 7645.5,
+    "target": 7907.59,
+    "latest_entry": "14:00",
+    "cutoff": "15:15"
+   },
+   "bars_5m": [
+    [
+     "09:15",
+     7662.0,
+     7716.5,
+     7645.5,
+     7665.0,
+     0.0
+    ],
+    [
+     "09:20",
+     7673.0,
+     7715.0,
+     7668.0,
+     7710.5,
+     23768.0
+    ],
+    [
+     "09:25",
+     7708.0,
+     7729.0,
+     7706.0,
+     7716.5,
+     23299.0
+    ]
+   ]
+  }
+ ]
+}

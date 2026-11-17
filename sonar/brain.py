@@ -80,6 +80,13 @@ REVIEW_SYSTEM = (
     "the Judge should do differently, and to be honest when the record is too thin to say."
 )
 
+ACCOUNT = {"NSE": "a small Indian retail account", "US": "a small US cash account"}
+
+
+def review_system(market: str) -> str:
+    return REVIEW_SYSTEM.replace("a small Indian retail account", ACCOUNT.get(market, ACCOUNT["NSE"]))
+
+
 REVIEW = (
     "From the cases, propose at most {max_add} new lessons and name any current lessons the record "
     "no longer supports.\n"
@@ -99,6 +106,11 @@ def init(con) -> None:
     cols = {r[1] for r in con.execute("PRAGMA table_info(mt_debates)")}
     if cols and "brain" not in cols:
         con.execute("ALTER TABLE mt_debates ADD COLUMN brain TEXT")
+    # Lessons are kept per market, so an India lesson never reaches a US Judge (or the reverse).
+    # Lessons written before this column existed were all India's.
+    cols = {r[1] for r in con.execute("PRAGMA table_info(mt_lessons)")}
+    if cols and "market" not in cols:
+        con.execute("ALTER TABLE mt_lessons ADD COLUMN market TEXT NOT NULL DEFAULT 'NSE'")
     con.commit()
 
 
@@ -370,11 +382,14 @@ def scoreboard(con, market: str) -> dict:
 # 4. Lessons: one model call, at most weekly, checked by code
 # ---------------------------------------------------------------------------
 
-def active_lessons(con) -> List[dict]:
+def active_lessons(con, market: str) -> List[dict]:
+    """This market's live lessons; each market (NSE, US) learns on its own."""
     if not _has(con, "mt_lessons"):
         return []
+    init(con)
     return [dict(id=r[0], version=r[1], text=r[2], n_cases=r[3], added=r[4]) for r in con.execute(
-        "SELECT id, version, text, n_cases, added FROM mt_lessons WHERE dropped IS NULL ORDER BY id")]
+        "SELECT id, version, text, n_cases, added FROM mt_lessons WHERE dropped IS NULL AND market=? ORDER BY id",
+        (market,))]
 
 
 def review_due(con, market: str, now: datetime) -> bool:
@@ -389,12 +404,14 @@ def review_due(con, market: str, now: datetime) -> bool:
     return age >= timedelta(days=C.BRAIN_REVIEW_EVERY_DAYS) and n - (last[1] or 0) >= C.BRAIN_REVIEW_MIN_NEW
 
 
-def check_lesson(text: str, case_ids: List[int], known_ids: set, names: set, current: List[str]) -> Optional[str]:
+def check_lesson(text: str, case_ids: List[int], known_ids: set, names: set, current: List[str],
+                 min_cases: Optional[int] = None) -> Optional[str]:
     """None when the lesson can be kept, else why not."""
+    need = C.BRAIN_MIN_CASES if min_cases is None else min_cases
     text = " ".join(str(text).split())
     ids = {int(i) for i in case_ids}
-    if len(ids & known_ids) < C.BRAIN_MIN_CASES:
-        return f"cites {len(ids & known_ids)} real cases, needs {C.BRAIN_MIN_CASES}"
+    if len(ids & known_ids) < need:
+        return f"cites {len(ids & known_ids)} real cases, needs {need}"
     if not 20 <= len(text) <= 320:
         return "not one or two sentences"
     for name in names:
@@ -422,12 +439,13 @@ def review(con, market: str, call: Optional[Callable] = None, now: Optional[date
         log.info("lessons review due but the month's budget is spent")
         return None
     cases = _cases(con, market)
-    lessons = active_lessons(con)
+    lessons = active_lessons(con, market)
     shared = "CASES AND CURRENT LESSONS\n" + json.dumps(
         dict(cases=cases, judge_record=_judge_record(cases), scoreboard=scoreboard(con, market),
              current_lessons=[dict(id=x["id"], text=x["text"], n_cases=x["n_cases"]) for x in lessons]),
         separators=(",", ":"))
-    version = (con.execute("SELECT COALESCE(MAX(version), 0) FROM mt_reviews").fetchone()[0] or 0) + 1
+    version = (con.execute("SELECT COALESCE(MAX(version), 0) FROM mt_reviews WHERE market=?",
+                           (market,)).fetchone()[0] or 0) + 1
     base = dict(market=market, created_utc=now.isoformat(timespec="seconds"), version=version, n_cases=len(cases))
 
     def log_review(**kw):
@@ -439,7 +457,7 @@ def review(con, market: str, call: Optional[Callable] = None, now: Optional[date
     try:
         reply = call(C.DEBATE_MODEL_JUDGE, shared,
                      REVIEW.format(max_add=C.BRAIN_MAX_ADD, min_cases=C.BRAIN_MIN_CASES), "high",
-                     LESSONS_SCHEMA, system=REVIEW_SYSTEM)
+                     LESSONS_SCHEMA, system=review_system(market))
         out = json.loads(reply.text)
     except Exception as e:                   # a failed review costs a week, never the day's run
         log.warning("lessons review failed: %s %s", type(e).__name__, str(e)[:300])
@@ -451,7 +469,7 @@ def review(con, market: str, call: Optional[Callable] = None, now: Optional[date
     today = now.strftime("%Y-%m-%d")
     dropped = 0
     for lid in {int(i) for i in out["lesson_ids_to_drop"]} & {x["id"] for x in lessons}:
-        con.execute("UPDATE mt_lessons SET dropped=? WHERE id=?", (today, lid))
+        con.execute("UPDATE mt_lessons SET dropped=? WHERE id=? AND market=?", (today, lid, market))
         dropped += 1
     room = C.BRAIN_MAX_LESSONS - (len(lessons) - dropped)
     current = [x["text"] for x in lessons]
@@ -465,8 +483,8 @@ def review(con, market: str, call: Optional[Callable] = None, now: Optional[date
             rejected.append(f"{why}: {text[:120]}")
             continue
         ids = sorted({int(i) for i in item["case_ids"]} & known)
-        con.execute("INSERT INTO mt_lessons (version, text, cases, n_cases, added) VALUES (?,?,?,?,?)",
-                    (version, text, json.dumps(ids), len(ids), today))
+        con.execute("INSERT INTO mt_lessons (market, version, text, cases, n_cases, added) VALUES (?,?,?,?,?,?)",
+                    (market, version, text, json.dumps(ids), len(ids), today))
         added.append(text)
     log_review(status="done", added=len(added), dropped=dropped, rejected="\n".join(rejected) or None,
                summary=" ".join(str(out["summary"]).split())[:1200], input_tokens=reply.input_tokens,

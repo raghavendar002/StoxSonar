@@ -1,0 +1,38 @@
+{
+ "decided": "2026-11-17T04:02:00+00:00",
+ "note": "Late run: the open was replayed from the day's 5-minute bars as it stood at the checkpoint, and orders start two minutes after it.",
+ "mechanical": [
+  {
+   "sym": "CANBK",
+   "side": "long",
+   "trigger": 134.37,
+   "stop": 132.2,
+   "target": 138.7,
+   "latest_entry": "14:00",
+   "cutoff": "15:15"
+  },
+  {
+   "sym": "EICHERMOT",
+   "side": "long",
+   "trigger": 7732.86,
+   "stop": 7645.5,
+   "target": 7907.59,
+   "latest_entry": "14:00",
+   "cutoff": "15:15"
+  }
+ ],
+ "judge": [
+  {
+   "sym": "CANBK",
+   "side": "long",
+   "trigger": 134.37,
+   "stop": 133.6,
+   "target": 135.6,
+   "conviction": 2,
+   "leverage": 1,
+   "latest_entry": "14:00",
+   "cutoff": "15:15"
+  }
+ ],
+ "replayed": true
+}
