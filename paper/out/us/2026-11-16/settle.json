@@ -1,0 +1,59 @@
+{
+ "mechanical": {
+  "trades": [
+   {
+    "status": "closed",
+    "entry": 326.0051904418945,
+    "entry_t": "2026-11-16 09:51:00-05:00",
+    "exit": 327.64444945678713,
+    "exit_t": "2026-11-16 15:50:00-05:00",
+    "reason": "time",
+    "sym": "FDX",
+    "side": "long",
+    "qty": 1.5371,
+    "costs": 0.0143,
+    "pnl": 2.51,
+    "r_mult": 0.71
+   }
+  ],
+  "end_cash": 1002.51
+ },
+ "judge": {
+  "trades": [],
+  "end_cash": 1000.0
+ },
+ "shadow": [
+  {
+   "sym": "FDX",
+   "side": "long",
+   "rule": {
+    "status": "closed",
+    "entry": 326.0051904418945,
+    "entry_t": "2026-11-16 09:51:00-05:00",
+    "exit": 327.64444945678713,
+    "exit_t": "2026-11-16 15:50:00-05:00",
+    "reason": "time",
+    "sym": "FDX",
+    "side": "long",
+    "qty": 1.5371,
+    "costs": 0.0143,
+    "pnl": 2.51,
+    "r_mult": 0.71
+   },
+   "judge_levels": {
+    "status": "closed",
+    "entry": 326.0051904418945,
+    "entry_t": "2026-11-16 09:51:00-05:00",
+    "exit": 323.83522,
+    "exit_t": "2026-11-16 09:59:00-05:00",
+    "reason": "stop",
+    "sym": "FDX",
+    "side": "long",
+    "qty": 1.5352,
+    "costs": 0.0141,
+    "pnl": -3.35,
+    "r_mult": -1.21
+   }
+  }
+ ]
+}
