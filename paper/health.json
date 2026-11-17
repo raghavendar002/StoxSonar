@@ -1,5 +1,5 @@
 {
- "checked_utc": "2026-11-17T11:59:57+00:00",
+ "checked_utc": "2026-11-17T13:16:16+00:00",
  "categories": {
   "in-intra": {
    "name": "India intraday",
@@ -87,10 +87,7 @@
    "last_learned": null
   }
  },
- "alerts": [
-  "India intraday 2026-11-17: the scan had not run; replayed it as of 15 minutes after the open",
-  "daily.yml failed at 2026-11-16 15:15 UTC: https://github.com/raghavendar002/StoxSonar/actions/runs/43894348405"
- ],
+ "alerts": [],
  "tries": {
   "in-intra:2026-11-17:scan": 1
  },
