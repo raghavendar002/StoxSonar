@@ -89,3 +89,26 @@ def test_run_writes_a_report(tmp_path, monkeypatch):
     monkeypatch.setattr(M, "CHECK_FROM", str(days[601].date()))
     text = M.run(w, bench, None, tmp_path)
     assert "Verdict" in text and (tmp_path / "check_2019_on.csv").exists()
+
+
+def test_vol_target_holds_less_when_the_basket_is_wild():
+    w, rk, days = _setup()
+    bench = w["Close"].mean(axis=1)
+    br = M.brake_series(bench, None, days)
+    br["under"] = False
+    start = str(days[300].date())
+    full = M.simulate(w, rk, br, M.Variant(10, "exit"), start, None)["equity"]
+    vt = M.simulate(w, rk, br, M.Variant(10, "exit", vt=0.02), start, None)["equity"]
+    assert (vt["cash"] / vt["equity"]).mean() > (full["cash"] / full["equity"]).mean() + 0.2
+
+
+def test_vt_study_only_chooses_among_its_candidates(tmp_path, monkeypatch):
+    w, rk, days = _setup(n_days=900)
+    bench = w["Close"].mean(axis=1)
+    monkeypatch.setattr(M, "FIT", (str(days[260].date()), str(days[600].date())))
+    monkeypatch.setattr(M, "CHECK_FROM", str(days[601].date()))
+    s = M.vt_study()
+    assert len(s["variants"]) == 17
+    text = M.run(w, bench, None, tmp_path, **s)
+    chosen = text.split("**")[3]
+    assert chosen in [c.name for c in s["candidates"]]

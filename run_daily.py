@@ -26,7 +26,7 @@ import pandas as pd
 
 from sonar import books
 from sonar import config as C
-from sonar import brain, data, debate, engine, ledger, publish
+from sonar import brain, data, debate, engine, ledger, momentum, publish
 
 ROOT = Path(__file__).resolve().parent
 log = logging.getLogger("stoxsonar")
@@ -211,6 +211,15 @@ def main(argv=None) -> int:
             books_ok = True
         except Exception:  # the books must never stop the day's signals going out
             log.exception("mid-term books failed; signals publish without them")
+    if a.mode == "daily" and not us:
+        try:     # momentum paper book (sonar/momentum.py): code only, never blocks the signals
+            path = a.db.parent / "momentum_book.json"
+            mb = momentum.step(momentum.load(path), prices, bench, as_of)
+            momentum.save(path, mb)
+            log.info("momentum book %s: equity %.0f, %d held, %s", as_of, mb["equity"][-1]["equity"],
+                     len(mb["holdings"]), mb["last_log"] or "no fills")
+        except Exception:
+            log.exception("momentum paper book failed; signals publish without it")
     if us:
         log.info("US shadow %s: %d new signals", as_of, new)
         if a.telegram:

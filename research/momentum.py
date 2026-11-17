@@ -58,12 +58,9 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "research"))
 from sonar import config as C, nse  # noqa: E402
 from sonar.portfolio import buy_cost, sell_cost, slippage  # noqa: E402
+from sonar.momentum import month_starts, ranks, wide  # noqa: E402,F401
 
 LIQUID_RATE = 0.055          # liquid ETF, a year, after its fee (overnight rates 2007-2026 ran ~3.5-8.5%)
-MIN_VALUE_RS = 5e7           # Rs 5 crore median daily traded value
-UNIVERSE_SIZE = 500
-MIN_PRICE = 10.0
-BAND_DAYS_MAX = 2            # 3+ locked-limit days in 126 sessions -> out
 VIX_PCT = 0.90
 NS = (10, 15, 20)
 BRAKES = ("none", "gate", "exit", "gate+vix", "exit+vix")
@@ -76,61 +73,13 @@ class Variant:
     n: int
     brake: str
     risk_pct: Optional[float] = None     # None: 1/N of equity; else size by risk to a 2.5-ATR stop
+    vt: Optional[float] = None           # volatility target: scale the month's basket to this yearly vol
 
     @property
     def name(self) -> str:
         s = f"top {self.n}, brake {self.brake}"
+        s += f", vol target {self.vt * 100:.0f}%" if self.vt else ""
         return s + (f", {self.risk_pct * 100:.1f}% risk sizing" if self.risk_pct else "")
-
-
-# ---------------------------------------------------------------------------
-# Wide matrices and monthly ranks
-
-
-def wide(prices: dict) -> dict:
-    """{SYM: OHLCV} -> one date x symbol frame per field, on the union of dates."""
-    out = {}
-    for k in ("Open", "High", "Low", "Close", "Volume"):
-        out[k] = pd.DataFrame({s: f[k] for s, f in prices.items()}).sort_index()
-    out["traded"] = out["Close"].notna()
-    out["value"] = out["Close"] * out["Volume"]
-    return out
-
-
-def month_starts(days: pd.DatetimeIndex) -> pd.DatetimeIndex:
-    s = pd.Series(days, index=days)
-    return pd.DatetimeIndex(s.groupby([days.year, days.month]).first().values)
-
-
-def ranks(w: dict, asof: pd.DatetimeIndex) -> dict:
-    """{as-of date: Series symbol -> rank (1 = best)} for the eligible universe on each date."""
-    close = w["Close"].ffill()
-    ret = close.pct_change(fill_method=None)
-    vol = ret.rolling(252, min_periods=200).std() * math.sqrt(252)
-    r6 = close / close.shift(126) - 1
-    r12 = close / close.shift(252) - 1
-    seen = w["traded"].rolling(252, min_periods=1).sum()
-    med_val = w["value"].rolling(126, min_periods=60).median()
-    prev = close.shift(1)
-    move = (w["Close"] / prev - 1).abs()
-    locked = (w["High"] == w["Low"]) & (move >= 0.019) & (w["Volume"] > 0)
-    bands = locked.rolling(126, min_periods=1).sum()
-    out = {}
-    for d in asof:
-        if d not in close.index:
-            continue
-        ok = (seen.loc[d] >= 0.9 * 252) & (close.loc[d] >= MIN_PRICE) & (med_val.loc[d] >= MIN_VALUE_RS) \
-            & (bands.loc[d] <= BAND_DAYS_MAX) & vol.loc[d].gt(0) & r12.loc[d].notna() & r6.loc[d].notna()
-        ok = ok & w["traded"].loc[d]
-        names = ok[ok].index
-        if len(names) < 30:
-            out[d] = pd.Series(dtype=float)
-            continue
-        top = med_val.loc[d, names].nlargest(UNIVERSE_SIZE).index
-        a, b = r6.loc[d, top] / vol.loc[d, top], r12.loc[d, top] / vol.loc[d, top]
-        z = ((a - a.mean()) / a.std() + (b - b.mean()) / b.std()) / 2
-        out[d] = z.rank(ascending=False, method="first")
-    return out
 
 
 def brake_series(bench: pd.Series, vix: Optional[pd.Series], days: pd.DatetimeIndex) -> pd.DataFrame:
@@ -162,6 +111,7 @@ def simulate(w: dict, rk: dict, brakes: pd.DataFrame, v: Variant, start: str, en
         pc = Cl.ffill().shift(1)
         tr = pd.concat([H - L, (H - pc).abs(), (L - pc).abs()]).groupby(level=0).max()
         atr = tr.rolling(14, min_periods=10).mean()
+    rets = Cl.ffill().pct_change(fill_method=None) if v.vt else None
     last_seen = w["traded"][::-1].cummax()[::-1]          # False after a stock's final day
     daily_cash = (1 + LIQUID_RATE) ** (1 / 365.25) - 1
     cash, hold, trades, curve = float(capital), {}, [], []   # hold: sym -> dict(qty, cost, entry_day, px)
@@ -186,6 +136,22 @@ def simulate(w: dict, rk: dict, brakes: pd.DataFrame, v: Variant, start: str, en
                                pnl=round(proceeds - c - h["qty"] * h["px"] - h["cost"], 2),
                                ret=round((proceeds - c) / (h["qty"] * h["px"] + h["cost"]) - 1, 4)))
             last_px.pop(sym, None)
+
+        def trim(sym, keep_qty):
+            nonlocal cash
+            h = hold[sym]
+            q = h["qty"] - keep_qty
+            px = O.at[day, sym] * (1 - slippage(tv.at[prev_day, sym]))
+            share = q / h["qty"]
+            proceeds = q * px
+            c = sell_cost(proceeds)
+            cash += proceeds - c
+            trades.append(dict(symbol=sym, entry_date=h["entry_day"].date(), exit_date=day.date(), qty=q,
+                               entry=round(h["px"], 2), exit=round(px, 2), reason="vol trim",
+                               pnl=round(proceeds - c - q * h["px"] - h["cost"] * share, 2),
+                               ret=round((proceeds - c) / (q * h["px"] + h["cost"] * share) - 1, 4)))
+            h["cost"] *= 1 - share
+            h["qty"] = keep_qty
 
         # delisted / merged: out at the last close
         for sym in [s for s in hold if not last_seen.at[day, s]]:
@@ -214,13 +180,27 @@ def simulate(w: dict, rk: dict, brakes: pd.DataFrame, v: Variant, start: str, en
                 blocked = blocked or bool(yb["vix_hot"])
             if not blocked and len(r):
                 equity = cash + sum(h["qty"] * last_px.get(s, h["px"]) for s, h in hold.items())
+                expo = 1.0
+                if v.vt:
+                    basket = list(r.sort_values().index[:v.n])
+                    i = Cl.index.get_loc(prev_day)
+                    sig = rets.iloc[max(i - 125, 0):i + 1][basket].mean(axis=1).std() * math.sqrt(252)
+                    expo = min(1.0, v.vt / sig) if sig and sig == sig else 1.0
+                    for sym in [s for s in hold if tradable(s)]:
+                        tgt = expo * equity / v.n
+                        if hold[sym]["qty"] * O.at[day, sym] > 1.25 * tgt:
+                            keep = int(tgt // O.at[day, sym])
+                            if keep < 1:
+                                sell(sym, "vol trim")
+                            elif keep < hold[sym]["qty"]:
+                                trim(sym, keep)
                 for sym in r.sort_values().index:
                     if len(hold) >= v.n:
                         break
                     if sym in hold or not tradable(sym):
                         continue
                     fill = O.at[day, sym] * (1 + slippage(tv.at[prev_day, sym]))
-                    target = equity / v.n
+                    target = expo * equity / v.n
                     if v.risk_pct:
                         a = atr.at[prev_day, sym]
                         if not (a == a and a > 0):
@@ -316,12 +296,17 @@ def md(df: pd.DataFrame) -> str:
     return "\n".join(rows) + "\n"
 
 
-def run(w: dict, bench: pd.Series, vix: Optional[pd.Series], out_dir: Path) -> str:
+def run(w: dict, bench: pd.Series, vix: Optional[pd.Series], out_dir: Path,
+        variants: Optional[list] = None, candidates: Optional[list] = None,
+        title: str = "PR 8: ranked momentum with a crash brake") -> str:
+    """variants: every trial (all count toward the deflated Sharpe);
+    candidates: the ones the 2007-2018 Sharpe may choose from (default: all)."""
     days = w["Close"].index
     pos = {d: i for i, d in enumerate(days)}
     rk = ranks(w, pd.DatetimeIndex([days[pos[d] - 1] for d in month_starts(days) if pos[d] > 0]))
     br = brake_series(bench, vix, days)
-    variants = [Variant(n, b) for n in NS for b in BRAKES]
+    variants = variants or [Variant(n, b) for n in NS for b in BRAKES]
+    candidates = candidates or variants
     fit, chk, res_chk = [], [], {}
     for v in variants:
         rf = simulate(w, rk, br, v, *FIT)
@@ -336,7 +321,8 @@ def run(w: dict, bench: pd.Series, vix: Optional[pd.Series], out_dir: Path) -> s
         print(f"{v.name}: fit sharpe {mf['sharpe']} cagr {mf['cagr_pct']} | check cagr {mc['cagr_pct']}",
               file=sys.stderr, flush=True)
     fit_df, chk_df = pd.DataFrame(fit), pd.DataFrame(chk)
-    best_i = int(fit_df["sharpe"].fillna(-9).idxmax())
+    pick = fit_df["sharpe"].where([v in candidates for v in variants])
+    best_i = int(pick.fillna(-9).idxmax())
     chosen = variants[best_i]
     rc = res_chk[chosen]
     eq = rc["equity"]["equity"]
@@ -364,7 +350,7 @@ def run(w: dict, bench: pd.Series, vix: Optional[pd.Series], out_dir: Path) -> s
     bar = [("CAGR >= Nifty 500 + 5 pts", f"{m['cagr_pct']}% vs {m['bench_cagr_pct']}% + 5", m["edge_pts"] >= 5),
            ("Max drawdown < 25%", f"{m['max_dd_pct']}%", m["max_dd_pct"] > -25),
            ("Ahead of the index in >= 5 of 7 years (2019-2025)", f"{years_ahead} of {len(full)}", years_ahead >= 5),
-           ("Deflated Sharpe >= 0.95 (15 trials)", f"{dsr:.2f}", dsr >= 0.95)]
+           (f"Deflated Sharpe >= 0.95 ({len(variants)} trials)", f"{dsr:.2f}", dsr >= 0.95)]
     passed = all(p for *_, p in bar)
     side = simulate(w, rk, br, replace(chosen, risk_pct=C.RISK_PCT), CHECK_FROM, None)
     ms = metrics(side["equity"]["equity"], bench, side["trades"])
@@ -378,13 +364,13 @@ def run(w: dict, bench: pd.Series, vix: Optional[pd.Series], out_dir: Path) -> s
     tr = rc["trades"]
     why = tr.groupby("reason").agg(trades=("pnl", "size"), avg_ret_pct=("ret", lambda x: round(x.mean() * 100, 1)),
                                    total_pnl_rs=("pnl", lambda x: round(x.sum()))).reset_index() if len(tr) else pd.DataFrame()
-    lines = [f"# PR 8: ranked momentum with a crash brake, Rs {C.CAPITAL_RS:,} account", "",
+    lines = [f"# {title}, Rs {C.CAPITAL_RS:,} account", "",
              f"Data {days[0].date()} to {days[-1].date()}, NSE daily files (delisted stocks included). "
              f"Benchmark: {'; '.join(bench.attrs.get('sources', ['Nifty 500']))} (price index, no dividends). "
              f"India VIX from {vix.index.min().date() if vix is not None and len(vix) else 'n/a'}. "
              f"Idle cash earns {LIQUID_RATE * 100:.1f}% a year (liquid ETF).", "",
              f"## Verdict: **{'PASS' if passed else 'FAIL'}**", "",
-             f"Chosen on 2007-2018 by Sharpe: **{chosen.name}**. Judged on {CHECK_FROM} on, fresh Rs 1 lakh.", "",
+             f"Chosen on 2007-2018 by Sharpe from {', '.join(c.name for c in candidates)}: **{chosen.name}**. Judged on {CHECK_FROM} on, fresh Rs 1 lakh.", "",
              md(pd.DataFrame(bar, columns=["test", "result", "pass"])), "",
              "## Every variant, 2007-2018 (the choice is made here)", "", md(fit_df), "",
              "## Every variant, 2019 on (shown for honesty; not used to choose)", "", md(chk_df), "",
@@ -408,13 +394,26 @@ def load_vix() -> Optional[pd.Series]:
         return None
 
 
-def main(cache_path: str, out_dir: str = "reports/momentum") -> int:
+def vt_study() -> dict:
+    """Pre-registered 2026-11-17: does a 15% volatility target fix the 2008 drawdown
+    of the exit-brake book? Candidates: exit brake, N 15 or 20, with or without it."""
+    base = [Variant(n, b) for n in NS for b in BRAKES]
+    new = [Variant(n, "exit", vt=0.15) for n in (15, 20)]
+    cands = [Variant(15, "exit"), Variant(20, "exit")] + new
+    return dict(variants=base + new, candidates=cands,
+                title="PR 8b: the exit-brake momentum book with a 15% volatility target")
+
+
+def main(cache_path: str, study: str = "base") -> int:
     from backtest import spliced_benchmark
     with open(cache_path, "rb") as fh:          # written by backtest.py on this runner
         prices = nse.to_price_dict(pickle.load(fh))
     w = wide(prices)
     bench = spliced_benchmark()
-    print(run(w, bench, load_vix(), ROOT / out_dir))
+    if study == "vt":
+        print(run(w, bench, load_vix(), ROOT / "reports" / "momentum_vt", **vt_study()))
+    else:
+        print(run(w, bench, load_vix(), ROOT / "reports" / "momentum"))
     return 0
 
 

@@ -6,7 +6,7 @@ name: PR 8 momentum study
 on:
   push:
     branches: [claude/project-thread-qhpown]
-    paths: [research/momentum.py, .github/workflows/pr8-momentum.yml]
+    paths: [research/momentum.py, sonar/momentum.py, .github/workflows/pr8-momentum.yml]
   workflow_dispatch:
 
 permissions:
@@ -27,7 +27,7 @@ jobs:
           python-version: "3.12"
           cache: pip
       - run: pip install -r requirements.txt
-      - run: python -m pytest -q tests/test_momentum.py tests/test_portfolio.py
+      - run: python -m pytest -q tests
       - uses: actions/cache/restore@v4
         with:
           path: cache/nse_panel.pkl
@@ -48,15 +48,15 @@ jobs:
         with:
           path: cache/nse_panel.pkl
           key: nse-panel-v2-${{ github.run_id }}
-      - name: Momentum study
+      - name: Volatility-target study (PR 8b; the base study's report is already committed)
         run: |
-          python research/momentum.py cache/nse_panel.pkl > reports/momentum.md
-          cat reports/momentum.md
+          python research/momentum.py cache/nse_panel.pkl vt > reports/momentum_vt.md
+          cat reports/momentum_vt.md
       - name: Commit the report
         run: |
           git config user.name "stoxsonar-bot"
           git config user.email "stoxsonar-bot@users.noreply.github.com"
-          git add reports/momentum.md reports/momentum/
-          git commit --quiet -m "PR 8 momentum report $(date -u +%F)"
+          git add reports/momentum_vt.md reports/momentum_vt/
+          git commit --quiet -m "PR 8b vol-target report $(date -u +%F)"
           git pull --rebase --quiet origin "$GITHUB_REF_NAME"
           git push --quiet origin HEAD:"$GITHUB_REF_NAME"

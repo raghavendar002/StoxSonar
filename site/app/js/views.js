@@ -93,6 +93,29 @@ function brief(s) {
   return out;
 }
 
+// The momentum paper book (sonar/momentum.py): top 15, monthly, all out under the Nifty 500's 200-day line
+function momentumCard(m) {
+  if (!m) return "";
+  const cur = "INR", held = m.holdings || [], o = m.pending;
+  const status = m.brake_on ? "Brake on: the Nifty 500 is under its 200-day line, so the book is in cash"
+    : held.length ? `${held.length} of ${m.n} held` : o && o.buys && o.buys.length ? "Buys queued for the next open" : "Waiting for the next rebalance";
+  const rows = held.map((h) => `<tr><td><a href="${tv(h.symbol, "IN")}" target="_blank" rel="noopener"><b>${esc(h.symbol)}</b></a><div class="dim" style="font-size:11.5px">since ${esc(shortDay(h.entry_date))}</div></td>
+    <td>${h.qty}</td><td>${px(h.entry)}</td><td>${px(h.last)}</td><td class="${sign(h.ret_pct)}">${pct(h.ret_pct)}</td></tr>`).join("");
+  const queued = o ? [o.buys && o.buys.length ? `Buy at the next open: ${o.buys.map((s) => esc(s.replace(".NS", ""))).join(", ")}` : "",
+    o.sells && o.sells.length ? `Sell at the next open: ${o.sells.map((s) => esc(s.replace(".NS", ""))).join(", ")}` : ""].filter(Boolean) : [];
+  return `${section("Momentum paper book")}
+    <div class="grid k4">
+      ${kpi("Book", money(m.equity, cur, 0), `from ${money(m.capital, cur, 0)} on ${esc(shortDay(m.started))}`)}
+      ${kpi("Return", pct(m.ret_pct), "after costs", sign(m.ret_pct))}
+      ${kpi("Nifty 500", pct(m.bench_ret_pct), "same days", sign(m.bench_ret_pct))}
+      ${kpi("Cash", money(m.cash, cur, 0), "earns the liquid-ETF rate")}
+    </div>
+    <div class="card" style="margin-top:10px"><div class="eyebrow">${esc(status)}</div>
+      ${queued.map((t) => `<p style="margin:6px 0 0;font-size:13.5px">${t}</p>`).join("")}
+      ${rows ? `<div class="scroll" style="margin-top:8px"><table><thead><tr><th>Stock</th><th>Qty</th><th>Bought</th><th>Last</th><th>Move</th></tr></thead><tbody>${rows}</tbody></table></div>` : ""}
+      <p class="foot" style="margin-top:8px">Code only, no money and no model. Top ${m.n} NSE stocks by 6- and 12-month momentum, checked monthly, sold when they drop below rank ${2 * m.n}, and everything sold when the Nifty 500 closes under its 200-day average. It passed the bar on 2019 on in the backtest but was not the pre-registered pick, so this is a forward test.</p></div>`;
+}
+
 function todayMidIN(f) {
   const s = f && f.snapshot;
   if (!s) return empty("No data yet", "The evening run has not published anything this app can read.");
@@ -117,6 +140,7 @@ function todayMidIN(f) {
       ${kpi("Open signals", s.open_signals.length, `${ups} up · ${s.open_signals.length - ups} down`)}
       ${kpi("Live record", live, "signals logged live")}
     </div>
+    ${momentumCard(f.momentum)}
     ${section("The brief")}
     <div class="card"><ul class="brief">${brief(s).map((t) => `<li>${icon("check")}<span>${esc(t)}</span></li>`).join("")}</ul></div>
     ${section("New breakouts")}
