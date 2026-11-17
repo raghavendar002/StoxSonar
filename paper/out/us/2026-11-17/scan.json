@@ -1,0 +1,253 @@
+{
+ "meta": {
+  "date": "2026-11-17",
+  "market": "us",
+  "checkpoint_et": "2026-11-17 09:45:00-05:00",
+  "spy_move_today": -0.0007042613265804132,
+  "universe": 100,
+  "signals": 3,
+  "near_misses": [
+   {
+    "sym": "DIS",
+    "relvol": 4.7763,
+    "dist_or_hi": -0.013,
+    "move_today": 0.0034
+   },
+   {
+    "sym": "NKE",
+    "relvol": 3.7434,
+    "dist_or_hi": -0.0211,
+    "move_today": -0.0095
+   },
+   {
+    "sym": "HD",
+    "relvol": 2.7734,
+    "dist_or_hi": -0.0105,
+    "move_today": 0.0125
+   },
+   {
+    "sym": "DUK",
+    "relvol": 2.6325,
+    "dist_or_hi": -0.0007,
+    "move_today": 0.0046
+   },
+   {
+    "sym": "JPM",
+    "relvol": 1.9845,
+    "dist_or_hi": -0.0019,
+    "move_today": 0.0016
+   },
+   {
+    "sym": "UNH",
+    "relvol": 1.7787,
+    "dist_or_hi": -0.0237,
+    "move_today": -0.0185
+   },
+   {
+    "sym": "EMR",
+    "relvol": 1.5165,
+    "dist_or_hi": -0.0028,
+    "move_today": 0.006
+   },
+   {
+    "sym": "SCHW",
+    "relvol": 1.465,
+    "dist_or_hi": -0.0044,
+    "move_today": 0.003
+   },
+   {
+    "sym": "CRM",
+    "relvol": 1.4591,
+    "dist_or_hi": -0.0314,
+    "move_today": -0.0222
+   },
+   {
+    "sym": "LOW",
+    "relvol": 1.4364,
+    "dist_or_hi": -0.0025,
+    "move_today": 0.015
+   }
+  ],
+  "replayed": true,
+  "ran_utc": "2026-11-17T19:27:15+00:00"
+ },
+ "candidates": [
+  {
+   "sym": "DUK",
+   "side": "long",
+   "stats": {
+    "sym": "DUK",
+    "last": 129.98,
+    "or_hi": 130.075,
+    "or_lo": 129.19,
+    "relvol": 2.6325,
+    "atr5": 0.525,
+    "vwap": 129.8302,
+    "gap": -0.0093,
+    "day_hi": 130.075,
+    "day_lo": 129.19,
+    "open": 129.38,
+    "prev_close": 130.59,
+    "prev_hi": 131.42,
+    "prev_lo": 129.96,
+    "dma20": 126.7485,
+    "move_today": 0.0046,
+    "dist_or_hi": -0.0007,
+    "dist_or_lo": 0.0061,
+    "side": "long"
+   },
+   "mechanical": {
+    "side": "long",
+    "trigger": 130.14,
+    "stop": 129.19,
+    "target": 132.04,
+    "latest_entry": "14:30",
+    "cutoff": "15:50"
+   },
+   "bars_5m": [
+    [
+     "09:30",
+     129.38,
+     129.94,
+     129.19,
+     129.81,
+     453492
+    ],
+    [
+     "09:35",
+     129.82,
+     130.07,
+     129.57,
+     129.85,
+     46609
+    ],
+    [
+     "09:40",
+     129.86,
+     130.04,
+     129.72,
+     129.98,
+     54890
+    ]
+   ]
+  },
+  {
+   "sym": "JPM",
+   "side": "long",
+   "stats": {
+    "sym": "JPM",
+    "last": 334.1,
+    "or_hi": 334.75,
+    "or_lo": 332.32,
+    "relvol": 1.9845,
+    "atr5": 1.6927,
+    "vwap": 333.3456,
+    "gap": -0.0137,
+    "day_hi": 334.75,
+    "day_lo": 332.32,
+    "open": 333.57,
+    "prev_close": 338.21,
+    "prev_hi": 346.52,
+    "prev_lo": 336.67,
+    "dma20": 339.279,
+    "move_today": 0.0016,
+    "dist_or_hi": -0.0019,
+    "dist_or_lo": 0.0054,
+    "side": "long"
+   },
+   "mechanical": {
+    "side": "long",
+    "trigger": 334.92,
+    "stop": 332.32,
+    "target": 340.11,
+    "latest_entry": "14:30",
+    "cutoff": "15:50"
+   },
+   "bars_5m": [
+    [
+     "09:30",
+     333.57,
+     334.75,
+     332.43,
+     333.11,
+     691161
+    ],
+    [
+     "09:35",
+     333.12,
+     334.0,
+     332.32,
+     333.87,
+     153115
+    ],
+    [
+     "09:40",
+     333.89,
+     334.59,
+     333.51,
+     334.1,
+     109323
+    ]
+   ]
+  },
+  {
+   "sym": "EMR",
+   "side": "long",
+   "stats": {
+    "sym": "EMR",
+    "last": 161.72,
+    "or_hi": 162.18,
+    "or_lo": 160.53,
+    "relvol": 1.5165,
+    "atr5": 0.7133,
+    "vwap": 161.6782,
+    "gap": 0.0007,
+    "day_hi": 162.18,
+    "day_lo": 160.53,
+    "open": 160.76,
+    "prev_close": 160.65,
+    "prev_hi": 165.1,
+    "prev_lo": 160.17,
+    "dma20": 165.1315,
+    "move_today": 0.006,
+    "dist_or_hi": -0.0028,
+    "dist_or_lo": 0.0074,
+    "side": "long"
+   },
+   "mechanical": {
+    "side": "long",
+    "trigger": 162.26,
+    "stop": 160.53,
+    "target": 165.72,
+    "latest_entry": "14:30",
+    "cutoff": "15:50"
+   },
+   "bars_5m": [
+    [
+     "09:30",
+     160.76,
+     161.51,
+     160.53,
+     161.51,
+     40166
+    ],
+    [
+     "09:35",
+     161.51,
+     161.74,
+     161.32,
+     161.74,
+     10616
+    ],
+    [
+     "09:40",
+     161.74,
+     162.18,
+     161.44,
+     161.72,
+     147198
+    ]
+   ]
+  }
+ ]
+}

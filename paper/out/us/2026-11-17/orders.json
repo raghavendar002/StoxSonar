@@ -1,0 +1,49 @@
+{
+ "decided": "2026-11-17T14:47:00+00:00",
+ "note": "Late run: the open was replayed from the day's 5-minute bars as it stood at the checkpoint, and orders start two minutes after it.",
+ "mechanical": [
+  {
+   "sym": "DUK",
+   "side": "long",
+   "trigger": 130.14,
+   "stop": 129.19,
+   "target": 132.04,
+   "latest_entry": "14:30",
+   "cutoff": "15:50"
+  },
+  {
+   "sym": "JPM",
+   "side": "long",
+   "trigger": 334.92,
+   "stop": 332.32,
+   "target": 340.11,
+   "latest_entry": "14:30",
+   "cutoff": "15:50"
+  }
+ ],
+ "judge": [
+  {
+   "sym": "DUK",
+   "side": "long",
+   "trigger": 130.14,
+   "stop": 129.6,
+   "target": 130.95,
+   "conviction": 2,
+   "leverage": 1,
+   "latest_entry": "14:30",
+   "cutoff": "15:50"
+  },
+  {
+   "sym": "JPM",
+   "side": "long",
+   "trigger": 334.92,
+   "stop": 333.3,
+   "target": 338.1,
+   "conviction": 2,
+   "leverage": 1,
+   "latest_entry": "14:30",
+   "cutoff": "15:50"
+  }
+ ],
+ "replayed": true
+}
