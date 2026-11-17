@@ -13,7 +13,7 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: "daily; replay to bootstrap the ledger; check to report data freshness; page to redraw the page"
+        description: "daily; replay to bootstrap the ledger; check to report data freshness; page to redraw the page; momentum to step the momentum paper book only"
         default: daily
 
 permissions:
