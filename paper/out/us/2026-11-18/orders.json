@@ -1,0 +1,26 @@
+{
+ "decided": "2026-11-18T14:47:00+00:00",
+ "note": "Late run: the open was replayed from the day's 5-minute bars as it stood at the checkpoint, and orders start two minutes after it.",
+ "mechanical": [
+  {
+   "sym": "TGT",
+   "side": "long",
+   "trigger": 168.01,
+   "stop": 159.95,
+   "target": 184.14,
+   "latest_entry": "14:30",
+   "cutoff": "15:50"
+  },
+  {
+   "sym": "DUK",
+   "side": "long",
+   "trigger": 130.31,
+   "stop": 128.51,
+   "target": 133.9,
+   "latest_entry": "14:30",
+   "cutoff": "15:50"
+  }
+ ],
+ "judge": [],
+ "replayed": true
+}
