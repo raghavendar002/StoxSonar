@@ -1,5 +1,5 @@
 {
- "checked_utc": "2026-11-18T09:12:47+00:00",
+ "checked_utc": "2026-11-18T11:19:52+00:00",
  "categories": {
   "in-intra": {
    "name": "India intraday",
@@ -31,13 +31,16 @@
      "scanned": true,
      "replayed": true,
      "candidates": 4,
-     "settled": false,
-     "state": "not_settled"
+     "settled": true,
+     "scored": 4,
+     "twin_trades": 2,
+     "judge_trades": 1,
+     "state": "learned"
     }
    ],
    "calendar": "exchange",
-   "last_ok": "2026-11-17",
-   "last_learned": "2026-11-17"
+   "last_ok": "2026-11-18",
+   "last_learned": "2026-11-18"
   },
   "us-intra": {
    "name": "US intraday",
@@ -126,12 +129,15 @@
    "last_learned": null
   }
  },
- "alerts": [],
+ "alerts": [
+  "India intraday 2026-11-18: the day had not been settled; settled it"
+ ],
  "tries": {
   "in-intra:2026-11-17:scan": 1,
   "us-intra:2026-11-17:scan": 1,
   "us-intra:2026-11-17:settle": 1,
-  "in-intra:2026-11-18:scan": 1
+  "in-intra:2026-11-18:scan": 1,
+  "in-intra:2026-11-18:settle": 1
  },
  "reported_runs": [
   43894348405,

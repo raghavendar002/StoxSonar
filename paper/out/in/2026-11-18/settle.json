@@ -1,0 +1,174 @@
+{
+ "mechanical": {
+  "trades": [
+   {
+    "status": "closed",
+    "entry": 2645.75646,
+    "entry_t": "2026-11-18 09:41:00+05:30",
+    "exit": 2641.2198522949216,
+    "exit_t": "2026-11-18 15:14:00+05:30",
+    "reason": "time",
+    "sym": "MUTHOOTFIN",
+    "side": "short",
+    "qty": 7.0,
+    "costs": 19.62,
+    "pnl": 12.14,
+    "r_mult": 0.03
+   },
+   {
+    "status": "closed",
+    "entry": 1107.795825,
+    "entry_t": "2026-11-18 09:42:00+05:30",
+    "exit": 1118.6590499999998,
+    "exit_t": "2026-11-18 14:09:00+05:30",
+    "reason": "stop",
+    "sym": "SBIN",
+    "side": "short",
+    "qty": 45.0,
+    "costs": 53.18,
+    "pnl": -542.03,
+    "r_mult": -1.24
+   }
+  ],
+  "end_cash": 99470.11
+ },
+ "judge": {
+  "trades": [
+   {
+    "status": "closed",
+    "entry": 919.8298550000001,
+    "entry_t": "2026-11-18 09:36:00+05:30",
+    "exit": 914.1268349999999,
+    "exit_t": "2026-11-18 09:43:00+05:30",
+    "reason": "target",
+    "sym": "INDUSINDBK",
+    "side": "short",
+    "qty": 54.0,
+    "costs": 52.48,
+    "pnl": 255.48,
+    "r_mult": 1.43
+   },
+   {
+    "status": "not_triggered",
+    "sym": "BAJAJFINSV",
+    "side": "short",
+    "qty": 27.0
+   }
+  ],
+  "end_cash": 100255.48
+ },
+ "shadow": [
+  {
+   "sym": "MUTHOOTFIN",
+   "side": "short",
+   "rule": {
+    "status": "closed",
+    "entry": 2645.75646,
+    "entry_t": "2026-11-18 09:41:00+05:30",
+    "exit": 2641.2198522949216,
+    "exit_t": "2026-11-18 15:14:00+05:30",
+    "reason": "time",
+    "sym": "MUTHOOTFIN",
+    "side": "short",
+    "qty": 7.0,
+    "costs": 19.62,
+    "pnl": 12.14,
+    "r_mult": 0.03
+   },
+   "judge_levels": {
+    "status": "closed",
+    "entry": 2645.6765,
+    "entry_t": "2026-11-18 09:41:00+05:30",
+    "exit": 2668.83375,
+    "exit_t": "2026-11-18 10:03:00+05:30",
+    "reason": "stop",
+    "sym": "MUTHOOTFIN",
+    "side": "short",
+    "qty": 18.0,
+    "costs": 50.77,
+    "pnl": -467.6,
+    "r_mult": -1.27
+   }
+  },
+  {
+   "sym": "SBIN",
+   "side": "short",
+   "rule": {
+    "status": "closed",
+    "entry": 1107.795825,
+    "entry_t": "2026-11-18 09:42:00+05:30",
+    "exit": 1118.6590499999998,
+    "exit_t": "2026-11-18 14:09:00+05:30",
+    "reason": "stop",
+    "sym": "SBIN",
+    "side": "short",
+    "qty": 45.0,
+    "costs": 53.18,
+    "pnl": -542.03,
+    "r_mult": -1.24
+   },
+   "judge_levels": {
+    "status": "closed",
+    "entry": 1107.74585,
+    "entry_t": "2026-11-18 09:42:00+05:30",
+    "exit": 1113.65655,
+    "exit_t": "2026-11-18 10:02:00+05:30",
+    "reason": "stop",
+    "sym": "SBIN",
+    "side": "short",
+    "qty": 45.0,
+    "costs": 53.03,
+    "pnl": -319.01,
+    "r_mult": -1.48
+   }
+  },
+  {
+   "sym": "INDUSINDBK",
+   "side": "short",
+   "rule": {
+    "status": "closed",
+    "entry": 919.8298550000001,
+    "entry_t": "2026-11-18 09:36:00+05:30",
+    "exit": 910.9252349999999,
+    "exit_t": "2026-11-18 09:46:00+05:30",
+    "reason": "target",
+    "sym": "INDUSINDBK",
+    "side": "short",
+    "qty": 54.0,
+    "costs": 52.37,
+    "pnl": 428.48,
+    "r_mult": 1.62
+   },
+   "judge_levels": {
+    "status": "closed",
+    "entry": 919.8298550000001,
+    "entry_t": "2026-11-18 09:36:00+05:30",
+    "exit": 914.1268349999999,
+    "exit_t": "2026-11-18 09:43:00+05:30",
+    "reason": "target",
+    "sym": "INDUSINDBK",
+    "side": "short",
+    "qty": 54.0,
+    "costs": 52.48,
+    "pnl": 255.48,
+    "r_mult": 1.43
+   }
+  },
+  {
+   "sym": "BAJAJFINSV",
+   "side": "short",
+   "rule": {
+    "status": "not_triggered",
+    "sym": "BAJAJFINSV",
+    "side": "short",
+    "qty": 27.0
+   },
+   "judge_levels": {
+    "status": "not_triggered",
+    "sym": "BAJAJFINSV",
+    "side": "short",
+    "qty": 27.0
+   }
+  }
+ ]
+}
