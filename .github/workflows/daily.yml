@@ -84,8 +84,16 @@ jobs:
         if: steps.run.outputs.published == 'true'
         with:
           path: site
+      # GitHub sometimes can't see the artifact just uploaded ("No artifacts named
+      # github-pages"); wait and try once more instead of failing the run.
       - uses: actions/deploy-pages@v4
+        id: deploy
+        continue-on-error: true
         if: steps.run.outputs.published == 'true'
+      - if: (steps.run.outputs.published == 'true') && steps.deploy.outcome == 'failure'
+        run: sleep 30
+      - uses: actions/deploy-pages@v4
+        if: (steps.run.outputs.published == 'true') && steps.deploy.outcome == 'failure'
       # Push alert to the StoxSonar app on your own devices (site/app/). Sent after
       # the deploy so tapping it opens fresh data. Skips quietly until the
       # VAPID_PRIVATE_KEY and PUSH_SUBS secrets exist; never fails the run.

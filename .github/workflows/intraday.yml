@@ -83,7 +83,15 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site
+      # GitHub sometimes can't see the artifact just uploaded ("No artifacts named
+      # github-pages"); wait and try once more instead of failing the run.
       - uses: actions/deploy-pages@v4
+        id: deploy
+        continue-on-error: true
+      - if: steps.deploy.outcome == 'failure'
+        run: sleep 30
+      - uses: actions/deploy-pages@v4
+        if: steps.deploy.outcome == 'failure'
       # Alert to the StoxSonar app on your own devices: the Judge's calls after a
       # scan, both books' results after a settle. Sent after the deploy so tapping
       # it opens fresh data. Skips quietly until the two secrets exist.
