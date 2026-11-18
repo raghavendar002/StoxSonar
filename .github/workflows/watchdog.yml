@@ -61,5 +61,13 @@ jobs:
         if: env.CHANGED != '0'
         with:
           path: site
+      # GitHub sometimes can't see the artifact just uploaded ("No artifacts named
+      # github-pages"); wait and try once more instead of failing the run.
       - uses: actions/deploy-pages@v4
+        id: deploy
+        continue-on-error: true
         if: env.CHANGED != '0'
+      - if: (env.CHANGED != '0') && steps.deploy.outcome == 'failure'
+        run: sleep 30
+      - uses: actions/deploy-pages@v4
+        if: (env.CHANGED != '0') && steps.deploy.outcome == 'failure'
