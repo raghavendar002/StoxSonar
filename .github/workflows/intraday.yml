@@ -19,7 +19,7 @@ on:
         required: true
         default: in
       mode:
-        description: "scan or settle"
+        description: "scan, settle or pool"
         required: true
         default: scan
   schedule:
@@ -69,14 +69,17 @@ jobs:
           fi
           echo "M=$M" >> "$GITHUB_ENV"; echo "MODE=$MODE" >> "$GITHUB_ENV"
           if [ "$MODE" = settle ]; then python paper/intraday.py settle --mkt $M || true
+          elif [ "$MODE" = pool ]; then python paper/intraday.py pool --mkt in
           else python paper/intraday.py scan --mkt $M; fi
+          # The wide India pool for the next session is built after the India settle
+          if [ "$MODE" = settle ] && [ "$M" = in ]; then python paper/intraday.py pool --mkt in || true; fi
       - name: Build app feeds
         run: python -m sonar.appfeed
       - name: Commit
         run: |
           git config user.name "stoxsonar-bot"
           git config user.email "stoxsonar-bot@users.noreply.github.com"
-          git add paper site/app/feed
+          git add paper site/app/feed universe
           if git diff --cached --quiet; then echo "CHANGED=0" >> "$GITHUB_ENV"; exit 0; fi
           git commit -m "Intraday $M $MODE"
           for i in 1 2 3; do git pull --rebase origin main && git push && break; sleep 5; done

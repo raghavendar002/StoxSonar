@@ -201,6 +201,7 @@ function todayIntra(f) {
     ${b && whys.length ? `<div class="card" style="margin-top:10px"><div class="eyebrow">Why the two books differ today</div>
       <ul class="brief" style="margin-top:8px">${whys.map(([c, t]) => `<li>${icon("chev")}<span><b>${esc(c.symbol)}.</b> ${esc(t)}</span></li>`).join("")}</ul>
       <p class="dim" style="font-size:12px;margin:10px 0 0">Same candidates, same money. The gap comes only from where the Judge passed or chose its own levels.${d.cost_usd ? ` Today's debates cost $${num(d.cost_usd, 2)} in API fees.` : ""}</p></div>` : ""}
+    ${poolTest(d, cur)}
     <div style="margin-top:10px">${howItWorks(true)}</div>
     ${section("Candidates", `<span class="dim" style="font-size:12.5px">Tap one for the full debate</span>`)}
     ${d.cases.length ? `<div class="list">${d.cases.map((c) => caseRow(c, cur)).join("")}</div>` : empty("No candidates today", "Nothing met the scanner's rule at the checkpoint, so neither book traded.", "clock")}
@@ -209,8 +210,19 @@ function todayIntra(f) {
       ${near.map((n) => `<tr><td><b>${esc(n.symbol)}</b></td>
         <td><div class="row" style="justify-content:flex-end"><span>${num(n.relvol, 1)}×</span><span class="meter" style="width:36px;margin:0"><span style="width:${Math.min(100, (n.relvol / maxRel) * 100)}%;background:${n.relvol >= 1.5 ? "var(--bull)" : "var(--text-3)"}"></span></span></div></td>
         <td class="${sign(n.move_pct)}">${pct(n.move_pct, 2)}</td><td class="${sign(n.dist_pct)}">${pct(n.dist_pct, 2)}</td>
-        <td>${n.passed ? `<span class="chip go">Signal</span>` : `<span class="chip">Missed</span>`}</td></tr>`).join("")}</tbody></table></div>`}
+        <td>${n.passed ? `<span class="chip go">Signal</span>` : `<span class="chip">Near miss</span>`}</td></tr>`).join("")}</tbody></table></div>`}
     <p class="foot">A signal needs opening volume of at least 1.5× normal and a price at or beyond the edge of the first 15 minutes' range${state.market === "IN" ? " (above the high for a long, below the low for a short)" : ""}.</p>`;
+}
+
+function poolTest(d, cur) {
+  const p = d.pool_test;
+  if (!p) return "";
+  if (p.error) return `<div class="card" style="margin-top:10px"><div class="eyebrow">Wide pool test</div><p class="dim" style="margin:6px 0 0">Not run today: ${esc(p.error)}</p></div>`;
+  const b = p.books, w = b && b.wide, f = b && b.f80;
+  return `<div class="card" style="margin-top:10px"><div class="eyebrow">Wide pool test${p.mode === "wide" ? "" : " · silent"}</div>
+    <p style="margin:6px 0 0">${p.scanned ?? "–"} of ${p.pool ?? "–"} liquid Nifty 500 stocks scanned in ${num(p.fetch_s || 0, 0)}s · ${p.signals ?? 0} signal${p.signals === 1 ? "" : "s"}${p.picks.length ? ` · top: ${esc(p.picks.join(", "))}` : ""}</p>
+    ${w && f ? `<p style="margin:6px 0 0">Rule twin on the wide pool <b class="${sign(w.pnl)}">${money(w.pnl, cur, 0)}</b> vs on the 80 F&amp;O stocks <b class="${sign(f.pnl)}">${money(f.pnl, cur, 0)}</b></p>` : ""}
+    <p class="dim" style="font-size:12px;margin:8px 0 0">Same rule, same money. After 150 signals the wide pool has to beat the 80 after costs, or it goes. Outside F&amp;O: long only, higher slippage charged.</p></div>`;
 }
 
 export function today() {

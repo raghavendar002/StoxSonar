@@ -524,7 +524,21 @@ def intraday_day(folder: Path, mkt: str) -> Optional[dict]:
         capital=capital, cost_usd=round(sum(t.get("cost_usd") or 0 for t in talk.values()), 2) or None,
         books=dict(twin=_book(settle.get("mechanical") or {}, capital),
                    judge=_book(settle.get("judge") or {}, capital)) if settle else None,
+        pool_test=_pool_test(scan, settle, capital),
         cases=cases)
+
+
+def _pool_test(scan: dict, settle: dict, capital) -> Optional[dict]:
+    """The wide India pool against the 80 F&O stocks: each pool's rule twin, same money and rules."""
+    wide = scan.get("wide")
+    if not wide:
+        return None
+    wm = wide.get("meta") or {}
+    pools = (settle or {}).get("pools") or {}
+    return dict(mode=(scan.get("meta") or {}).get("pool") or "shadow", error=wm.get("error"),
+                pool=wm.get("pool"), scanned=wm.get("scanned"), fetch_s=wm.get("fetch_s"),
+                signals=wm.get("signals"), picks=[c["sym"] for c in wide.get("candidates") or []],
+                books={k: _book(v, capital) for k, v in pools.items()} or None)
 
 
 def intraday(paper: Path, mkt: str) -> dict:
