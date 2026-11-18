@@ -1,5 +1,5 @@
 {
- "checked_utc": "2026-11-18T07:40:50+00:00",
+ "checked_utc": "2026-11-18T09:12:47+00:00",
  "categories": {
   "in-intra": {
    "name": "India intraday",
@@ -126,9 +126,7 @@
    "last_learned": null
   }
  },
- "alerts": [
-  "India intraday 2026-11-18: the scan had not run; replayed it as of 15 minutes after the open"
- ],
+ "alerts": [],
  "tries": {
   "in-intra:2026-11-17:scan": 1,
   "us-intra:2026-11-17:scan": 1,
