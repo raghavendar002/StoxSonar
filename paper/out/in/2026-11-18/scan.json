@@ -1,0 +1,312 @@
+{
+ "meta": {
+  "date": "2026-11-18",
+  "market": "in",
+  "checkpoint": "2026-11-18 09:30:00+05:30",
+  "index_move": -0.0011531413518679479,
+  "universe": 78,
+  "signals": 14,
+  "near_misses": [
+   {
+    "sym": "MUTHOOTFIN",
+    "relvol": 3.1691,
+    "dist_or_hi": -0.0207,
+    "move_today": -0.0207
+   },
+   {
+    "sym": "SBIN",
+    "relvol": 3.0015,
+    "dist_or_hi": -0.0065,
+    "move_today": 0.0015
+   },
+   {
+    "sym": "INDUSINDBK",
+    "relvol": 2.8847,
+    "dist_or_hi": -0.0042,
+    "move_today": -0.0029
+   },
+   {
+    "sym": "BAJAJFINSV",
+    "relvol": 2.7085,
+    "dist_or_hi": -0.0041,
+    "move_today": -0.0035
+   },
+   {
+    "sym": "APOLLOHOSP",
+    "relvol": 2.7029,
+    "dist_or_hi": -0.011,
+    "move_today": 0.0001
+   },
+   {
+    "sym": "GAIL",
+    "relvol": 2.6587,
+    "dist_or_hi": -0.0015,
+    "move_today": 0.0134
+   },
+   {
+    "sym": "LUPIN",
+    "relvol": 2.5406,
+    "dist_or_hi": -0.0095,
+    "move_today": -0.0009
+   },
+   {
+    "sym": "ADANIENT",
+    "relvol": 2.1377,
+    "dist_or_hi": -0.0121,
+    "move_today": -0.0043
+   },
+   {
+    "sym": "SIEMENS",
+    "relvol": 1.9134,
+    "dist_or_hi": -0.0115,
+    "move_today": -0.0115
+   },
+   {
+    "sym": "AXISBANK",
+    "relvol": 1.8727,
+    "dist_or_hi": -0.0015,
+    "move_today": 0.003
+   }
+  ],
+  "replayed": true,
+  "ran_utc": "2026-11-18T07:41:15+00:00"
+ },
+ "candidates": [
+  {
+   "sym": "MUTHOOTFIN",
+   "side": "short",
+   "stats": {
+    "sym": "MUTHOOTFIN",
+    "last": 2654.8999,
+    "or_hi": 2710.8999,
+    "or_lo": 2648.3999,
+    "relvol": 3.1691,
+    "atr5": 32.7667,
+    "vwap": 2661.6095,
+    "gap": -0.0139,
+    "day_hi": 2710.8999,
+    "day_lo": 2648.3999,
+    "open": 2710.8999,
+    "prev_close": 2749.0,
+    "prev_hi": 2800.0,
+    "prev_lo": 2749.0,
+    "dma20": 2626.135,
+    "move_today": -0.0207,
+    "dist_or_hi": -0.0207,
+    "dist_or_lo": 0.0025,
+    "side": "short"
+   },
+   "mechanical": {
+    "side": "short",
+    "trigger": 2647.08,
+    "stop": 2710.9,
+    "target": 2519.43,
+    "latest_entry": "14:00",
+    "cutoff": "15:15"
+   },
+   "bars_5m": [
+    [
+     "09:15",
+     2710.9,
+     2710.9,
+     2648.4,
+     2666.5,
+     72242.0
+    ],
+    [
+     "09:20",
+     2668.2,
+     2676.8,
+     2657.3,
+     2663.1,
+     47866.0
+    ],
+    [
+     "09:25",
+     2663.9,
+     2667.1,
+     2650.8,
+     2654.9,
+     63289.0
+    ]
+   ]
+  },
+  {
+   "sym": "SBIN",
+   "side": "short",
+   "stats": {
+    "sym": "SBIN",
+    "last": 1110.8,
+    "or_hi": 1118.1,
+    "or_lo": 1108.9,
+    "relvol": 3.0015,
+    "atr5": 5.35,
+    "vwap": 1112.9851,
+    "gap": 0.0005,
+    "day_hi": 1118.1,
+    "day_lo": 1108.9,
+    "open": 1109.15,
+    "prev_close": 1108.6,
+    "prev_hi": 1114.0,
+    "prev_lo": 1091.95,
+    "dma20": 1004.585,
+    "move_today": 0.0015,
+    "dist_or_hi": -0.0065,
+    "dist_or_lo": 0.0017,
+    "side": "short"
+   },
+   "mechanical": {
+    "side": "short",
+    "trigger": 1108.35,
+    "stop": 1118.1,
+    "target": 1088.84,
+    "latest_entry": "14:00",
+    "cutoff": "15:15"
+   },
+   "bars_5m": [
+    [
+     "09:15",
+     1109.15,
+     1118.1,
+     1108.9,
+     1113.7,
+     1738455.0
+    ],
+    [
+     "09:20",
+     1113.7,
+     1114.75,
+     1110.35,
+     1112.05,
+     598928.0
+    ],
+    [
+     "09:25",
+     1112.0,
+     1112.65,
+     1110.2,
+     1110.8,
+     312415.0
+    ]
+   ]
+  },
+  {
+   "sym": "INDUSINDBK",
+   "side": "short",
+   "stats": {
+    "sym": "INDUSINDBK",
+    "last": 921.35,
+    "or_hi": 925.2,
+    "or_lo": 920.75,
+    "relvol": 2.8847,
+    "atr5": 3.6,
+    "vwap": 922.437,
+    "gap": -0.0075,
+    "day_hi": 925.2,
+    "day_lo": 920.75,
+    "open": 924.0,
+    "prev_close": 931.0,
+    "prev_hi": 932.4,
+    "prev_lo": 905.2,
+    "dma20": 875.0725,
+    "move_today": -0.0029,
+    "dist_or_hi": -0.0042,
+    "dist_or_lo": 0.0007,
+    "side": "short"
+   },
+   "mechanical": {
+    "side": "short",
+    "trigger": 920.29,
+    "stop": 925.2,
+    "target": 910.47,
+    "latest_entry": "14:00",
+    "cutoff": "15:15"
+   },
+   "bars_5m": [
+    [
+     "09:15",
+     924.0,
+     925.2,
+     921.1,
+     923.05,
+     151721.0
+    ],
+    [
+     "09:20",
+     923.45,
+     924.2,
+     921.35,
+     922.95,
+     63137.0
+    ],
+    [
+     "09:25",
+     923.25,
+     924.6,
+     920.75,
+     921.35,
+     115350.0
+    ]
+   ]
+  },
+  {
+   "sym": "BAJAJFINSV",
+   "side": "short",
+   "stats": {
+    "sym": "BAJAJFINSV",
+    "last": 1842.1,
+    "or_hi": 1849.7,
+    "or_lo": 1839.0,
+    "relvol": 2.7085,
+    "atr5": 8.0667,
+    "vwap": 1845.019,
+    "gap": -0.0119,
+    "day_hi": 1849.7,
+    "day_lo": 1839.0,
+    "open": 1848.6,
+    "prev_close": 1870.8,
+    "prev_hi": 1881.0,
+    "prev_lo": 1848.2,
+    "dma20": 1753.885,
+    "move_today": -0.0035,
+    "dist_or_hi": -0.0041,
+    "dist_or_lo": 0.0017,
+    "side": "short"
+   },
+   "mechanical": {
+    "side": "short",
+    "trigger": 1838.08,
+    "stop": 1849.7,
+    "target": 1814.84,
+    "latest_entry": "14:00",
+    "cutoff": "15:15"
+   },
+   "bars_5m": [
+    [
+     "09:15",
+     1848.6,
+     1849.7,
+     1840.4,
+     1844.6,
+     32097.0
+    ],
+    [
+     "09:20",
+     1842.2,
+     1847.8,
+     1840.4,
+     1846.2,
+     68120.0
+    ],
+    [
+     "09:25",
+     1846.2,
+     1846.5,
+     1839.0,
+     1842.1,
+     22952.0
+    ]
+   ]
+  }
+ ]
+}

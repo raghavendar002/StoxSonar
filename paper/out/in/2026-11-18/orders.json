@@ -1,0 +1,49 @@
+{
+ "decided": "2026-11-18T04:02:00+00:00",
+ "note": "Late run: the open was replayed from the day's 5-minute bars as it stood at the checkpoint, and orders start two minutes after it.",
+ "mechanical": [
+  {
+   "sym": "MUTHOOTFIN",
+   "side": "short",
+   "trigger": 2647.08,
+   "stop": 2710.9,
+   "target": 2519.43,
+   "latest_entry": "14:00",
+   "cutoff": "15:15"
+  },
+  {
+   "sym": "SBIN",
+   "side": "short",
+   "trigger": 1108.35,
+   "stop": 1118.1,
+   "target": 1088.84,
+   "latest_entry": "14:00",
+   "cutoff": "15:15"
+  }
+ ],
+ "judge": [
+  {
+   "sym": "INDUSINDBK",
+   "side": "short",
+   "trigger": 920.29,
+   "stop": 923.6,
+   "target": 913.67,
+   "conviction": 2,
+   "leverage": 1,
+   "latest_entry": "14:00",
+   "cutoff": "15:15"
+  },
+  {
+   "sym": "BAJAJFINSV",
+   "side": "short",
+   "trigger": 1838.0,
+   "stop": 1848.3,
+   "target": 1817.6,
+   "conviction": 2,
+   "leverage": 1,
+   "latest_entry": "14:00",
+   "cutoff": "15:15"
+  }
+ ],
+ "replayed": true
+}
