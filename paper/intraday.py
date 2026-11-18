@@ -27,6 +27,8 @@ import yfinance as yf
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import pool  # noqa: E402  (paper/pool.py: the wide India pool)
 OUT = ROOT / "paper" / "out"
 SPEND = ROOT / "paper" / "spend.json"
 
@@ -57,6 +59,10 @@ MAX_POS = 2              # open positions per book
 MAX_DEBATE = int(__import__("os").environ.get("INTRA_MAX_DEBATE", 4))  # candidates debated per market per day
 MONTHLY_CAP_USD = 28.0   # intraday debates; the mid-term debates have their own $6 cap
 RESERVE_USD = 0.25       # a candidate is debated only if this much is left this month
+# The wide India pool (Raghav, 18 Nov 2026): "shadow" scans it and logs its own rule twin
+# beside the 80-stock F&O scan, which still feeds the debates; "live" debates the wide
+# pool's top signals instead and keeps the 80-stock twin as a control; "off" skips it.
+WIDE = __import__("os").environ.get("INTRA_WIDE", "shadow")
 
 
 # ---------------------------------------------------------------------------
@@ -130,6 +136,95 @@ def late_day(mkt, now=None):
     hh, mm = map(int, cfg["open"].split(":"))
     opened = now.normalize() + pd.Timedelta(hours=hh, minutes=mm)
     return now.date() if now > opened + pd.Timedelta(minutes=LATE_AFTER_MIN) else None
+
+
+def make_cands(sig, packs, cfg, extra=None):
+    """Signals -> candidates with the rule plan (the Twin's trade) and the 5-minute bars so far."""
+    cands = []
+    for _, r in sig.iterrows():
+        up = r.side == "long"
+        atr = max(r.atr5, 0.0015 * r.last)
+        if up:
+            trig = max(r.or_hi, r.last) * 1.0005
+            stop = max(r.or_lo, trig - 1.5 * atr * 2)
+            tgt = trig + 2 * (trig - stop)
+        else:
+            trig = min(r.or_lo, r.last) * 0.9995
+            stop = min(r.or_hi, trig + 1.5 * atr * 2)
+            tgt = trig - 2 * (stop - trig)
+        b = packs[r.sym][["Open", "High", "Low", "Close", "Volume"]].round(2)
+        b.index = b.index.strftime("%H:%M")
+        stats = {k: (round(float(v), 4) if isinstance(v, (float, np.floating)) else v) for k, v in r.to_dict().items()}
+        mech = dict(side=r.side, trigger=round(trig, 2), stop=round(stop, 2), target=round(tgt, 2),
+                    latest_entry=cfg["latest"], cutoff=cfg["cutoff"])
+        c = dict(sym=r.sym, side=r.side, stats=stats, mechanical=mech, bars_5m=b.reset_index().values.tolist())
+        if extra:
+            info = extra(r.sym)
+            c["pool"] = info
+            mech["slip"] = info["slip"]
+        cands.append(c)
+    return cands
+
+
+def _signals(df, can_short):
+    """The scanner's rule: opening volume >= 1.5x normal and price within 0.3% of the range edge."""
+    longs = df[(df.relvol >= 1.5) & (df.dist_or_hi >= -0.003)].assign(side="long")
+    shorts = df[(df.relvol >= 1.5) & (df.dist_or_lo <= 0.003) & can_short].assign(side="short")
+    sig = pd.concat([longs, shorts]).sort_values("relvol", ascending=False).drop_duplicates("sym")
+    return sig, int(len(longs) + len(shorts))
+
+
+def _near(df, passed):
+    return [dict(r, passed=r["sym"] in passed) for r in
+            df[df.relvol >= 1.2].sort_values("relvol", ascending=False).head(10)
+            [["sym", "relvol", "dist_or_hi", "dist_or_lo", "move_today"]].round(4).to_dict("records")]
+
+
+def scan_wide(mkt, day):
+    """The wide pool as it stood at the checkpoint (first three 5-minute bars), whenever
+    this runs: live it runs after the 80-stock scan, so it is always cut to the checkpoint
+    and its orders start when the 80-stock ones do. Never sees later bars."""
+    cfg = MKT[mkt]
+    day = pd.Timestamp(str(day)).date()
+    p = pool.load(mkt, day)
+    if not p or not p.get("members"):
+        return dict(meta=dict(error=f"no pool built before {day}"), candidates=[])
+    mem = {m["sym"]: m for m in p["members"]}
+    t0 = time.time()
+    age = (pd.Timestamp.now(tz=cfg["tz"]).date() - day).days
+    b5 = bars([ticker(s, mkt) for s in mem], "5d" if age <= 2 else "60d", "5m", cfg["tz"])
+    fetch_s = round(time.time() - t0, 1)
+    rows, packs = [], {}
+    for t, d in b5.items():
+        s, m = sym(t), mem.get(sym(t))
+        d = _cut(d, day)
+        td, before = d[d.index.date == day], d[d.index.date < day]
+        if m is None or len(td) < OR_BARS or not len(before) or not m.get("or_vol_norm"):
+            continue
+        pd_ = before[before.index.date == before.index[-1].date()]
+        orb = td.iloc[:OR_BARS]
+        or_hi, or_lo = orb["High"].max(), orb["Low"].min()
+        last = td["Close"].iloc[-1]
+        tr = pd.concat([td["High"] - td["Low"], (td["High"] - td["Close"].shift()).abs(),
+                        (td["Low"] - td["Close"].shift()).abs()], axis=1).max(axis=1)
+        prev_close = pd_["Close"].iloc[-1]
+        rows.append(dict(sym=s, last=last, or_hi=or_hi, or_lo=or_lo, relvol=orb["Volume"].sum() / m["or_vol_norm"],
+                         atr5=tr.tail(14).mean(), vwap=(td["Close"] * td["Volume"]).sum() / max(td["Volume"].sum(), 1),
+                         gap=td["Open"].iloc[0] / prev_close - 1, day_hi=td["High"].max(), day_lo=td["Low"].min(),
+                         open=td["Open"].iloc[0], prev_close=prev_close, prev_hi=pd_["High"].max(),
+                         prev_lo=pd_["Low"].min(), dma20=m.get("dma20"), move_today=last / td["Open"].iloc[0] - 1,
+                         dist_or_hi=last / or_hi - 1, dist_or_lo=last / or_lo - 1, fo=bool(m["fo"])))
+        packs[s] = td
+    meta = dict(pool_built_on=p.get("built_on"), pool=len(mem), scanned=len(rows), fetch_s=fetch_s,
+                missing=len(mem) - len(rows))
+    if not rows:
+        return dict(meta=dict(meta, signals=0, near_misses=[]), candidates=[])
+    df = pd.DataFrame(rows)
+    sig, n = _signals(df, df.fo & cfg["shorts"])
+    sig = sig.head(MAX_DEBATE)
+    info = lambda s: dict(fo=mem[s]["fo"], slip=mem[s]["slip"], turnover_cr=mem[s]["turnover_cr"])  # noqa: E731
+    return dict(meta=dict(meta, signals=n, near_misses=_near(df, set(sig.sym))),
+                candidates=make_cands(sig.drop(columns=["fo"]), packs, cfg, info))
 
 
 def scan_market(mkt, wait=True, day=None):
@@ -207,25 +302,7 @@ def scan_market(mkt, wait=True, day=None):
             "near_misses": df[(df.relvol >= 1.2)].assign(_d=df.dist_or_hi.abs())
             .sort_values("relvol", ascending=False).head(10)[["sym", "relvol", "dist_or_hi", "move_today"]]
             .round(4).to_dict("records")}
-    cands = []
-    for _, r in sig.iterrows():
-        up = r.side == "long"
-        atr = max(r.atr5, 0.0015 * r.last)
-        if up:
-            trig = max(r.or_hi, r.last) * 1.0005
-            stop = max(r.or_lo, trig - 1.5 * atr * 2)
-            tgt = trig + 2 * (trig - stop)
-        else:
-            trig = min(r.or_lo, r.last) * 0.9995
-            stop = min(r.or_hi, trig + 1.5 * atr * 2)
-            tgt = trig - 2 * (stop - trig)
-        b = packs[r.sym][["Open", "High", "Low", "Close", "Volume"]].round(2)
-        b.index = b.index.strftime("%H:%M")
-        stats = {k: (round(float(v), 4) if isinstance(v, (float, np.floating)) else v) for k, v in r.to_dict().items()}
-        cands.append(dict(sym=r.sym, side=r.side, stats=stats,
-                          mechanical=dict(side=r.side, trigger=round(trig, 2), stop=round(stop, 2),
-                                          target=round(tgt, 2), latest_entry=cfg["latest"], cutoff=cfg["cutoff"]),
-                          bars_5m=b.reset_index().values.tolist()))
+    cands = make_cands(sig, packs, cfg)
     return dict(meta=meta, candidates=cands)
 
 
@@ -284,14 +361,16 @@ def add_spend(usd):
     SPEND.write_text(json.dumps(d, indent=1))
 
 
-def check(v, last, mkt):
-    """Why the Judge's order cannot be used; empty when it can."""
+def check(v, last, mkt, fo=True):
+    """Why the Judge's order cannot be used; empty when it can. `fo` False: a stock outside F&O (long only)."""
     if v["decision"] == "NO_TRADE":
         return []
     bad = []
     up = v["decision"] == "LONG"
     if not MKT[mkt]["shorts"] and not up:
         return ["US account is cash-only: shorts are logged, not traded"]
+    if not fo and not up:
+        return ["shorts are allowed only on F&O stocks: logged, not traded"]
     trig, stop, tgt = v["trigger"], v["stop"], v["target"]
     if min(trig, stop, tgt) <= 0:
         return ["a level is missing"]
@@ -335,6 +414,8 @@ def debate(mkt, scan, caller=None):
             talks.append(dict(sym=c["sym"], skipped="monthly intraday debate cap reached"))
             continue
         pack = json.dumps(dict(market=cfg["name"], symbol=c["sym"], scanner_side=c["side"], stats=c["stats"],
+                               **({"liquidity": dict(c["pool"], note="outside F&O: LONG only, a SHORT is not traded")
+                                   if not c["pool"]["fo"] else c["pool"]} if c.get("pool") else {}),
                                rule_based_plan=c["mechanical"], index_move_today=scan["meta"].get(cfg["meta_move"]),
                                bars_5m_today=c["bars_5m"]), default=str)
         memory = judge_memory(mkt, c, scan)
@@ -352,14 +433,16 @@ def debate(mkt, scan, caller=None):
         v = json.loads(judge.text)
         cost = bull.cost_usd + bear.cost_usd + judge.cost_usd
         add_spend(cost)
-        problems = check(v, c["stats"]["last"], mkt)
+        fo = (c.get("pool") or {}).get("fo", True)
+        problems = check(v, c["stats"]["last"], mkt, fo)
         traded = v["decision"] != "NO_TRADE" and not problems
         lev = 2 if (mkt == "in" and int(v["conviction"]) >= 4) else 1
         if traded:
             judge_orders.append(dict(sym=c["sym"], side="long" if v["decision"] == "LONG" else "short",
                                      trigger=round(v["trigger"], 2), stop=round(v["stop"], 2),
                                      target=round(v["target"], 2), conviction=int(v["conviction"]), leverage=lev,
-                                     latest_entry=cfg["latest"], cutoff=cfg["cutoff"]))
+                                     latest_entry=cfg["latest"], cutoff=cfg["cutoff"],
+                                     **({"slip": c["mechanical"]["slip"]} if "slip" in c["mechanical"] else {})))
         talks.append(dict(sym=c["sym"], name=None, headline=v["headline"], bull=bull.text, bear=bear.text,
                           judge_title=v["title"] if traded else f"No trade: {v['title']}",
                           judge_text=v["text"] + (f" (Order not placed: {'; '.join(problems)}.)" if problems else ""),
@@ -417,7 +500,7 @@ def settle_book(mkt, orders, b1, start):
             out.append(dict(sym=o["sym"], status="no_data"))
             continue
         d = d[d.index.date == start.date()]
-        r = simulate(o, d, start, cfg["slip"])
+        r = simulate(o, d, start, o.get("slip", cfg["slip"]))
         up = o.get("side", "long") == "long"
         rps = abs(o["trigger"] - o["stop"])
         cap = cfg["cash"] / MAX_POS * o.get("leverage", 1)
@@ -465,12 +548,16 @@ def settle(mkt, day, caller=None):
     orders = json.loads((od / "orders.json").read_text())
     scan = json.loads((od / "scan.json").read_text()) if (od / "scan.json").exists() else {}
     talks = {t["sym"]: t for t in json.loads((od / "debates.json").read_text())} if (od / "debates.json").exists() else {}
-    syms = sorted({ticker(o["sym"], mkt) for o in orders["mechanical"] + orders["judge"]}
+    pools = orders.get("pools") or {}
+    syms = sorted({ticker(o["sym"], mkt) for o in orders["mechanical"] + orders["judge"]
+                   + [o for p in pools.values() for o in p]}
                   | {ticker(c["sym"], mkt) for c in scan.get("candidates") or []})
     b1 = bars(syms, "7d", "1m", cfg["tz"]) if syms else {}    # Yahoo keeps 1-minute bars about a week
     start = pd.Timestamp(orders["decided"]).tz_convert(cfg["tz"])
     res = {book: settle_book(mkt, orders[book], b1, start) for book in ("mechanical", "judge")}
     res["shadow"] = shadow(mkt, scan, talks, b1, start)
+    if pools:                                    # the pool test: each pool's rule twin, same money and rules
+        res["pools"] = {k: settle_book(mkt, v, b1, start) for k, v in pools.items()}
     (od / "settle.json").write_text(json.dumps(res, indent=1, default=str))
     print(json.dumps(res, indent=1, default=str))
     lessons_review(mkt, caller)
@@ -518,10 +605,20 @@ def run_scan(mkt, no_debate=False, day=None, force=False):
         s["meta"]["replayed"] = True
         s["meta"]["ran_utc"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
     od.mkdir(parents=True, exist_ok=True)
+    twin = lambda cands: [dict(sym=c["sym"], **c["mechanical"]) for c in cands  # noqa: E731
+                          if cfg["shorts"] or c["side"] == "long"][:MAX_POS]
+    pools = None
+    if mkt == "in" and WIDE in ("shadow", "live"):
+        pools = dict(f80=twin(s["candidates"]))
+        if WIDE == "live":                       # the wide pool feeds the debates; the 80 stay as a control
+            s["wide"] = _wide(mkt, day)
+            if s["wide"].get("candidates") is not None and "error" not in s["wide"]["meta"]:
+                s["f80"] = dict(candidates=s["candidates"])
+                s["candidates"] = s["wide"]["candidates"]
+                s["meta"]["pool"] = "wide"
     (od / "scan.json").write_text(json.dumps(s, indent=1, default=str))
     print(json.dumps(s["meta"], indent=1, default=str), flush=True)
-    mech = [dict(sym=c["sym"], **c["mechanical"]) for c in s["candidates"]
-            if cfg["shorts"] or c["side"] == "long"][:MAX_POS]
+    mech = twin(s["candidates"])
     talks, judge_orders = ([], []) if no_debate else debate(mkt, s)
     if talks:
         (od / "debates.json").write_text(json.dumps(talks, indent=1, default=str))
@@ -534,12 +631,29 @@ def run_scan(mkt, no_debate=False, day=None, force=False):
         decided = (pd.Timestamp(cp) + pd.Timedelta(minutes=2)).tz_convert("UTC").isoformat()
     note = ("Late run: the open was replayed from the day's 5-minute bars as it stood at the checkpoint, "
             "and orders start two minutes after it." if replay else "Live paper day.")
+    if pools is not None:
+        if "wide" not in s:                      # shadow: after the debates, so it never delays them
+            s["wide"] = _wide(mkt, day)
+            (od / "scan.json").write_text(json.dumps(s, indent=1, default=str))
+        pools["wide"] = twin(s["wide"].get("candidates") or [])
     orders = dict(decided=decided,
                   note=note + ("" if talks else " No debates ran (no candidates, cap or no key)."),
                   mechanical=mech, judge=judge_orders, replayed=bool(replay))
+    if pools is not None:
+        orders["pools"] = pools
     (od / "orders.json").write_text(json.dumps(orders, indent=1))
     print(json.dumps(orders, indent=1))
     return day
+
+
+def _wide(mkt, day):
+    """The wide scan, or an error note: it never stops the 80-stock day."""
+    try:
+        w = scan_wide(mkt, day)
+    except Exception as e:                                        # noqa: BLE001
+        w = dict(meta=dict(error=f"{type(e).__name__}: {e}"[:300]), candidates=[])
+    print("wide pool:", json.dumps(w["meta"], default=str)[:600], flush=True)
+    return w
 
 
 def last_day(mkt):
@@ -549,7 +663,7 @@ def last_day(mkt):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("mode", choices=["scan", "settle"])
+    ap.add_argument("mode", choices=["scan", "settle", "pool"])
     ap.add_argument("--mkt", choices=["in", "us"], required=True)
     ap.add_argument("--day")
     ap.add_argument("--no-debate", action="store_true")
@@ -557,6 +671,8 @@ if __name__ == "__main__":
     a = ap.parse_args()
     if a.mode == "scan":
         run_scan(a.mkt, a.no_debate, day=a.day, force=a.force)
+    elif a.mode == "pool":
+        pool.build(bars, MKT[a.mkt]["tz"], IN, a.mkt)
     else:
         d = a.day or last_day(a.mkt)
         if not d:
