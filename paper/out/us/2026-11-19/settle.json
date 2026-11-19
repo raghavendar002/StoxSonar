@@ -1,0 +1,81 @@
+{
+ "mechanical": {
+  "trades": [
+   {
+    "status": "not_triggered",
+    "sym": "MMM",
+    "side": "long",
+    "qty": 2.7663
+   },
+   {
+    "status": "closed",
+    "entry": 887.317428,
+    "entry_t": "2026-11-19 09:48:00-05:00",
+    "exit": 879.8739899999999,
+    "exit_t": "2026-11-19 10:14:00-05:00",
+    "reason": "stop",
+    "sym": "GS",
+    "side": "long",
+    "qty": 0.5636,
+    "costs": 0.0139,
+    "pnl": -4.21,
+    "r_mult": -1.05
+   }
+  ],
+  "end_cash": 995.79
+ },
+ "judge": {
+  "trades": [],
+  "end_cash": 1000.0
+ },
+ "shadow": [
+  {
+   "sym": "MMM",
+   "side": "long",
+   "rule": {
+    "status": "not_triggered",
+    "sym": "MMM",
+    "side": "long",
+    "qty": 2.7663
+   },
+   "judge_levels": {
+    "status": "not_triggered",
+    "sym": "MMM",
+    "side": "long",
+    "qty": 2.7663
+   }
+  },
+  {
+   "sym": "GS",
+   "side": "long",
+   "rule": {
+    "status": "closed",
+    "entry": 887.317428,
+    "entry_t": "2026-11-19 09:48:00-05:00",
+    "exit": 879.8739899999999,
+    "exit_t": "2026-11-19 10:14:00-05:00",
+    "reason": "stop",
+    "sym": "GS",
+    "side": "long",
+    "qty": 0.5636,
+    "costs": 0.0139,
+    "pnl": -4.21,
+    "r_mult": -1.05
+   },
+   "judge_levels": {
+    "status": "closed",
+    "entry": 887.5774799999999,
+    "entry_t": "2026-11-19 09:48:00-05:00",
+    "exit": 884.22312,
+    "exit_t": "2026-11-19 10:00:00-05:00",
+    "reason": "stop",
+    "sym": "GS",
+    "side": "long",
+    "qty": 0.5634,
+    "costs": 0.0139,
+    "pnl": -1.9,
+    "r_mult": -1.13
+   }
+  }
+ ]
+}
