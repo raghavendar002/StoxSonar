@@ -1,0 +1,208 @@
+{
+ "meta": {
+  "date": "2026-11-19",
+  "market": "us",
+  "checkpoint_et": "2026-11-19 09:50:00-05:00",
+  "spy_move_today": -0.000528862089899107,
+  "universe": 100,
+  "signals": 2,
+  "near_misses": [
+   {
+    "sym": "WMT",
+    "relvol": 3.3543,
+    "dist_or_hi": -0.0046,
+    "move_today": 0.0089
+   },
+   {
+    "sym": "CVX",
+    "relvol": 3.2158,
+    "dist_or_hi": -0.0058,
+    "move_today": -0.0027
+   },
+   {
+    "sym": "TGT",
+    "relvol": 2.9106,
+    "dist_or_hi": -0.013,
+    "move_today": -0.0083
+   },
+   {
+    "sym": "PEP",
+    "relvol": 2.8141,
+    "dist_or_hi": -0.0171,
+    "move_today": -0.0169
+   },
+   {
+    "sym": "HON",
+    "relvol": 2.7055,
+    "dist_or_hi": -0.0096,
+    "move_today": -0.0077
+   },
+   {
+    "sym": "PM",
+    "relvol": 2.3001,
+    "dist_or_hi": -0.0264,
+    "move_today": -0.0163
+   },
+   {
+    "sym": "MMM",
+    "relvol": 2.1613,
+    "dist_or_hi": -0.003,
+    "move_today": 0.0004
+   },
+   {
+    "sym": "DIS",
+    "relvol": 2.0563,
+    "dist_or_hi": -0.0072,
+    "move_today": -0.005
+   },
+   {
+    "sym": "UNH",
+    "relvol": 1.7642,
+    "dist_or_hi": -0.0273,
+    "move_today": -0.0198
+   },
+   {
+    "sym": "GS",
+    "relvol": 1.5652,
+    "dist_or_hi": -0.0008,
+    "move_today": 0.0011
+   }
+  ]
+ },
+ "candidates": [
+  {
+   "sym": "MMM",
+   "side": "long",
+   "stats": {
+    "sym": "MMM",
+    "last": 180.12,
+    "or_hi": 180.66,
+    "or_lo": 179.98,
+    "relvol": 2.1613,
+    "atr5": 0.4044,
+    "vwap": 180.4037,
+    "gap": -0.0056,
+    "day_hi": 180.66,
+    "day_lo": 179.98,
+    "open": 180.04,
+    "prev_close": 181.05,
+    "prev_hi": 182.2,
+    "prev_lo": 178.1,
+    "dma20": 181.028,
+    "move_today": 0.0004,
+    "dist_or_hi": -0.003,
+    "dist_or_lo": 0.0008,
+    "side": "long"
+   },
+   "mechanical": {
+    "side": "long",
+    "trigger": 180.75,
+    "stop": 179.98,
+    "target": 182.29,
+    "latest_entry": "14:30",
+    "cutoff": "15:50"
+   },
+   "bars_5m": [
+    [
+     "09:30",
+     180.04,
+     180.5,
+     180.04,
+     180.41,
+     483117
+    ],
+    [
+     "09:35",
+     180.24,
+     180.37,
+     179.98,
+     180.37,
+     13724
+    ],
+    [
+     "09:40",
+     180.37,
+     180.66,
+     180.11,
+     180.18,
+     10124
+    ],
+    [
+     "09:45",
+     180.3,
+     180.3,
+     180.12,
+     180.12,
+     1036
+    ]
+   ]
+  },
+  {
+   "sym": "GS",
+   "side": "long",
+   "stats": {
+    "sym": "GS",
+    "last": 886.0101,
+    "or_hi": 886.7,
+    "or_lo": 880.055,
+    "relvol": 1.5652,
+    "atr5": 4.0525,
+    "vwap": 885.1299,
+    "gap": 0.0135,
+    "day_hi": 887.3,
+    "day_lo": 880.055,
+    "open": 885.0,
+    "prev_close": 873.18,
+    "prev_hi": 880.0,
+    "prev_lo": 866.24,
+    "dma20": 899.634,
+    "move_today": 0.0011,
+    "dist_or_hi": -0.0008,
+    "dist_or_lo": 0.0068,
+    "side": "long"
+   },
+   "mechanical": {
+    "side": "long",
+    "trigger": 887.14,
+    "stop": 880.05,
+    "target": 901.32,
+    "latest_entry": "14:30",
+    "cutoff": "15:50"
+   },
+   "bars_5m": [
+    [
+     "09:30",
+     885.0,
+     886.67,
+     882.5,
+     885.1,
+     198595
+    ],
+    [
+     "09:35",
+     884.03,
+     884.2,
+     880.05,
+     883.34,
+     24100
+    ],
+    [
+     "09:40",
+     882.55,
+     886.7,
+     881.54,
+     886.51,
+     28449
+    ],
+    [
+     "09:45",
+     887.05,
+     887.3,
+     885.47,
+     886.01,
+     11158
+    ]
+   ]
+  }
+ ]
+}
