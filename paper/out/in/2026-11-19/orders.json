@@ -1,0 +1,82 @@
+{
+ "decided": "2026-11-19T04:03:24+00:00",
+ "note": "Live paper day.",
+ "mechanical": [
+  {
+   "sym": "SBIN",
+   "side": "short",
+   "trigger": 1140.43,
+   "stop": 1150.55,
+   "target": 1120.19,
+   "latest_entry": "14:00",
+   "cutoff": "15:15"
+  },
+  {
+   "sym": "HINDALCO",
+   "side": "long",
+   "trigger": 896.5,
+   "stop": 881.1,
+   "target": 927.29,
+   "latest_entry": "14:00",
+   "cutoff": "15:15"
+  }
+ ],
+ "judge": [
+  {
+   "sym": "BANKBARODA",
+   "side": "long",
+   "trigger": 278.52,
+   "stop": 277.2,
+   "target": 281.2,
+   "conviction": 2,
+   "leverage": 1,
+   "latest_entry": "14:00",
+   "cutoff": "15:15"
+  }
+ ],
+ "replayed": false,
+ "pools": {
+  "f80": [
+   {
+    "sym": "SBIN",
+    "side": "short",
+    "trigger": 1140.43,
+    "stop": 1150.55,
+    "target": 1120.19,
+    "latest_entry": "14:00",
+    "cutoff": "15:15"
+   },
+   {
+    "sym": "HINDALCO",
+    "side": "long",
+    "trigger": 896.5,
+    "stop": 881.1,
+    "target": 927.29,
+    "latest_entry": "14:00",
+    "cutoff": "15:15"
+   }
+  ],
+  "wide": [
+   {
+    "sym": "POLYCAB",
+    "side": "long",
+    "trigger": 7336.17,
+    "stop": 7240.0,
+    "target": 7528.5,
+    "latest_entry": "14:00",
+    "cutoff": "15:15",
+    "slip": 0.0005
+   },
+   {
+    "sym": "SBIN",
+    "side": "short",
+    "trigger": 1140.83,
+    "stop": 1150.55,
+    "target": 1121.39,
+    "latest_entry": "14:00",
+    "cutoff": "15:15",
+    "slip": 0.0005
+   }
+  ]
+ }
+}
