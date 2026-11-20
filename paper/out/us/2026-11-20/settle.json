@@ -1,0 +1,155 @@
+{
+ "mechanical": {
+  "trades": [
+   {
+    "status": "stale",
+    "note": "price was already past the trigger when the order went in",
+    "sym": "PYPL",
+    "side": "long",
+    "qty": 4.0984
+   },
+   {
+    "status": "closed",
+    "entry": 59.321862,
+    "entry_t": "2026-11-20 09:50:00-05:00",
+    "exit": 58.933210694885254,
+    "exit_t": "2026-11-20 15:50:00-05:00",
+    "reason": "time",
+    "sym": "BMY",
+    "side": "long",
+    "qty": 8.4303,
+    "costs": 0.0152,
+    "pnl": -3.29,
+    "r_mult": -0.67
+   }
+  ],
+  "end_cash": 996.71
+ },
+ "judge": {
+  "trades": [],
+  "end_cash": 1000.0
+ },
+ "shadow": [
+  {
+   "sym": "PYPL",
+   "side": "long",
+   "rule": {
+    "status": "stale",
+    "note": "price was already past the trigger when the order went in",
+    "sym": "PYPL",
+    "side": "long",
+    "qty": 4.0984
+   },
+   "judge_levels": {
+    "status": "closed",
+    "entry": 54.72094108428955,
+    "entry_t": "2026-11-20 09:49:00-05:00",
+    "exit": 53.989200000000004,
+    "exit_t": "2026-11-20 13:00:00-05:00",
+    "reason": "stop",
+    "sym": "PYPL",
+    "side": "long",
+    "qty": 7.1429,
+    "costs": 0.0119,
+    "pnl": -5.24,
+    "r_mult": -1.05
+   }
+  },
+  {
+   "sym": "BMY",
+   "side": "long",
+   "rule": {
+    "status": "closed",
+    "entry": 59.321862,
+    "entry_t": "2026-11-20 09:50:00-05:00",
+    "exit": 58.933210694885254,
+    "exit_t": "2026-11-20 15:50:00-05:00",
+    "reason": "time",
+    "sym": "BMY",
+    "side": "long",
+    "qty": 8.4303,
+    "costs": 0.0152,
+    "pnl": -3.29,
+    "r_mult": -0.67
+   },
+   "judge_levels": {
+    "status": "closed",
+    "entry": 59.321862,
+    "entry_t": "2026-11-20 09:50:00-05:00",
+    "exit": 58.868224000000005,
+    "exit_t": "2026-11-20 15:34:00-05:00",
+    "reason": "stop",
+    "sym": "BMY",
+    "side": "long",
+    "qty": 8.4303,
+    "costs": 0.0152,
+    "pnl": -3.84,
+    "r_mult": -1.06
+   }
+  },
+  {
+   "sym": "MRK",
+   "side": "long",
+   "rule": {
+    "status": "closed",
+    "entry": 135.62712,
+    "entry_t": "2026-11-20 09:51:00-05:00",
+    "exit": 133.763242,
+    "exit_t": "2026-11-20 15:30:00-05:00",
+    "reason": "stop",
+    "sym": "MRK",
+    "side": "long",
+    "qty": 2.7624,
+    "costs": 0.0107,
+    "pnl": -5.16,
+    "r_mult": -1.03
+   },
+   "judge_levels": {
+    "status": "closed",
+    "entry": 135.87716999999998,
+    "entry_t": "2026-11-20 09:52:00-05:00",
+    "exit": 134.42310999999998,
+    "exit_t": "2026-11-20 12:42:00-05:00",
+    "reason": "stop",
+    "sym": "MRK",
+    "side": "long",
+    "qty": 3.5714,
+    "costs": 0.0139,
+    "pnl": -5.21,
+    "r_mult": -1.04
+   }
+  },
+  {
+   "sym": "IBM",
+   "side": "long",
+   "rule": {
+    "status": "closed",
+    "entry": 228.96077628479003,
+    "entry_t": "2026-11-20 09:49:00-05:00",
+    "exit": 225.3999183227539,
+    "exit_t": "2026-11-20 15:50:00-05:00",
+    "reason": "time",
+    "sym": "IBM",
+    "side": "long",
+    "qty": 0.994,
+    "costs": 0.0064,
+    "pnl": -3.55,
+    "r_mult": -0.71
+   },
+   "judge_levels": {
+    "status": "closed",
+    "entry": 228.96077628479003,
+    "entry_t": "2026-11-20 09:49:00-05:00",
+    "exit": 231.9536,
+    "exit_t": "2026-11-20 10:00:00-05:00",
+    "reason": "target",
+    "sym": "IBM",
+    "side": "long",
+    "qty": 2.185,
+    "costs": 0.0145,
+    "pnl": 6.52,
+    "r_mult": 1.44
+   }
+  }
+ ]
+}
