@@ -1,0 +1,696 @@
+{
+ "meta": {
+  "date": "2026-11-20",
+  "market": "in",
+  "checkpoint": "2026-11-20 09:35:00+05:30",
+  "index_move": 0.0027573909418159293,
+  "universe": 78,
+  "signals": 19,
+  "near_misses": [
+   {
+    "sym": "TATASTEEL",
+    "relvol": 13.5497,
+    "dist_or_hi": -0.0226,
+    "move_today": -0.0226
+   },
+   {
+    "sym": "ULTRACEMCO",
+    "relvol": 7.1524,
+    "dist_or_hi": -0.0063,
+    "move_today": 0.0114
+   },
+   {
+    "sym": "VEDL",
+    "relvol": 6.7308,
+    "dist_or_hi": -0.0136,
+    "move_today": -0.0136
+   },
+   {
+    "sym": "BAJAJ-AUTO",
+    "relvol": 5.4349,
+    "dist_or_hi": -0.0099,
+    "move_today": 0.002
+   },
+   {
+    "sym": "TATAPOWER",
+    "relvol": 5.2526,
+    "dist_or_hi": -0.0038,
+    "move_today": -0.001
+   },
+   {
+    "sym": "MARUTI",
+    "relvol": 4.4699,
+    "dist_or_hi": -0.0075,
+    "move_today": 0.0111
+   },
+   {
+    "sym": "JSWSTEEL",
+    "relvol": 4.2633,
+    "dist_or_hi": -0.0195,
+    "move_today": -0.0195
+   },
+   {
+    "sym": "NMDC",
+    "relvol": 4.1392,
+    "dist_or_hi": -0.014,
+    "move_today": -0.014
+   },
+   {
+    "sym": "MUTHOOTFIN",
+    "relvol": 4.0666,
+    "dist_or_hi": 0.002,
+    "move_today": 0.0095
+   },
+   {
+    "sym": "JINDALSTEL",
+    "relvol": 3.7469,
+    "dist_or_hi": -0.0062,
+    "move_today": -0.0062
+   }
+  ]
+ },
+ "candidates": [
+  {
+   "sym": "MUTHOOTFIN",
+   "side": "long",
+   "stats": {
+    "sym": "MUTHOOTFIN",
+    "last": 2543.0,
+    "or_hi": 2538.0,
+    "or_lo": 2485.8,
+    "relvol": 4.0666,
+    "atr5": 22.825,
+    "vwap": 2532.8771,
+    "gap": -0.0378,
+    "day_hi": 2543.0,
+    "day_lo": 2485.8,
+    "open": 2519.0,
+    "prev_close": 2618.0,
+    "prev_hi": 2635.2,
+    "prev_lo": 2553.8,
+    "dma20": 2636.245,
+    "move_today": 0.0095,
+    "dist_or_hi": 0.002,
+    "dist_or_lo": 0.023,
+    "side": "long"
+   },
+   "mechanical": {
+    "side": "long",
+    "trigger": 2544.27,
+    "stop": 2485.8,
+    "target": 2661.21,
+    "latest_entry": "14:00",
+    "cutoff": "15:15"
+   },
+   "bars_5m": [
+    [
+     "09:15",
+     2519.0,
+     2538.0,
+     2485.8,
+     2532.5,
+     147211.0
+    ],
+    [
+     "09:20",
+     2533.5,
+     2537.4,
+     2523.2,
+     2532.6,
+     65795.0
+    ],
+    [
+     "09:25",
+     2531.9,
+     2534.8,
+     2522.6,
+     2532.0,
+     42427.0
+    ],
+    [
+     "09:30",
+     2532.0,
+     2543.0,
+     2530.3,
+     2543.0,
+     10960.0
+    ]
+   ]
+  },
+  {
+   "sym": "TECHM",
+   "side": "long",
+   "stats": {
+    "sym": "TECHM",
+    "last": 1759.0,
+    "or_hi": 1759.9,
+    "or_lo": 1715.2,
+    "relvol": 3.615,
+    "atr5": 15.875,
+    "vwap": 1755.5808,
+    "gap": -0.0044,
+    "day_hi": 1759.9,
+    "day_lo": 1715.2,
+    "open": 1715.5,
+    "prev_close": 1723.0,
+    "prev_hi": 1735.9,
+    "prev_lo": 1698.5,
+    "dma20": 1785.905,
+    "move_today": 0.0254,
+    "dist_or_hi": -0.0005,
+    "dist_or_lo": 0.0255,
+    "side": "long"
+   },
+   "mechanical": {
+    "side": "long",
+    "trigger": 1760.78,
+    "stop": 1715.2,
+    "target": 1851.94,
+    "latest_entry": "14:00",
+    "cutoff": "15:15"
+   },
+   "bars_5m": [
+    [
+     "09:15",
+     1715.5,
+     1753.8,
+     1715.2,
+     1753.4,
+     103289.0
+    ],
+    [
+     "09:20",
+     1752.9,
+     1758.0,
+     1745.4,
+     1756.3,
+     85140.0
+    ],
+    [
+     "09:25",
+     1756.0,
+     1759.9,
+     1753.6,
+     1755.6,
+     190790.0
+    ],
+    [
+     "09:30",
+     1755.1,
+     1759.0,
+     1753.0,
+     1759.0,
+     46900.0
+    ]
+   ]
+  },
+  {
+   "sym": "APOLLOHOSP",
+   "side": "long",
+   "stats": {
+    "sym": "APOLLOHOSP",
+    "last": 9019.5,
+    "or_hi": 9015.0,
+    "or_lo": 8831.5,
+    "relvol": 3.4645,
+    "atr5": 66.5,
+    "vwap": 8973.3045,
+    "gap": 0.0107,
+    "day_hi": 9025.0,
+    "day_lo": 8831.5,
+    "open": 8831.5,
+    "prev_close": 8738.0,
+    "prev_hi": 8810.0,
+    "prev_lo": 8690.0,
+    "dma20": 8365.375,
+    "move_today": 0.0213,
+    "dist_or_hi": 0.0005,
+    "dist_or_lo": 0.0213,
+    "side": "long"
+   },
+   "mechanical": {
+    "side": "long",
+    "trigger": 9024.01,
+    "stop": 8831.5,
+    "target": 9409.03,
+    "latest_entry": "14:00",
+    "cutoff": "15:15"
+   },
+   "bars_5m": [
+    [
+     "09:15",
+     8831.5,
+     8925.0,
+     8831.5,
+     8911.0,
+     34473.0
+    ],
+    [
+     "09:20",
+     8911.0,
+     8974.0,
+     8890.5,
+     8967.5,
+     42026.0
+    ],
+    [
+     "09:25",
+     8969.5,
+     9015.0,
+     8963.0,
+     8998.5,
+     42762.0
+    ],
+    [
+     "09:30",
+     8999.0,
+     9025.0,
+     8988.0,
+     9019.5,
+     28452.0
+    ]
+   ]
+  },
+  {
+   "sym": "COALINDIA",
+   "side": "short",
+   "stats": {
+    "sym": "COALINDIA",
+    "last": 388.95,
+    "or_hi": 394.0,
+    "or_lo": 388.0,
+    "relvol": 3.458,
+    "atr5": 1.9875,
+    "vwap": 389.4245,
+    "gap": 0.0064,
+    "day_hi": 394.0,
+    "day_lo": 388.0,
+    "open": 394.0,
+    "prev_close": 391.5,
+    "prev_hi": 393.45,
+    "prev_lo": 386.55,
+    "dma20": 398.56,
+    "move_today": -0.0128,
+    "dist_or_hi": -0.0128,
+    "dist_or_lo": 0.0024,
+    "side": "short"
+   },
+   "mechanical": {
+    "side": "short",
+    "trigger": 387.81,
+    "stop": 393.77,
+    "target": 375.88,
+    "latest_entry": "14:00",
+    "cutoff": "15:15"
+   },
+   "bars_5m": [
+    [
+     "09:15",
+     394.0,
+     394.0,
+     390.25,
+     390.45,
+     422263.0
+    ],
+    [
+     "09:20",
+     391.3,
+     391.3,
+     390.0,
+     390.1,
+     300094.0
+    ],
+    [
+     "09:25",
+     390.15,
+     390.15,
+     388.0,
+     388.2,
+     512235.0
+    ],
+    [
+     "09:30",
+     388.5,
+     388.95,
+     388.45,
+     388.95,
+     17982.0
+    ]
+   ]
+  }
+ ],
+ "wide": {
+  "meta": {
+   "pool_built_on": "2026-11-19",
+   "pool": 456,
+   "scanned": 456,
+   "fetch_s": 59.9,
+   "missing": 0,
+   "signals": 54,
+   "near_misses": [
+    {
+     "sym": "TATATECH",
+     "relvol": 17.1133,
+     "dist_or_hi": -0.0002,
+     "dist_or_lo": 0.0492,
+     "move_today": 0.0435,
+     "passed": true
+    },
+    {
+     "sym": "FSL",
+     "relvol": 14.5264,
+     "dist_or_hi": -0.0163,
+     "dist_or_lo": 0.0248,
+     "move_today": 0.0235,
+     "passed": false
+    },
+    {
+     "sym": "TATASTEEL",
+     "relvol": 13.5497,
+     "dist_or_hi": -0.0242,
+     "dist_or_lo": 0.0042,
+     "move_today": -0.0242,
+     "passed": false
+    },
+    {
+     "sym": "IREDA",
+     "relvol": 11.9633,
+     "dist_or_hi": -0.0206,
+     "dist_or_lo": 0.0115,
+     "move_today": 0.0054,
+     "passed": false
+    },
+    {
+     "sym": "BLUESTARCO",
+     "relvol": 10.2324,
+     "dist_or_hi": -0.0227,
+     "dist_or_lo": 0.0036,
+     "move_today": -0.0007,
+     "passed": false
+    },
+    {
+     "sym": "MAXHEALTH",
+     "relvol": 9.4926,
+     "dist_or_hi": -0.0006,
+     "dist_or_lo": 0.0305,
+     "move_today": 0.0251,
+     "passed": true
+    },
+    {
+     "sym": "ULTRACEMCO",
+     "relvol": 9.1488,
+     "dist_or_hi": -0.0076,
+     "dist_or_lo": 0.0101,
+     "move_today": 0.0101,
+     "passed": false
+    },
+    {
+     "sym": "VEDL",
+     "relvol": 7.4668,
+     "dist_or_hi": -0.0182,
+     "dist_or_lo": 0.0022,
+     "move_today": -0.0182,
+     "passed": true
+    },
+    {
+     "sym": "ENDURANCE",
+     "relvol": 6.6097,
+     "dist_or_hi": -0.0296,
+     "dist_or_lo": 0.0,
+     "move_today": -0.0118,
+     "passed": false
+    },
+    {
+     "sym": "MARUTI",
+     "relvol": 5.4748,
+     "dist_or_hi": -0.0067,
+     "dist_or_lo": 0.0139,
+     "move_today": 0.0119,
+     "passed": false
+    }
+   ]
+  },
+  "candidates": [
+   {
+    "sym": "TATATECH",
+    "side": "long",
+    "stats": {
+     "sym": "TATATECH",
+     "last": 727.6,
+     "or_hi": 727.75,
+     "or_lo": 693.5,
+     "relvol": 17.1133,
+     "atr5": 13.4833,
+     "vwap": 720.8971,
+     "gap": -0.0095,
+     "day_hi": 727.75,
+     "day_lo": 693.5,
+     "open": 697.3,
+     "prev_close": 704.0,
+     "prev_hi": 717.65,
+     "prev_lo": 648.35,
+     "dma20": 664.82,
+     "move_today": 0.0435,
+     "dist_or_hi": -0.0002,
+     "dist_or_lo": 0.0492,
+     "side": "long"
+    },
+    "mechanical": {
+     "side": "long",
+     "trigger": 728.11,
+     "stop": 693.5,
+     "target": 797.34,
+     "latest_entry": "14:00",
+     "cutoff": "15:15",
+     "slip": 0.002
+    },
+    "bars_5m": [
+     [
+      "09:15",
+      697.3,
+      702.2,
+      693.5,
+      702.2,
+      76225
+     ],
+     [
+      "09:20",
+      702.2,
+      713.8,
+      700.0,
+      712.5,
+      216067
+     ],
+     [
+      "09:25",
+      712.55,
+      727.75,
+      709.8,
+      727.6,
+      483305
+     ]
+    ],
+    "pool": {
+     "fo": false,
+     "slip": 0.002,
+     "turnover_cr": 34.0
+    }
+   },
+   {
+    "sym": "MAXHEALTH",
+    "side": "long",
+    "stats": {
+     "sym": "MAXHEALTH",
+     "last": 1083.35,
+     "or_hi": 1084.0,
+     "or_lo": 1051.3,
+     "relvol": 9.4926,
+     "atr5": 14.5167,
+     "vwap": 1076.1745,
+     "gap": 0.0156,
+     "day_hi": 1084.0,
+     "day_lo": 1051.3,
+     "open": 1056.85,
+     "prev_close": 1040.65,
+     "prev_hi": 1040.65,
+     "prev_lo": 1014.2,
+     "dma20": 903.42,
+     "move_today": 0.0251,
+     "dist_or_hi": -0.0006,
+     "dist_or_lo": 0.0305,
+     "side": "long"
+    },
+    "mechanical": {
+     "side": "long",
+     "trigger": 1084.54,
+     "stop": 1051.3,
+     "target": 1151.03,
+     "latest_entry": "14:00",
+     "cutoff": "15:15",
+     "slip": 0.0005
+    },
+    "bars_5m": [
+     [
+      "09:15",
+      1056.85,
+      1074.0,
+      1051.3,
+      1068.95,
+      594852.0
+     ],
+     [
+      "09:20",
+      1068.5,
+      1080.0,
+      1066.95,
+      1076.8,
+      594167.0
+     ],
+     [
+      "09:25",
+      1077.7,
+      1084.0,
+      1076.2,
+      1083.35,
+      547132.0
+     ]
+    ],
+    "pool": {
+     "fo": true,
+     "slip": 0.0005,
+     "turnover_cr": 325.0
+    }
+   },
+   {
+    "sym": "VEDL",
+    "side": "short",
+    "stats": {
+     "sym": "VEDL",
+     "last": 232.4,
+     "or_hi": 236.71,
+     "or_lo": 231.89,
+     "relvol": 7.4668,
+     "atr5": 2.08,
+     "vwap": 233.2168,
+     "gap": -0.0287,
+     "day_hi": 236.71,
+     "day_lo": 231.89,
+     "open": 236.71,
+     "prev_close": 243.7,
+     "prev_hi": 244.15,
+     "prev_lo": 240.91,
+     "dma20": 246.6,
+     "move_today": -0.0182,
+     "dist_or_hi": -0.0182,
+     "dist_or_lo": 0.0022,
+     "side": "short"
+    },
+    "mechanical": {
+     "side": "short",
+     "trigger": 231.77,
+     "stop": 236.71,
+     "target": 221.9,
+     "latest_entry": "14:00",
+     "cutoff": "15:15",
+     "slip": 0.0005
+    },
+    "bars_5m": [
+     [
+      "09:15",
+      236.71,
+      236.71,
+      233.39,
+      233.6,
+      1576722.0
+     ],
+     [
+      "09:20",
+      233.29,
+      234.06,
+      233.15,
+      233.79,
+      1253789.0
+     ],
+     [
+      "09:25",
+      233.79,
+      233.9,
+      231.89,
+      232.4,
+      1619778.0
+     ]
+    ],
+    "pool": {
+     "fo": true,
+     "slip": 0.0005,
+     "turnover_cr": 264.0
+    }
+   },
+   {
+    "sym": "TATAPOWER",
+    "side": "short",
+    "stats": {
+     "sym": "TATAPOWER",
+     "last": 337.15,
+     "or_hi": 338.7,
+     "or_lo": 336.3,
+     "relvol": 5.4596,
+     "atr5": 1.65,
+     "vwap": 337.7017,
+     "gap": -0.0066,
+     "day_hi": 338.7,
+     "day_lo": 336.3,
+     "open": 337.75,
+     "prev_close": 340.0,
+     "prev_hi": 343.3,
+     "prev_lo": 336.05,
+     "dma20": 349.91,
+     "move_today": -0.0018,
+     "dist_or_hi": -0.0046,
+     "dist_or_lo": 0.0025,
+     "side": "short"
+    },
+    "mechanical": {
+     "side": "short",
+     "trigger": 336.13,
+     "stop": 338.7,
+     "target": 331.0,
+     "latest_entry": "14:00",
+     "cutoff": "15:15",
+     "slip": 0.0005
+    },
+    "bars_5m": [
+     [
+      "09:15",
+      337.75,
+      338.7,
+      336.6,
+      337.5,
+      333343.0
+     ],
+     [
+      "09:20",
+      337.6,
+      338.2,
+      336.3,
+      337.9,
+      698989.0
+     ],
+     [
+      "09:25",
+      337.9,
+      338.0,
+      337.05,
+      337.15,
+      129280.0
+     ]
+    ],
+    "pool": {
+     "fo": true,
+     "slip": 0.0005,
+     "turnover_cr": 194.8
+    }
+   }
+  ]
+ }
+}

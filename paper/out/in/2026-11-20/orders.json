@@ -1,0 +1,115 @@
+{
+ "decided": "2026-11-20T04:03:30+00:00",
+ "note": "Live paper day.",
+ "mechanical": [
+  {
+   "sym": "MUTHOOTFIN",
+   "side": "long",
+   "trigger": 2544.27,
+   "stop": 2485.8,
+   "target": 2661.21,
+   "latest_entry": "14:00",
+   "cutoff": "15:15"
+  },
+  {
+   "sym": "TECHM",
+   "side": "long",
+   "trigger": 1760.78,
+   "stop": 1715.2,
+   "target": 1851.94,
+   "latest_entry": "14:00",
+   "cutoff": "15:15"
+  }
+ ],
+ "judge": [
+  {
+   "sym": "MUTHOOTFIN",
+   "side": "long",
+   "trigger": 2545.0,
+   "stop": 2521.0,
+   "target": 2582.0,
+   "conviction": 2,
+   "leverage": 1,
+   "latest_entry": "14:00",
+   "cutoff": "15:15"
+  },
+  {
+   "sym": "TECHM",
+   "side": "long",
+   "trigger": 1761.0,
+   "stop": 1746.0,
+   "target": 1786.0,
+   "conviction": 2,
+   "leverage": 1,
+   "latest_entry": "14:00",
+   "cutoff": "15:15"
+  },
+  {
+   "sym": "APOLLOHOSP",
+   "side": "long",
+   "trigger": 9030,
+   "stop": 8965,
+   "target": 9135,
+   "conviction": 3,
+   "leverage": 1,
+   "latest_entry": "14:00",
+   "cutoff": "15:15"
+  },
+  {
+   "sym": "COALINDIA",
+   "side": "short",
+   "trigger": 387.8,
+   "stop": 389.7,
+   "target": 384.2,
+   "conviction": 2,
+   "leverage": 1,
+   "latest_entry": "14:00",
+   "cutoff": "15:15"
+  }
+ ],
+ "replayed": false,
+ "pools": {
+  "f80": [
+   {
+    "sym": "MUTHOOTFIN",
+    "side": "long",
+    "trigger": 2544.27,
+    "stop": 2485.8,
+    "target": 2661.21,
+    "latest_entry": "14:00",
+    "cutoff": "15:15"
+   },
+   {
+    "sym": "TECHM",
+    "side": "long",
+    "trigger": 1760.78,
+    "stop": 1715.2,
+    "target": 1851.94,
+    "latest_entry": "14:00",
+    "cutoff": "15:15"
+   }
+  ],
+  "wide": [
+   {
+    "sym": "TATATECH",
+    "side": "long",
+    "trigger": 728.11,
+    "stop": 693.5,
+    "target": 797.34,
+    "latest_entry": "14:00",
+    "cutoff": "15:15",
+    "slip": 0.002
+   },
+   {
+    "sym": "MAXHEALTH",
+    "side": "long",
+    "trigger": 1084.54,
+    "stop": 1051.3,
+    "target": 1151.03,
+    "latest_entry": "14:00",
+    "cutoff": "15:15",
+    "slip": 0.0005
+   }
+  ]
+ }
+}
