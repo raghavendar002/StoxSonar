@@ -2,7 +2,7 @@
 
 A free daily page and Telegram post listing graded Stage 2 breakouts on NSE, with the outcome of every past signal. It is the smallest version that can tell you two things in about three months: whether the grades work, and whether strangers care.
 
-Start with [docs/GUIDE.md](docs/GUIDE.md) for a plain explanation and setup steps.
+Start with [docs/HOW-IT-ALL-WORKS.md](docs/HOW-IT-ALL-WORKS.md) for the whole system in plain language (diagrams, data, schedule, which AI models are used, costs), and [docs/GUIDE.md](docs/GUIDE.md) for setup steps.
 
 The rules follow the StoxSonar Stock Segregation Rules Spec. This is a fresh, standalone build and does not import the old `backend/`.
 
