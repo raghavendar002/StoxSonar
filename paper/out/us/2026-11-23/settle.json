@@ -1,0 +1,105 @@
+{
+ "mechanical": {
+  "trades": [
+   {
+    "status": "closed",
+    "entry": 295.299048,
+    "entry_t": "2026-11-23 09:49:00-05:00",
+    "exit": 290.2919361022949,
+    "exit_t": "2026-11-23 15:50:00-05:00",
+    "reason": "time",
+    "sym": "TXN",
+    "side": "long",
+    "qty": 0.6068,
+    "costs": 0.005,
+    "pnl": -3.04,
+    "r_mult": -0.61
+   },
+   {
+    "status": "closed",
+    "entry": 511.612302,
+    "entry_t": "2026-11-23 09:52:00-05:00",
+    "exit": 515.7668211181641,
+    "exit_t": "2026-11-23 15:50:00-05:00",
+    "reason": "time",
+    "sym": "LIN",
+    "side": "long",
+    "qty": 0.9775,
+    "costs": 0.0142,
+    "pnl": 4.05,
+    "r_mult": 0.81
+   }
+  ],
+  "end_cash": 1001.0
+ },
+ "judge": {
+  "trades": [],
+  "end_cash": 1000.0
+ },
+ "shadow": [
+  {
+   "sym": "TXN",
+   "side": "long",
+   "rule": {
+    "status": "closed",
+    "entry": 295.299048,
+    "entry_t": "2026-11-23 09:49:00-05:00",
+    "exit": 290.2919361022949,
+    "exit_t": "2026-11-23 15:50:00-05:00",
+    "reason": "time",
+    "sym": "TXN",
+    "side": "long",
+    "qty": 0.6068,
+    "costs": 0.005,
+    "pnl": -3.04,
+    "r_mult": -0.61
+   },
+   "judge_levels": {
+    "status": "closed",
+    "entry": 295.299048,
+    "entry_t": "2026-11-23 09:49:00-05:00",
+    "exit": 292.84141999999997,
+    "exit_t": "2026-11-23 10:45:00-05:00",
+    "reason": "stop",
+    "sym": "TXN",
+    "side": "long",
+    "qty": 1.6935,
+    "costs": 0.0141,
+    "pnl": -4.18,
+    "r_mult": -1.05
+   }
+  },
+  {
+   "sym": "LIN",
+   "side": "long",
+   "rule": {
+    "status": "closed",
+    "entry": 511.612302,
+    "entry_t": "2026-11-23 09:52:00-05:00",
+    "exit": 515.7668211181641,
+    "exit_t": "2026-11-23 15:50:00-05:00",
+    "reason": "time",
+    "sym": "LIN",
+    "side": "long",
+    "qty": 0.9775,
+    "costs": 0.0142,
+    "pnl": 4.05,
+    "r_mult": 0.81
+   },
+   "judge_levels": {
+    "status": "closed",
+    "entry": 511.612302,
+    "entry_t": "2026-11-23 09:52:00-05:00",
+    "exit": 508.69824,
+    "exit_t": "2026-11-23 10:09:00-05:00",
+    "reason": "stop",
+    "sym": "LIN",
+    "side": "long",
+    "qty": 0.9775,
+    "costs": 0.014,
+    "pnl": -2.86,
+    "r_mult": -1.08
+   }
+  }
+ ]
+}
