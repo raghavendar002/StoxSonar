@@ -62,7 +62,8 @@ RESERVE_USD = 0.25       # a candidate is debated only if this much is left this
 # The wide India pool (Raghav, 18 Nov 2026): "shadow" scans it and logs its own rule twin
 # beside the 80-stock F&O scan, which still feeds the debates; "live" debates the wide
 # pool's top signals instead and keeps the 80-stock twin as a control; "off" skips it.
-WIDE = __import__("os").environ.get("INTRA_WIDE", "shadow")
+# Live since 24 Nov 2026 (Raghav, after 3 clean silent days).
+WIDE = __import__("os").environ.get("INTRA_WIDE", "live")
 
 
 # ---------------------------------------------------------------------------
@@ -613,9 +614,12 @@ def run_scan(mkt, no_debate=False, day=None, force=False):
         if WIDE == "live":                       # the wide pool feeds the debates; the 80 stay as a control
             s["wide"] = _wide(mkt, day)
             if s["wide"].get("candidates") is not None and "error" not in s["wide"]["meta"]:
-                s["f80"] = dict(candidates=s["candidates"])
+                wm = s["wide"]["meta"]
+                s["f80"] = dict(candidates=s["candidates"],
+                                meta={k: s["meta"].get(k) for k in ("universe", "signals", "near_misses")})
                 s["candidates"] = s["wide"]["candidates"]
-                s["meta"]["pool"] = "wide"
+                s["meta"].update(pool="wide", universe=wm.get("scanned"), signals=wm.get("signals"),
+                                 near_misses=wm.get("near_misses") or [])
     (od / "scan.json").write_text(json.dumps(s, indent=1, default=str))
     print(json.dumps(s["meta"], indent=1, default=str), flush=True)
     mech = twin(s["candidates"])
