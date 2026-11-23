@@ -117,3 +117,18 @@ def test_a_wide_failure_never_stops_the_day(tmp_path, monkeypatch):
     I.run_scan("in", day="2026-11-17")
     s = json.loads((tmp_path / "in" / "2026-11-17" / "scan.json").read_text())
     assert "ZeroDivisionError" in s["wide"]["meta"]["error"]
+
+
+def test_debaters_get_yesterday_and_daily_context_without_look_ahead(monkeypatch):
+    data = fake_5m(DAYS, spike_day="2026-11-17")
+    dly = daily(100, 1_000_000, n=80)
+    dly.index = pd.bdate_range("2026-07-27", periods=80, tz=TZ)          # runs past 17 Nov
+    monkeypatch.setattr(I, "bars", lambda tickers, period, interval, tz:
+                        {t: (dly if interval == "1d" else data) for t in tickers})
+    monkeypatch.setattr(I.pool, "load", lambda mkt, day: dict(built_on="2026-11-16", members=[
+        dict(sym="SMALL", fo=False, or_vol_norm=3000, dma20=100, slip=0.002, turnover_cr=12)]))
+    ctx = I.scan_wide("in", "2026-11-17")["candidates"][0]["context"]
+    assert ctx["prev_session_date"] == "2026-11-16"
+    assert len(ctx["prev_session_15m"]) == 25 and ctx["prev_session_15m"][0][0] == "09:15"
+    assert len(ctx["daily_last_10"]) == 10 and ctx["daily_last_10"][-1][0] < "2026-11-17"
+    assert ctx["atr14_daily"] is not None and "ret_20d" in ctx
