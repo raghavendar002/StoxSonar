@@ -103,6 +103,8 @@ def test_live_mode_debates_the_wide_pool(tmp_path, monkeypatch):
     monkeypatch.setattr(I, "debate", lambda mkt, s: (debated.extend(c["sym"] for c in s["candidates"]) or ([], [])))
     I.run_scan("in", day="2026-11-17")
     assert debated == ["SMALL"]
+    meta = json.loads((tmp_path / "in" / "2026-11-17" / "scan.json").read_text())["meta"]
+    assert meta["pool"] == "wide" and meta["universe"] == 1 and meta["signals"] == 1
 
 
 def test_a_wide_failure_never_stops_the_day(tmp_path, monkeypatch):
