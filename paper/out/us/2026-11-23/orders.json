@@ -1,0 +1,26 @@
+{
+ "decided": "2026-11-23T14:48:04+00:00",
+ "note": "Live paper day.",
+ "mechanical": [
+  {
+   "sym": "TXN",
+   "side": "long",
+   "trigger": 295.24,
+   "stop": 287.0,
+   "target": 311.73,
+   "latest_entry": "14:30",
+   "cutoff": "15:50"
+  },
+  {
+   "sym": "LIN",
+   "side": "long",
+   "trigger": 511.51,
+   "stop": 506.42,
+   "target": 521.68,
+   "latest_entry": "14:30",
+   "cutoff": "15:50"
+  }
+ ],
+ "judge": [],
+ "replayed": false
+}
