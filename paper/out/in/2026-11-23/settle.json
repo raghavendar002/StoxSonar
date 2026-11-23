@@ -1,0 +1,259 @@
+{
+ "mechanical": {
+  "trades": [
+   {
+    "status": "closed",
+    "entry": 973.17317,
+    "entry_t": "2026-11-23 09:34:00+05:30",
+    "exit": 963.7816377868652,
+    "exit_t": "2026-11-23 15:15:00+05:30",
+    "reason": "time",
+    "sym": "INDUSINDBK",
+    "side": "short",
+    "qty": 16.0,
+    "costs": 16.42,
+    "pnl": 133.84,
+    "r_mult": 0.28
+   },
+   {
+    "status": "closed",
+    "entry": 1404.9971500000001,
+    "entry_t": "2026-11-23 09:34:00+05:30",
+    "exit": 1393.19625,
+    "exit_t": "2026-11-23 15:15:00+05:30",
+    "reason": "time",
+    "sym": "AXISBANK",
+    "side": "short",
+    "qty": 11.0,
+    "costs": 16.31,
+    "pnl": 113.5,
+    "r_mult": 0.24
+   }
+  ],
+  "end_cash": 100247.34
+ },
+ "judge": {
+  "trades": [
+   {
+    "status": "closed",
+    "entry": 973.163175,
+    "entry_t": "2026-11-23 09:34:00+05:30",
+    "exit": 985.4925,
+    "exit_t": "2026-11-23 10:35:00+05:30",
+    "reason": "stop",
+    "sym": "INDUSINDBK",
+    "side": "short",
+    "qty": 44.0,
+    "costs": 45.76,
+    "pnl": -588.25,
+    "r_mult": -1.18
+   },
+   {
+    "status": "closed",
+    "entry": 1404.9971500000001,
+    "entry_t": "2026-11-23 09:34:00+05:30",
+    "exit": 1420.20975,
+    "exit_t": "2026-11-23 11:16:00+05:30",
+    "reason": "stop",
+    "sym": "AXISBANK",
+    "side": "short",
+    "qty": 35.0,
+    "costs": 52.49,
+    "pnl": -584.93,
+    "r_mult": -1.21
+   }
+  ],
+  "end_cash": 98826.82
+ },
+ "shadow": [
+  {
+   "sym": "INDUSINDBK",
+   "side": "short",
+   "rule": {
+    "status": "closed",
+    "entry": 973.17317,
+    "entry_t": "2026-11-23 09:34:00+05:30",
+    "exit": 963.7816377868652,
+    "exit_t": "2026-11-23 15:15:00+05:30",
+    "reason": "time",
+    "sym": "INDUSINDBK",
+    "side": "short",
+    "qty": 16.0,
+    "costs": 16.42,
+    "pnl": 133.84,
+    "r_mult": 0.28
+   },
+   "judge_levels": {
+    "status": "closed",
+    "entry": 973.163175,
+    "entry_t": "2026-11-23 09:34:00+05:30",
+    "exit": 985.4925,
+    "exit_t": "2026-11-23 10:35:00+05:30",
+    "reason": "stop",
+    "sym": "INDUSINDBK",
+    "side": "short",
+    "qty": 44.0,
+    "costs": 45.76,
+    "pnl": -588.25,
+    "r_mult": -1.18
+   }
+  },
+  {
+   "sym": "AXISBANK",
+   "side": "short",
+   "rule": {
+    "status": "closed",
+    "entry": 1404.9971500000001,
+    "entry_t": "2026-11-23 09:34:00+05:30",
+    "exit": 1393.19625,
+    "exit_t": "2026-11-23 15:15:00+05:30",
+    "reason": "time",
+    "sym": "AXISBANK",
+    "side": "short",
+    "qty": 11.0,
+    "costs": 16.31,
+    "pnl": 113.5,
+    "r_mult": 0.24
+   },
+   "judge_levels": {
+    "status": "closed",
+    "entry": 1404.9971500000001,
+    "entry_t": "2026-11-23 09:34:00+05:30",
+    "exit": 1420.20975,
+    "exit_t": "2026-11-23 11:16:00+05:30",
+    "reason": "stop",
+    "sym": "AXISBANK",
+    "side": "short",
+    "qty": 35.0,
+    "costs": 52.49,
+    "pnl": -584.93,
+    "r_mult": -1.21
+   }
+  },
+  {
+   "sym": "CANBK",
+   "side": "short",
+   "rule": {
+    "status": "closed",
+    "entry": 134.88252194976806,
+    "entry_t": "2026-11-23 09:34:00+05:30",
+    "exit": 133.84688877868652,
+    "exit_t": "2026-11-23 15:15:00+05:30",
+    "reason": "time",
+    "sym": "CANBK",
+    "side": "short",
+    "qty": 112.0,
+    "costs": 15.95,
+    "pnl": 100.04,
+    "r_mult": 0.2
+   },
+   "judge_levels": {
+    "status": "closed",
+    "entry": 134.88252194976806,
+    "entry_t": "2026-11-23 09:34:00+05:30",
+    "exit": 133.84688877868652,
+    "exit_t": "2026-11-23 15:15:00+05:30",
+    "reason": "time",
+    "sym": "CANBK",
+    "side": "short",
+    "qty": 369.0,
+    "costs": 52.54,
+    "pnl": 329.61,
+    "r_mult": 0.71
+   }
+  },
+  {
+   "sym": "ADANIENT",
+   "side": "short",
+   "rule": {
+    "status": "closed",
+    "entry": 2708.4850800000004,
+    "entry_t": "2026-11-23 10:07:00+05:30",
+    "exit": 2675.236852294922,
+    "exit_t": "2026-11-23 15:14:00+05:30",
+    "reason": "time",
+    "sym": "ADANIENT",
+    "side": "short",
+    "qty": 7.0,
+    "costs": 19.96,
+    "pnl": 212.78,
+    "r_mult": 0.47
+   },
+   "judge_levels": {
+    "status": "closed",
+    "entry": 2707.14575,
+    "entry_t": "2026-11-23 10:07:00+05:30",
+    "exit": 2673.83625,
+    "exit_t": "2026-11-23 15:01:00+05:30",
+    "reason": "target",
+    "sym": "ADANIENT",
+    "side": "short",
+    "qty": 18.0,
+    "costs": 51.29,
+    "pnl": 548.28,
+    "r_mult": 1.27
+   }
+  }
+ ],
+ "pools": {
+  "f80": {
+   "trades": [
+    {
+     "status": "closed",
+     "entry": 973.17317,
+     "entry_t": "2026-11-23 09:34:00+05:30",
+     "exit": 963.7816377868652,
+     "exit_t": "2026-11-23 15:15:00+05:30",
+     "reason": "time",
+     "sym": "INDUSINDBK",
+     "side": "short",
+     "qty": 16.0,
+     "costs": 16.42,
+     "pnl": 133.84,
+     "r_mult": 0.28
+    },
+    {
+     "status": "closed",
+     "entry": 1404.9971500000001,
+     "entry_t": "2026-11-23 09:34:00+05:30",
+     "exit": 1393.19625,
+     "exit_t": "2026-11-23 15:15:00+05:30",
+     "reason": "time",
+     "sym": "AXISBANK",
+     "side": "short",
+     "qty": 11.0,
+     "costs": 16.31,
+     "pnl": 113.5,
+     "r_mult": 0.24
+    }
+   ],
+   "end_cash": 100247.34
+  },
+  "wide": {
+   "trades": [
+    {
+     "status": "stale",
+     "note": "price was already past the trigger when the order went in",
+     "sym": "APLAPOLLO",
+     "side": "short",
+     "qty": 9.0
+    },
+    {
+     "status": "closed",
+     "entry": 1731.064035,
+     "entry_t": "2026-11-23 09:34:00+05:30",
+     "exit": 1745.5723011474608,
+     "exit_t": "2026-11-23 15:15:00+05:30",
+     "reason": "time",
+     "sym": "ICICIGI",
+     "side": "short",
+     "qty": 17.0,
+     "costs": 31.36,
+     "pnl": -278.0,
+     "r_mult": -0.57
+    }
+   ],
+   "end_cash": 99722.0
+  }
+ }
+}
