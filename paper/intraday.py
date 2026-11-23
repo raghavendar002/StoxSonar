@@ -139,8 +139,37 @@ def late_day(mkt, now=None):
     return now.date() if now > opened + pd.Timedelta(minutes=LATE_AFTER_MIN) else None
 
 
-def make_cands(sig, packs, cfg, extra=None):
-    """Signals -> candidates with the rule plan (the Twin's trade) and the 5-minute bars so far."""
+def context(before5, daily_before, n_days=10):
+    """What came before today, for the debaters: the last session in 15-minute bars and the
+    last `n_days` daily bars with a few derived numbers. Only data from before the scan day,
+    so it adds no look-ahead and does not move the 09:30 decision."""
+    out = {}
+    if before5 is not None and len(before5):
+        last = before5[before5.index.date == before5.index[-1].date()]
+        q = last.resample("15min", label="left", closed="left", origin="start").agg(
+            dict(Open="first", High="max", Low="min", Close="last", Volume="sum")).dropna()
+        q.index = q.index.strftime("%H:%M")
+        out["prev_session_date"] = str(last.index[-1].date())
+        out["prev_session_15m"] = q.round(2).reset_index().values.tolist()
+    if daily_before is not None and len(daily_before):
+        d = daily_before.dropna(subset=["Close"])
+        tr = pd.concat([d["High"] - d["Low"], (d["High"] - d["Close"].shift()).abs(),
+                        (d["Low"] - d["Close"].shift()).abs()], axis=1).max(axis=1)
+        c = d["Close"]
+        dd = d.tail(n_days)[["Open", "High", "Low", "Close", "Volume"]].round(2)
+        dd.index = dd.index.strftime("%Y-%m-%d")
+        out["daily_last_10"] = dd.reset_index().values.tolist()
+        out.update(atr14_daily=round(float(tr.tail(14).mean()), 2),
+                   avg_volume_20d=round(float(d["Volume"].tail(20).mean())),
+                   ret_5d=round(float(c.iloc[-1] / c.iloc[-6] - 1), 4) if len(c) > 5 else None,
+                   ret_20d=round(float(c.iloc[-1] / c.iloc[-21] - 1), 4) if len(c) > 20 else None,
+                   high_20d=round(float(d["High"].tail(20).max()), 2), low_20d=round(float(d["Low"].tail(20).min()), 2))
+    return out
+
+
+def make_cands(sig, packs, cfg, extra=None, ctx=None):
+    """Signals -> candidates with the rule plan (the Twin's trade), the 5-minute bars so far
+    and, with `ctx`, what came before today (see context())."""
     cands = []
     for _, r in sig.iterrows():
         up = r.side == "long"
@@ -163,6 +192,11 @@ def make_cands(sig, packs, cfg, extra=None):
             info = extra(r.sym)
             c["pool"] = info
             mech["slip"] = info["slip"]
+        if ctx:
+            try:
+                c["context"] = ctx(r.sym)
+            except Exception as e:                                # noqa: BLE001 - context helps, never blocks
+                c["context"] = dict(error=f"{type(e).__name__}: {e}"[:200])
         cands.append(c)
     return cands
 
@@ -195,7 +229,7 @@ def scan_wide(mkt, day):
     age = (pd.Timestamp.now(tz=cfg["tz"]).date() - day).days
     b5 = bars([ticker(s, mkt) for s in mem], "5d" if age <= 2 else "60d", "5m", cfg["tz"])
     fetch_s = round(time.time() - t0, 1)
-    rows, packs = [], {}
+    rows, packs, befores = [], {}, {}
     for t, d in b5.items():
         s, m = sym(t), mem.get(sym(t))
         d = _cut(d, day)
@@ -215,7 +249,7 @@ def scan_wide(mkt, day):
                          open=td["Open"].iloc[0], prev_close=prev_close, prev_hi=pd_["High"].max(),
                          prev_lo=pd_["Low"].min(), dma20=m.get("dma20"), move_today=last / td["Open"].iloc[0] - 1,
                          dist_or_hi=last / or_hi - 1, dist_or_lo=last / or_lo - 1, fo=bool(m["fo"])))
-        packs[s] = td
+        packs[s], befores[s] = td, before
     meta = dict(pool_built_on=p.get("built_on"), pool=len(mem), scanned=len(rows), fetch_s=fetch_s,
                 missing=len(mem) - len(rows))
     if not rows:
@@ -224,8 +258,14 @@ def scan_wide(mkt, day):
     sig, n = _signals(df, df.fo & cfg["shorts"])
     sig = sig.head(MAX_DEBATE)
     info = lambda s: dict(fo=mem[s]["fo"], slip=mem[s]["slip"], turnover_cr=mem[s]["turnover_cr"])  # noqa: E731
+    daily = bars([ticker(s, mkt) for s in sig.sym], "6mo", "1d", cfg["tz"]) if len(sig) else {}
+    ctx = lambda s: context(befores.get(s), _before(daily.get(ticker(s, mkt)), day))  # noqa: E731
     return dict(meta=dict(meta, signals=n, near_misses=_near(df, set(sig.sym))),
-                candidates=make_cands(sig.drop(columns=["fo"]), packs, cfg, info))
+                candidates=make_cands(sig.drop(columns=["fo"]), packs, cfg, info, ctx))
+
+
+def _before(d, day):
+    return d[d.index.date < day] if d is not None else None
 
 
 def scan_market(mkt, wait=True, day=None):
@@ -303,7 +343,8 @@ def scan_market(mkt, wait=True, day=None):
             "near_misses": df[(df.relvol >= 1.2)].assign(_d=df.dist_or_hi.abs())
             .sort_values("relvol", ascending=False).head(10)[["sym", "relvol", "dist_or_hi", "move_today"]]
             .round(4).to_dict("records")}
-    cands = make_cands(sig, packs, cfg)
+    ctx = lambda s: context(_before(b5.get(ticker(s, mkt)), today), _before(daily.get(ticker(s, mkt)), today))  # noqa: E731
+    cands = make_cands(sig, packs, cfg, ctx=ctx)
     return dict(meta=meta, candidates=cands)
 
 
@@ -316,8 +357,11 @@ SYSTEM = (
     "({acct}). Every position is closed the same day by {cutoff} local time; entries are allowed until "
     "{latest}. A rule-based opening-range scanner flagged the stock; it has NOT proved it makes money. "
     "Work only from the fact pack: today's 5-minute bars so far, the opening range, relative volume, "
-    "VWAP, yesterday's levels and the index move. No news, no fundamentals, nothing you remember about "
-    "later prices. Cite numbers from the pack for every claim. Costs and slippage are about {cost} of a "
+    "VWAP and the index move; `context` adds the previous session in 15-minute bars and the last 10 daily "
+    "bars with the daily ATR, 20-day range and 5/20-day returns. The decision is taken right after the "
+    "15-minute opening range, so today has only three or four 5-minute bars by design: read them against "
+    "yesterday's session and the daily bars instead of asking for more. No news, no fundamentals, nothing "
+    "you remember about later prices. Cite numbers from the pack for every claim. Costs and slippage are about {cost} of a "
     "typical trade's risk, so a marginal edge is a loss."
 )
 BULL = ("You are the Bull. Make the strongest honest case for going LONG this stock today: where to enter, "
@@ -418,7 +462,7 @@ def debate(mkt, scan, caller=None):
                                **({"liquidity": dict(c["pool"], note="outside F&O: LONG only, a SHORT is not traded")
                                    if not c["pool"]["fo"] else c["pool"]} if c.get("pool") else {}),
                                rule_based_plan=c["mechanical"], index_move_today=scan["meta"].get(cfg["meta_move"]),
-                               bars_5m_today=c["bars_5m"]), default=str)
+                               bars_5m_today=c["bars_5m"], context=c.get("context")), default=str)
         memory = judge_memory(mkt, c, scan)
         try:
             bull = caller(C.DEBATE_MODEL_ARGUE, pack, BULL, "low", system=system)
