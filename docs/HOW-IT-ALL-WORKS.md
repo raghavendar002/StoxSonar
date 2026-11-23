@@ -2,6 +2,8 @@
 
 *Written 22 Nov 2026 from the code on `main` (commit `2519a2b`). Every claim below was checked against the code, the ledger database and the files in the repository, not against memory or old design docs. Where the docs and the code disagree, section 16 says so.*
 
+*Updated 23 Nov 2026: the wide India pool is live for the debates (11.1, 11.7), and the intraday debaters now get the previous session and the last 10 daily bars (11.4a).*
+
 This guide is for the owner. Each section starts with the plain answer, then gives the technical detail and the file to look at. You can stop reading any section after its first paragraph.
 
 ---
@@ -530,7 +532,7 @@ File: `paper/intraday.py`. Workflow: `.github/workflows/intraday.yml`.
 | Money | ₹1,00,000 | $1,000 |
 | Risk per trade | ₹500 (0.5%) | $5 (0.5%) |
 | Sides | long and short (intraday MIS) | long only (cash account; a SHORT verdict is logged, not traded) |
-| Stock list | 80 liquid F&O names (Nifty 50 + active Next 50) | ~100 large US names |
+| Stock list | wide pool: ~456 liquid Nifty 500 names (since 24 Nov; the 80 F&O names stay as a control twin) | ~100 large US names |
 | Entries allowed until | 14:00 | 14:30 New York |
 | Everything closed by | 15:15 | 15:50 New York |
 | Leverage | Judge conviction 4–5 → up to 2x position size (risk stays ₹500) | none |
@@ -565,7 +567,7 @@ The trigger must sit within 0.6% of the last price, the stop 0.15–2% from the 
 flowchart LR
     A[09:31 scan<br/>5-min bars from Yahoo] --> B{relvol ≥ 1.5x and<br/>within 0.3% of range edge}
     B -->|top 2| T[Twin orders<br/>fixed plan]
-    B -->|top 4| P[Fact pack: today's 5-min bars,<br/>opening range, VWAP, yesterday, index]
+    B -->|top 4| P[Fact pack: today's 5-min bars,<br/>opening range, VWAP, index,<br/>yesterday in 15-min bars,<br/>last 10 daily bars]
     P --> BU[Bull: Sonnet 5.5, low]
     BU --> BR[Bear rebuts: Sonnet 5.5, low]
     MEM[Judge memory<br/>own record + 5 similar setups + lessons] --> J
@@ -575,6 +577,16 @@ flowchart LR
     T & JO --> S[After the close: simulate on<br/>1-min bars, slippage + costs]
     S --> SH[Shadow: score every candidate<br/>both ways → memory]
 ```
+
+### 11.4a What the Bull, Bear and Judge see (the fact pack)
+The decision is taken right after the 15-minute opening range, so **today** has only three or four 5-minute bars (09:15–09:30, plus the bar that has just started on an on-time run). That is by design: waiting for more of today's bars means entering later, after much of the opening move.
+
+Since 24 Nov the pack also carries what came **before** today (`context` in `scan.json`, built by `paper/intraday.py context()`):
+- the previous session in **15-minute bars** (25 bars for India);
+- the last **10 daily bars** (open, high, low, close, volume);
+- the daily ATR(14), 20-day average volume, 20-day high and low, and 5- and 20-day returns.
+
+All of it is from before the scan day, so it adds no hindsight. Before 24 Nov the debaters got only single numbers for the past (yesterday's close, high and low, the gap and the 20-day average), which is why their texts kept saying "only four candles". The extra numbers add about a cent per stock to the API bill.
 
 ### 11.5 Settling on 1-minute bars
 
@@ -596,8 +608,8 @@ Indian costs are modelled in full: brokerage ₹20 or 0.03%, STT, exchange fee, 
 ### 11.6 Late or missed runs
 If a scan starts more than 30 minutes after the open, it **replays** the open from that day's 5-minute bars, cut at the checkpoint. The Judge sees exactly what an on-time run would have seen, and orders start 2 minutes after the checkpoint. The day is marked `replayed`.
 
-### 11.7 The wide India pool (built, running in "shadow")
-Since 18 Nov a second, wider list is built each evening after the India settle (`paper/pool.py`): Nifty 500 stocks in the EQ series, a price band of 10% or more, price ≥ ₹50, and median turnover ≥ ₹10 crore a day. Shorts are allowed only on F&O names. Right now it runs in **shadow mode** (`INTRA_WIDE` defaults to `"shadow"`). It is scanned and its own rule twin is logged, but the debates still use the 80-stock list. Switching it live is a one-line setting.
+### 11.7 The wide India pool (live since 24 Nov)
+Since 18 Nov a second, wider list is built each evening after the India settle (`paper/pool.py`): Nifty 500 stocks in the EQ series, a price band of 10% or more, price ≥ ₹50, and median turnover ≥ ₹10 crore a day (about 456 stocks). Shorts are allowed only on F&O names; slippage is 0.05% a side for F&O names, 0.10% for turnover ≥ ₹50 crore, 0.20% below. It ran silently on 19, 20 and 23 Nov (every stock scanned, none missing, 42–60 s), and Raghav switched it live on 23 Nov: from 24 Nov the 4 debates come from the wide pool (`INTRA_WIDE` defaults to `"live"`). The 80-stock rule twin keeps running as a **control** (`orders.pools.f80`); after 150 signals the wide pool has to beat it after costs, or the debates go back to the 80.
 
 ### 11.8 Files for one day
 `paper/out/<in|us>/<date>/`: `scan.json` (candidates and bars), `debates.json` (Bull, Bear, Judge texts, verdict, cost, memory), `orders.json` (Twin and Judge orders), `settle.json` (both books, the shadow scores and the pool test).
@@ -720,7 +732,7 @@ These are the places where a doc, the app, or an earlier plan says one thing and
 | 5 | Lessons / "the Brain learns" | **No lessons exist yet**, in any market. Mid-term needs 8 closed judged trades (1 so far). Intraday needs 20 scored calls. `paper/brain/` hasn't been created. |
 | 6 | Intraday design doc: up to 6 debates per market | Code: **4** (`INTRA_MAX_DEBATE`, default 4). |
 | 7 | Intraday design doc: US data from an Alpaca paper account | No Alpaca. US intraday prices come from **Yahoo** (free, a few minutes late). |
-| 8 | Wide India pool "rolls out" | Built and scanned daily, but in **shadow** mode only. Debates still use the 80 F&O names. |
+| 8 | Wide India pool "rolls out" | Live since 24 Nov: debates come from the wide pool; the 80 F&O names run only as a control twin. |
 | 9 | Push alerts to your iPhone | Code and workflow steps exist and skip quietly until `VAPID_PRIVATE_KEY` and `PUSH_SUBS` are set. **Nobody has confirmed that an alert reached your phone.** Code can't show whether the secrets are set. |
 | 10 | Intraday results on Telegram | Intraday runs send **push alerts only**, not Telegram. Telegram gets intraday news only through the watchdog. |
 | 11 | Refusals | If Claude declines a request (`stop_reason == "refusal"`), the debate is logged as `refused` and skipped. There is no automatic fallback to another model. |
@@ -888,5 +900,5 @@ In the US the Judge said NO_TRADE on 12 of 14 calls. Its two LONG calls on Tuesd
 | **VAPID** | The key pair that lets push services trust that alerts come from StoxSonar. |
 | **VWAP** | Volume-weighted average price for the day so far. |
 | **Watchdog** | The missed-run check. |
-| **Wide pool** | The larger Nifty 500 intraday list, currently in shadow mode. |
+| **Wide pool** | The larger Nifty 500 intraday list (~456 stocks); feeds the India intraday debates since 24 Nov. |
 | **yfinance** | The free, unofficial Python library that reads Yahoo Finance. |
