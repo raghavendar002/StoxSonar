@@ -1,0 +1,104 @@
+{
+ "decided": "2026-11-23T04:03:48+00:00",
+ "note": "Live paper day.",
+ "mechanical": [
+  {
+   "sym": "INDUSINDBK",
+   "side": "short",
+   "trigger": 973.66,
+   "stop": 1003.45,
+   "target": 914.09,
+   "latest_entry": "14:00",
+   "cutoff": "15:15"
+  },
+  {
+   "sym": "AXISBANK",
+   "side": "short",
+   "trigger": 1405.7,
+   "stop": 1448.0,
+   "target": 1321.1,
+   "latest_entry": "14:00",
+   "cutoff": "15:15"
+  }
+ ],
+ "judge": [
+  {
+   "sym": "INDUSINDBK",
+   "side": "short",
+   "trigger": 973.65,
+   "stop": 985.0,
+   "target": 955.5,
+   "conviction": 2,
+   "leverage": 1,
+   "latest_entry": "14:00",
+   "cutoff": "15:15"
+  },
+  {
+   "sym": "AXISBANK",
+   "side": "short",
+   "trigger": 1405.7,
+   "stop": 1419.5,
+   "target": 1384.5,
+   "conviction": 2,
+   "leverage": 1,
+   "latest_entry": "14:00",
+   "cutoff": "15:15"
+  },
+  {
+   "sym": "ADANIENT",
+   "side": "short",
+   "trigger": 2708.5,
+   "stop": 2732.5,
+   "target": 2672.5,
+   "conviction": 2,
+   "leverage": 1,
+   "latest_entry": "14:00",
+   "cutoff": "15:15"
+  }
+ ],
+ "replayed": false,
+ "pools": {
+  "f80": [
+   {
+    "sym": "INDUSINDBK",
+    "side": "short",
+    "trigger": 973.66,
+    "stop": 1003.45,
+    "target": 914.09,
+    "latest_entry": "14:00",
+    "cutoff": "15:15"
+   },
+   {
+    "sym": "AXISBANK",
+    "side": "short",
+    "trigger": 1405.7,
+    "stop": 1448.0,
+    "target": 1321.1,
+    "latest_entry": "14:00",
+    "cutoff": "15:15"
+   }
+  ],
+  "wide": [
+   {
+    "sym": "APLAPOLLO",
+    "side": "short",
+    "trigger": 1908.55,
+    "stop": 1959.15,
+    "target": 1807.35,
+    "latest_entry": "14:00",
+    "cutoff": "15:15",
+    "slip": 0.0005
+   },
+   {
+    "sym": "ICICIGI",
+    "side": "short",
+    "trigger": 1731.93,
+    "stop": 1760.8,
+    "target": 1674.2,
+    "latest_entry": "14:00",
+    "cutoff": "15:15",
+    "slip": 0.0005
+   }
+  ]
+ }
+}
