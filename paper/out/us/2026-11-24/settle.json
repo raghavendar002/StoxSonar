@@ -1,0 +1,169 @@
+{
+ "mechanical": {
+  "trades": [
+   {
+    "status": "closed",
+    "entry": 100.740144,
+    "entry_t": "2026-11-24 09:51:00-05:00",
+    "exit": 96.10077874603272,
+    "exit_t": "2026-11-24 15:50:00-05:00",
+    "reason": "time",
+    "sym": "MDT",
+    "side": "long",
+    "qty": 0.8726,
+    "costs": 0.0025,
+    "pnl": -4.05,
+    "r_mult": -0.81
+   },
+   {
+    "status": "closed",
+    "entry": 197.099412,
+    "entry_t": "2026-11-24 10:09:00-05:00",
+    "exit": 194.581076,
+    "exit_t": "2026-11-24 10:43:00-05:00",
+    "reason": "stop",
+    "sym": "RTX",
+    "side": "long",
+    "qty": 2.0492,
+    "costs": 0.0114,
+    "pnl": -5.17,
+    "r_mult": -1.03
+   }
+  ],
+  "end_cash": 990.78
+ },
+ "judge": {
+  "trades": [],
+  "end_cash": 1000.0
+ },
+ "shadow": [
+  {
+   "sym": "MDT",
+   "side": "long",
+   "rule": {
+    "status": "closed",
+    "entry": 100.740144,
+    "entry_t": "2026-11-24 09:51:00-05:00",
+    "exit": 96.10077874603272,
+    "exit_t": "2026-11-24 15:50:00-05:00",
+    "reason": "time",
+    "sym": "MDT",
+    "side": "long",
+    "qty": 0.8726,
+    "costs": 0.0025,
+    "pnl": -4.05,
+    "r_mult": -0.81
+   },
+   "judge_levels": {
+    "status": "closed",
+    "entry": 100.77015,
+    "entry_t": "2026-11-24 09:52:00-05:00",
+    "exit": 99.93001000000001,
+    "exit_t": "2026-11-24 09:57:00-05:00",
+    "reason": "stop",
+    "sym": "MDT",
+    "side": "long",
+    "qty": 4.9628,
+    "costs": 0.0146,
+    "pnl": -4.18,
+    "r_mult": -1.05
+   }
+  },
+  {
+   "sym": "RTX",
+   "side": "long",
+   "rule": {
+    "status": "closed",
+    "entry": 197.099412,
+    "entry_t": "2026-11-24 10:09:00-05:00",
+    "exit": 194.581076,
+    "exit_t": "2026-11-24 10:43:00-05:00",
+    "reason": "stop",
+    "sym": "RTX",
+    "side": "long",
+    "qty": 2.0492,
+    "costs": 0.0114,
+    "pnl": -5.17,
+    "r_mult": -1.03
+   },
+   "judge_levels": {
+    "status": "closed",
+    "entry": 197.099412,
+    "entry_t": "2026-11-24 10:09:00-05:00",
+    "exit": 195.61087,
+    "exit_t": "2026-11-24 10:25:00-05:00",
+    "reason": "stop",
+    "sym": "RTX",
+    "side": "long",
+    "qty": 2.5373,
+    "costs": 0.0142,
+    "pnl": -3.79,
+    "r_mult": -1.06
+   }
+  },
+  {
+   "sym": "MMM",
+   "side": "long",
+   "rule": {
+    "status": "closed",
+    "entry": 186.11221194763183,
+    "entry_t": "2026-11-24 09:49:00-05:00",
+    "exit": 186.75263528747558,
+    "exit_t": "2026-11-24 15:50:00-05:00",
+    "reason": "time",
+    "sym": "MMM",
+    "side": "long",
+    "qty": 2.0492,
+    "costs": 0.011,
+    "pnl": 1.3,
+    "r_mult": 0.26
+   },
+   "judge_levels": {
+    "status": "closed",
+    "entry": 186.11221194763183,
+    "entry_t": "2026-11-24 09:49:00-05:00",
+    "exit": 184.86302,
+    "exit_t": "2026-11-24 11:01:00-05:00",
+    "reason": "stop",
+    "sym": "MMM",
+    "side": "long",
+    "qty": 2.6901,
+    "costs": 0.0143,
+    "pnl": -3.37,
+    "r_mult": -1.29
+   }
+  },
+  {
+   "sym": "INTU",
+   "side": "long",
+   "rule": {
+    "status": "closed",
+    "entry": 279.56591176757814,
+    "entry_t": "2026-11-24 09:49:00-05:00",
+    "exit": 278.4292883544922,
+    "exit_t": "2026-11-24 15:50:00-05:00",
+    "reason": "time",
+    "sym": "INTU",
+    "side": "long",
+    "qty": 0.5814,
+    "costs": 0.0046,
+    "pnl": -0.67,
+    "r_mult": -0.13
+   },
+   "judge_levels": {
+    "status": "closed",
+    "entry": 279.65592000000004,
+    "entry_t": "2026-11-24 09:49:00-05:00",
+    "exit": 283.64326,
+    "exit_t": "2026-11-24 10:00:00-05:00",
+    "reason": "target",
+    "sym": "INTU",
+    "side": "long",
+    "qty": 1.7883,
+    "costs": 0.0144,
+    "pnl": 7.12,
+    "r_mult": 1.47
+   }
+  }
+ ]
+}
