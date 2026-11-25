@@ -1,0 +1,109 @@
+{
+ "decided": "2026-11-25T04:04:21+00:00",
+ "note": "Live paper day.",
+ "mechanical": [
+  {
+   "sym": "APLAPOLLO",
+   "side": "short",
+   "trigger": 1418.79,
+   "stop": 1503.0,
+   "target": 1250.37,
+   "latest_entry": "14:00",
+   "cutoff": "15:15",
+   "slip": 0.0005
+  },
+  {
+   "sym": "BRIGADE",
+   "side": "long",
+   "trigger": 618.31,
+   "stop": 600.5,
+   "target": 653.93,
+   "latest_entry": "14:00",
+   "cutoff": "15:15",
+   "slip": 0.002
+  }
+ ],
+ "judge": [
+  {
+   "sym": "BRIGADE",
+   "side": "long",
+   "trigger": 618.31,
+   "stop": 609.5,
+   "target": 632.5,
+   "conviction": 3,
+   "leverage": 1,
+   "latest_entry": "14:00",
+   "cutoff": "15:15",
+   "slip": 0.002
+  },
+  {
+   "sym": "NH",
+   "side": "long",
+   "trigger": 2064.5,
+   "stop": 2040.0,
+   "target": 2110.0,
+   "conviction": 2,
+   "leverage": 1,
+   "latest_entry": "14:00",
+   "cutoff": "15:15",
+   "slip": 0.002
+  },
+  {
+   "sym": "SOBHA",
+   "side": "long",
+   "trigger": 1280.5,
+   "stop": 1264.0,
+   "target": 1306.0,
+   "conviction": 2,
+   "leverage": 1,
+   "latest_entry": "14:00",
+   "cutoff": "15:15",
+   "slip": 0.002
+  }
+ ],
+ "replayed": false,
+ "pools": {
+  "f80": [
+   {
+    "sym": "DABUR",
+    "side": "long",
+    "trigger": 410.41,
+    "stop": 401.75,
+    "target": 427.72,
+    "latest_entry": "14:00",
+    "cutoff": "15:15"
+   },
+   {
+    "sym": "ITC",
+    "side": "long",
+    "trigger": 306.35,
+    "stop": 301.52,
+    "target": 316.03,
+    "latest_entry": "14:00",
+    "cutoff": "15:15"
+   }
+  ],
+  "wide": [
+   {
+    "sym": "APLAPOLLO",
+    "side": "short",
+    "trigger": 1418.79,
+    "stop": 1503.0,
+    "target": 1250.37,
+    "latest_entry": "14:00",
+    "cutoff": "15:15",
+    "slip": 0.0005
+   },
+   {
+    "sym": "BRIGADE",
+    "side": "long",
+    "trigger": 618.31,
+    "stop": 600.5,
+    "target": 653.93,
+    "latest_entry": "14:00",
+    "cutoff": "15:15",
+    "slip": 0.002
+   }
+  ]
+ }
+}
