@@ -1,0 +1,11 @@
+{
+ "mechanical": {
+  "trades": [],
+  "end_cash": 1000.0
+ },
+ "judge": {
+  "trades": [],
+  "end_cash": 1000.0
+ },
+ "shadow": []
+}
