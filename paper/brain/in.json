@@ -1,0 +1,54 @@
+{
+ "lessons": [
+  {
+   "id": 1,
+   "version": 1,
+   "text": "On longs, refusing is wrong when price sits 0% to 0.5% above VWAP and the stock is up less than about 2.3% so far, so take these. Pass on longs stretched more than 0.6% above VWAP or up more than 2.5% on the day, because the rule plan lost on all three such longs here, whatever the relative volume.",
+   "n_cases": 9,
+   "added": "2026-11-25",
+   "cases": [
+    "2026-11-16 GRASIM",
+    "2026-11-17 EICHERMOT",
+    "2026-11-19 HINDALCO",
+    "2026-11-19 PNB",
+    "2026-11-19 BANKBARODA",
+    "2026-11-20 MUTHOOTFIN",
+    "2026-11-20 TECHM",
+    "2026-11-25 BRIGADE",
+    "2026-11-25 SOBHA"
+   ]
+  },
+  {
+   "id": 2,
+   "version": 1,
+   "text": "Favour shorts when the index is down and the stock is also down on the day: the rule plan made money in 6 of 6 such filled cases here, so do not refuse them. Pass on shorts when the index is up or the stock is green on the day: the rule plan lost or went flat in all four such cases.",
+   "n_cases": 10,
+   "added": "2026-11-25",
+   "cases": [
+    "2026-11-16 COALINDIA",
+    "2026-11-16 BRITANNIA",
+    "2026-11-18 MUTHOOTFIN",
+    "2026-11-18 SBIN",
+    "2026-11-18 INDUSINDBK",
+    "2026-11-23 INDUSINDBK",
+    "2026-11-23 AXISBANK",
+    "2026-11-23 CANBK",
+    "2026-11-23 ADANIENT",
+    "2026-11-25 APLAPOLLO"
+   ]
+  }
+ ],
+ "reviews": [
+  {
+   "created_utc": "2026-11-25T10:16:45+00:00",
+   "version": 1,
+   "n_scored": 21,
+   "status": "done",
+   "added": 2,
+   "dropped": 0,
+   "rejected": [],
+   "summary": "The Judge was right on moderate longs it took near VWAP (13) and on shorts taken with a falling index (8, 21), and it correctly refused shorts against a rising index or on a stock that was up (3, 7, 22). It refused too much: it passed five longs sitting just above VWAP that the rule plan made money on (0, 5, 11, 12) and one short in a down market (20), all at conviction 2. It lost on longs that were already stretched above VWAP or up a lot on the day (15, 23, 25), and its own tighter levels turned rule-plan winners into losses on two down-market shorts (18, 19).",
+   "cost_usd": 0.0589
+  }
+ ]
+}

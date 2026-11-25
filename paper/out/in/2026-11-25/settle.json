@@ -1,0 +1,242 @@
+{
+ "mechanical": {
+  "trades": [
+   {
+    "status": "closed",
+    "entry": 1418.080605,
+    "entry_t": "2026-11-25 09:40:00+05:30",
+    "exit": 1503.7514999999999,
+    "exit_t": "2026-11-25 10:39:00+05:30",
+    "reason": "stop",
+    "sym": "APLAPOLLO",
+    "side": "short",
+    "qty": 5.0,
+    "costs": 7.79,
+    "pnl": -436.14,
+    "r_mult": -1.04
+   },
+   {
+    "status": "closed",
+    "entry": 619.54662,
+    "entry_t": "2026-11-25 09:36:00+05:30",
+    "exit": 599.299,
+    "exit_t": "2026-11-25 10:20:00+05:30",
+    "reason": "stop",
+    "sym": "BRIGADE",
+    "side": "long",
+    "qty": 28.0,
+    "costs": 18.03,
+    "pnl": -584.96,
+    "r_mult": -1.17
+   }
+  ],
+  "end_cash": 98978.89
+ },
+ "judge": {
+  "trades": [
+   {
+    "status": "closed",
+    "entry": 619.54662,
+    "entry_t": "2026-11-25 09:36:00+05:30",
+    "exit": 608.281,
+    "exit_t": "2026-11-25 09:58:00+05:30",
+    "reason": "stop",
+    "sym": "BRIGADE",
+    "side": "long",
+    "qty": 56.0,
+    "costs": 36.39,
+    "pnl": -667.26,
+    "r_mult": -1.35
+   },
+   {
+    "status": "not_triggered",
+    "sym": "NH",
+    "side": "long",
+    "qty": 20.0
+   }
+  ],
+  "end_cash": 99332.74
+ },
+ "shadow": [
+  {
+   "sym": "APLAPOLLO",
+   "side": "short",
+   "rule": {
+    "status": "closed",
+    "entry": 1418.080605,
+    "entry_t": "2026-11-25 09:40:00+05:30",
+    "exit": 1503.7514999999999,
+    "exit_t": "2026-11-25 10:39:00+05:30",
+    "reason": "stop",
+    "sym": "APLAPOLLO",
+    "side": "short",
+    "qty": 5.0,
+    "costs": 7.79,
+    "pnl": -436.14,
+    "r_mult": -1.04
+   },
+   "judge_levels": {
+    "status": "closed",
+    "entry": 1418.080605,
+    "entry_t": "2026-11-25 09:40:00+05:30",
+    "exit": 1375.6875,
+    "exit_t": "2026-11-25 09:41:00+05:30",
+    "reason": "target",
+    "sym": "APLAPOLLO",
+    "side": "short",
+    "qty": 19.0,
+    "costs": 28.06,
+    "pnl": 777.41,
+    "r_mult": 1.56
+   }
+  },
+  {
+   "sym": "BRIGADE",
+   "side": "long",
+   "rule": {
+    "status": "closed",
+    "entry": 619.54662,
+    "entry_t": "2026-11-25 09:36:00+05:30",
+    "exit": 599.299,
+    "exit_t": "2026-11-25 10:20:00+05:30",
+    "reason": "stop",
+    "sym": "BRIGADE",
+    "side": "long",
+    "qty": 28.0,
+    "costs": 18.03,
+    "pnl": -584.96,
+    "r_mult": -1.17
+   },
+   "judge_levels": {
+    "status": "closed",
+    "entry": 618.6191549999999,
+    "entry_t": "2026-11-25 09:36:00+05:30",
+    "exit": 609.19525,
+    "exit_t": "2026-11-25 09:58:00+05:30",
+    "reason": "stop",
+    "sym": "BRIGADE",
+    "side": "long",
+    "qty": 56.0,
+    "costs": 36.4,
+    "pnl": -564.14,
+    "r_mult": -1.14
+   }
+  },
+  {
+   "sym": "NH",
+   "side": "long",
+   "rule": {
+    "status": "not_triggered",
+    "sym": "NH",
+    "side": "long",
+    "qty": 7.0
+   },
+   "judge_levels": {
+    "status": "not_triggered",
+    "sym": "NH",
+    "side": "long",
+    "qty": 20.0
+   }
+  },
+  {
+   "sym": "SOBHA",
+   "side": "long",
+   "rule": {
+    "status": "closed",
+    "entry": 1286.2673510742188,
+    "entry_t": "2026-11-25 09:35:00+05:30",
+    "exit": 1251.5917756347656,
+    "exit_t": "2026-11-25 12:54:00+05:30",
+    "reason": "stop",
+    "sym": "SOBHA",
+    "side": "long",
+    "qty": 20.0,
+    "costs": 26.84,
+    "pnl": -720.35,
+    "r_mult": -1.49
+   },
+   "judge_levels": {
+    "status": "closed",
+    "entry": 1284.341801147461,
+    "entry_t": "2026-11-25 09:35:00+05:30",
+    "exit": 1263.3680000000002,
+    "exit_t": "2026-11-25 10:38:00+05:30",
+    "reason": "stop",
+    "sym": "SOBHA",
+    "side": "long",
+    "qty": 30.0,
+    "costs": 40.46,
+    "pnl": -669.67,
+    "r_mult": -1.35
+   }
+  }
+ ],
+ "pools": {
+  "f80": {
+   "trades": [
+    {
+     "status": "closed",
+     "entry": 410.615205,
+     "entry_t": "2026-11-25 09:35:00+05:30",
+     "exit": 427.5061400000001,
+     "exit_t": "2026-11-25 11:58:00+05:30",
+     "reason": "target",
+     "sym": "DABUR",
+     "side": "long",
+     "qty": 57.0,
+     "costs": 25.44,
+     "pnl": 937.34,
+     "r_mult": 1.9
+    },
+    {
+     "status": "closed",
+     "entry": 306.503175,
+     "entry_t": "2026-11-25 09:57:00+05:30",
+     "exit": 309.1453377990723,
+     "exit_t": "2026-11-25 15:14:00+05:30",
+     "reason": "time",
+     "sym": "ITC",
+     "side": "long",
+     "qty": 103.0,
+     "costs": 33.65,
+     "pnl": 238.49,
+     "r_mult": 0.48
+    }
+   ],
+   "end_cash": 101175.84
+  },
+  "wide": {
+   "trades": [
+    {
+     "status": "closed",
+     "entry": 1418.080605,
+     "entry_t": "2026-11-25 09:40:00+05:30",
+     "exit": 1503.7514999999999,
+     "exit_t": "2026-11-25 10:39:00+05:30",
+     "reason": "stop",
+     "sym": "APLAPOLLO",
+     "side": "short",
+     "qty": 5.0,
+     "costs": 7.79,
+     "pnl": -436.14,
+     "r_mult": -1.04
+    },
+    {
+     "status": "closed",
+     "entry": 619.54662,
+     "entry_t": "2026-11-25 09:36:00+05:30",
+     "exit": 599.299,
+     "exit_t": "2026-11-25 10:20:00+05:30",
+     "reason": "stop",
+     "sym": "BRIGADE",
+     "side": "long",
+     "qty": 28.0,
+     "costs": 18.03,
+     "pnl": -584.96,
+     "r_mult": -1.17
+    }
+   ],
+   "end_cash": 98978.89
+  }
+ }
+}
