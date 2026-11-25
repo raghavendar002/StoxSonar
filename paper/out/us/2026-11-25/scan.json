@@ -1,0 +1,73 @@
+{
+ "meta": {
+  "date": "2026-11-25",
+  "market": "us",
+  "checkpoint_et": "2026-11-25 09:50:00-05:00",
+  "spy_move_today": -0.008233843802601282,
+  "universe": 100,
+  "signals": 0,
+  "near_misses": [
+   {
+    "sym": "DE",
+    "relvol": 8.0976,
+    "dist_or_hi": -0.0137,
+    "move_today": 0.0419
+   },
+   {
+    "sym": "MDT",
+    "relvol": 1.8822,
+    "dist_or_hi": -0.0275,
+    "move_today": -0.0055
+   },
+   {
+    "sym": "INTU",
+    "relvol": 1.8428,
+    "dist_or_hi": -0.0199,
+    "move_today": -0.0138
+   },
+   {
+    "sym": "TSLA",
+    "relvol": 1.7639,
+    "dist_or_hi": -0.0257,
+    "move_today": -0.0257
+   },
+   {
+    "sym": "TXN",
+    "relvol": 1.7557,
+    "dist_or_hi": -0.0056,
+    "move_today": 0.0019
+   },
+   {
+    "sym": "MS",
+    "relvol": 1.7411,
+    "dist_or_hi": -0.0078,
+    "move_today": -0.0053
+   },
+   {
+    "sym": "COST",
+    "relvol": 1.6937,
+    "dist_or_hi": -0.0073,
+    "move_today": -0.002
+   },
+   {
+    "sym": "AMGN",
+    "relvol": 1.6721,
+    "dist_or_hi": -0.0211,
+    "move_today": -0.0211
+   },
+   {
+    "sym": "CRM",
+    "relvol": 1.5188,
+    "dist_or_hi": -0.0151,
+    "move_today": -0.0082
+   },
+   {
+    "sym": "META",
+    "relvol": 1.4728,
+    "dist_or_hi": -0.0148,
+    "move_today": -0.0078
+   }
+  ]
+ },
+ "candidates": []
+}
