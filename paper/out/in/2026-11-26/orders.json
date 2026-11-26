@@ -1,0 +1,97 @@
+{
+ "decided": "2026-11-26T04:04:30+00:00",
+ "note": "Live paper day.",
+ "mechanical": [
+  {
+   "sym": "SCHAEFFLER",
+   "side": "long",
+   "trigger": 3751.88,
+   "stop": 3664.9,
+   "target": 3925.83,
+   "latest_entry": "14:00",
+   "cutoff": "15:15",
+   "slip": 0.002
+  },
+  {
+   "sym": "TORNTPHARM",
+   "side": "long",
+   "trigger": 4983.49,
+   "stop": 4916.1,
+   "target": 5118.27,
+   "latest_entry": "14:00",
+   "cutoff": "15:15",
+   "slip": 0.0005
+  }
+ ],
+ "judge": [
+  {
+   "sym": "SCHAEFFLER",
+   "side": "long",
+   "trigger": 3752.0,
+   "stop": 3708.0,
+   "target": 3830.0,
+   "conviction": 3,
+   "leverage": 1,
+   "latest_entry": "14:00",
+   "cutoff": "15:15",
+   "slip": 0.002
+  },
+  {
+   "sym": "TORNTPHARM",
+   "side": "long",
+   "trigger": 4983.5,
+   "stop": 4950.0,
+   "target": 5055.0,
+   "conviction": 3,
+   "leverage": 1,
+   "latest_entry": "14:00",
+   "cutoff": "15:15",
+   "slip": 0.0005
+  }
+ ],
+ "replayed": false,
+ "pools": {
+  "f80": [
+   {
+    "sym": "HDFCBANK",
+    "side": "long",
+    "trigger": 856.38,
+    "stop": 845.75,
+    "target": 877.63,
+    "latest_entry": "14:00",
+    "cutoff": "15:15"
+   },
+   {
+    "sym": "HINDUNILVR",
+    "side": "short",
+    "trigger": 2124.94,
+    "stop": 2150.0,
+    "target": 2074.81,
+    "latest_entry": "14:00",
+    "cutoff": "15:15"
+   }
+  ],
+  "wide": [
+   {
+    "sym": "SCHAEFFLER",
+    "side": "long",
+    "trigger": 3751.88,
+    "stop": 3664.9,
+    "target": 3925.83,
+    "latest_entry": "14:00",
+    "cutoff": "15:15",
+    "slip": 0.002
+   },
+   {
+    "sym": "TORNTPHARM",
+    "side": "long",
+    "trigger": 4983.49,
+    "stop": 4916.1,
+    "target": 5118.27,
+    "latest_entry": "14:00",
+    "cutoff": "15:15",
+    "slip": 0.0005
+   }
+  ]
+ }
+}
