@@ -1,0 +1,51 @@
+{
+ "mechanical": {
+  "trades": [
+   {
+    "status": "closed",
+    "entry": 141.82836,
+    "entry_t": "2026-11-27 09:48:00-05:00",
+    "exit": 141.16176444091798,
+    "exit_t": "2026-11-27 12:45:00-05:00",
+    "reason": "time",
+    "sym": "MRK",
+    "side": "long",
+    "qty": 3.5261,
+    "costs": 0.0144,
+    "pnl": -2.36,
+    "r_mult": -0.48
+   }
+  ],
+  "end_cash": 997.64
+ },
+ "judge": {
+  "trades": [],
+  "end_cash": 1000.0
+ },
+ "shadow": [
+  {
+   "sym": "MRK",
+   "side": "long",
+   "rule": {
+    "status": "closed",
+    "entry": 141.82836,
+    "entry_t": "2026-11-27 09:48:00-05:00",
+    "exit": 141.16176444091798,
+    "exit_t": "2026-11-27 12:45:00-05:00",
+    "reason": "time",
+    "sym": "MRK",
+    "side": "long",
+    "qty": 3.5261,
+    "costs": 0.0144,
+    "pnl": -2.36,
+    "r_mult": -0.48
+   },
+   "judge_levels": {
+    "status": "not_triggered",
+    "sym": "MRK",
+    "side": "long",
+    "qty": 3.5137
+   }
+  }
+ ]
+}
