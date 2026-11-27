@@ -1,0 +1,17 @@
+{
+ "decided": "2026-11-27T14:47:38+00:00",
+ "note": "Live paper day.",
+ "mechanical": [
+  {
+   "sym": "MRK",
+   "side": "long",
+   "trigger": 141.8,
+   "stop": 140.4,
+   "target": 144.59,
+   "latest_entry": "14:30",
+   "cutoff": "15:50"
+  }
+ ],
+ "judge": [],
+ "replayed": false
+}
