@@ -1,0 +1,4145 @@
+{
+ "market": "in",
+ "built_on": "2026-11-27",
+ "built_utc": "2026-11-27T10:19:03+00:00",
+ "build_s": 148,
+ "nifty500": 495,
+ "after_lists": 494,
+ "with_daily": 494,
+ "after_liquidity": 458,
+ "members": [
+  {
+   "sym": "HDFCBANK",
+   "fo": true,
+   "close": 857.25,
+   "turnover_cr": 3105.9,
+   "or_vol_norm": 3065642.7,
+   "dma20": 789.91,
+   "slip": 0.0005
+  },
+  {
+   "sym": "ICICIBANK",
+   "fo": true,
+   "close": 1593.4,
+   "turnover_cr": 2461.5,
+   "or_vol_norm": 926009.5,
+   "dma20": 1544.49,
+   "slip": 0.0005
+  },
+  {
+   "sym": "RELIANCE",
+   "fo": true,
+   "close": 1382.6,
+   "turnover_cr": 2394.3,
+   "or_vol_norm": 1689110.75,
+   "dma20": 1327.77,
+   "slip": 0.0005
+  },
+  {
+   "sym": "SBIN",
+   "fo": true,
+   "close": 1123.9,
+   "turnover_cr": 1742.1,
+   "or_vol_norm": 1044341.55,
+   "dma20": 1067.56,
+   "slip": 0.0005
+  },
+  {
+   "sym": "BHARTIARTL",
+   "fo": true,
+   "close": 2067.9,
+   "turnover_cr": 1393.2,
+   "or_vol_norm": 380717.35,
+   "dma20": 2088.07,
+   "slip": 0.0005
+  },
+  {
+   "sym": "BSE",
+   "fo": true,
+   "close": 3945.0,
+   "turnover_cr": 1268.8,
+   "or_vol_norm": 317345.4,
+   "dma20": 3772.53,
+   "slip": 0.0005
+  },
+  {
+   "sym": "INFY",
+   "fo": true,
+   "close": 1151.3,
+   "turnover_cr": 1196.4,
+   "or_vol_norm": 536632.35,
+   "dma20": 1143.05,
+   "slip": 0.0005
+  },
+  {
+   "sym": "BAJFINANCE",
+   "fo": true,
+   "close": 1080.0,
+   "turnover_cr": 982.4,
+   "or_vol_norm": 594272.35,
+   "dma20": 1063.96,
+   "slip": 0.0005
+  },
+  {
+   "sym": "KOTAKBANK",
+   "fo": true,
+   "close": 500.0,
+   "turnover_cr": 962.7,
+   "or_vol_norm": 718142.1,
+   "dma20": 486.15,
+   "slip": 0.0005
+  },
+  {
+   "sym": "AXISBANK",
+   "fo": true,
+   "close": 1380.1,
+   "turnover_cr": 954.8,
+   "or_vol_norm": 422899.0,
+   "dma20": 1326.63,
+   "slip": 0.0005
+  },
+  {
+   "sym": "M&M",
+   "fo": true,
+   "close": 3450.0,
+   "turnover_cr": 881.7,
+   "or_vol_norm": 175865.25,
+   "dma20": 3272.84,
+   "slip": 0.0005
+  },
+  {
+   "sym": "MCX",
+   "fo": true,
+   "close": 3900.0,
+   "turnover_cr": 877.0,
+   "or_vol_norm": 210689.6,
+   "dma20": 3549.54,
+   "slip": 0.0005
+  },
+  {
+   "sym": "KALYANKJIL",
+   "fo": true,
+   "close": 659.5,
+   "turnover_cr": 848.7,
+   "or_vol_norm": 1631444.7,
+   "dma20": 615.91,
+   "slip": 0.0005
+  },
+  {
+   "sym": "HINDALCO",
+   "fo": true,
+   "close": 923.0,
+   "turnover_cr": 830.8,
+   "or_vol_norm": 544238.85,
+   "dma20": 923.98,
+   "slip": 0.0005
+  },
+  {
+   "sym": "ETERNAL",
+   "fo": true,
+   "close": 363.0,
+   "turnover_cr": 827.4,
+   "or_vol_norm": 1307992.4,
+   "dma20": 360.05,
+   "slip": 0.0005
+  },
+  {
+   "sym": "DIVISLAB",
+   "fo": true,
+   "close": 11560.0,
+   "turnover_cr": 824.3,
+   "or_vol_norm": 57273.15,
+   "dma20": 10877.98,
+   "slip": 0.0005
+  },
+  {
+   "sym": "LT",
+   "fo": true,
+   "close": 4108.5,
+   "turnover_cr": 808.3,
+   "or_vol_norm": 91060.8,
+   "dma20": 4089.01,
+   "slip": 0.0005
+  },
+  {
+   "sym": "TCS",
+   "fo": true,
+   "close": 2572.5,
+   "turnover_cr": 785.3,
+   "or_vol_norm": 196237.95,
+   "dma20": 2465.46,
+   "slip": 0.0005
+  },
+  {
+   "sym": "GROWW",
+   "fo": false,
+   "close": 222.41,
+   "turnover_cr": 757.8,
+   "or_vol_norm": 4941799.55,
+   "dma20": 215.94,
+   "slip": 0.001
+  },
+  {
+   "sym": "MARUTI",
+   "fo": true,
+   "close": 13765.0,
+   "turnover_cr": 725.0,
+   "or_vol_norm": 41440.95,
+   "dma20": 12858.5,
+   "slip": 0.0005
+  },
+  {
+   "sym": "LAURUSLABS",
+   "fo": true,
+   "close": 2504.4,
+   "turnover_cr": 683.2,
+   "or_vol_norm": 179208.2,
+   "dma20": 2367.93,
+   "slip": 0.0005
+  },
+  {
+   "sym": "SHRIRAMFIN",
+   "fo": true,
+   "close": 923.5,
+   "turnover_cr": 575.5,
+   "or_vol_norm": 581898.5,
+   "dma20": 945.1,
+   "slip": 0.0005
+  },
+  {
+   "sym": "ITC",
+   "fo": true,
+   "close": 304.7,
+   "turnover_cr": 571.8,
+   "or_vol_norm": 1157315.35,
+   "dma20": 287.64,
+   "slip": 0.0005
+  },
+  {
+   "sym": "PAYTM",
+   "fo": true,
+   "close": 1741.9,
+   "turnover_cr": 509.8,
+   "or_vol_norm": 207910.8,
+   "dma20": 1777.82,
+   "slip": 0.0005
+  },
+  {
+   "sym": "POWERINDIA",
+   "fo": true,
+   "close": 31120.0,
+   "turnover_cr": 496.0,
+   "or_vol_norm": 14141.9,
+   "dma20": 29386.25,
+   "slip": 0.0005
+  },
+  {
+   "sym": "COFORGE",
+   "fo": true,
+   "close": 2071.0,
+   "turnover_cr": 477.2,
+   "or_vol_norm": 202737.2,
+   "dma20": 2050.47,
+   "slip": 0.0005
+  },
+  {
+   "sym": "TATASTEEL",
+   "fo": true,
+   "close": 163.94,
+   "turnover_cr": 462.2,
+   "or_vol_norm": 2624380.95,
+   "dma20": 176.97,
+   "slip": 0.0005
+  },
+  {
+   "sym": "TITAN",
+   "fo": true,
+   "close": 4675.3,
+   "turnover_cr": 459.4,
+   "or_vol_norm": 87743.85,
+   "dma20": 4734.93,
+   "slip": 0.0005
+  },
+  {
+   "sym": "PNB",
+   "fo": true,
+   "close": 146.5,
+   "turnover_cr": 458.9,
+   "or_vol_norm": 2513189.9,
+   "dma20": 138.39,
+   "slip": 0.0005
+  },
+  {
+   "sym": "ADANIPORTS",
+   "fo": true,
+   "close": 1880.0,
+   "turnover_cr": 451.8,
+   "or_vol_norm": 389986.45,
+   "dma20": 1902.02,
+   "slip": 0.0005
+  },
+  {
+   "sym": "HCLTECH",
+   "fo": true,
+   "close": 1424.1,
+   "turnover_cr": 450.4,
+   "or_vol_norm": 129309.0,
+   "dma20": 1397.03,
+   "slip": 0.0005
+  },
+  {
+   "sym": "SUNPHARMA",
+   "fo": true,
+   "close": 1899.9,
+   "turnover_cr": 433.6,
+   "or_vol_norm": 98306.95,
+   "dma20": 1854.17,
+   "slip": 0.0005
+  },
+  {
+   "sym": "APOLLOHOSP",
+   "fo": true,
+   "close": 9128.0,
+   "turnover_cr": 430.3,
+   "or_vol_norm": 42618.15,
+   "dma20": 8715.4,
+   "slip": 0.0005
+  },
+  {
+   "sym": "ATHERENERG",
+   "fo": true,
+   "close": 1888.4,
+   "turnover_cr": 419.9,
+   "or_vol_norm": 166350.9,
+   "dma20": 1864.0,
+   "slip": 0.0005
+  },
+  {
+   "sym": "DIXON",
+   "fo": true,
+   "close": 13138.0,
+   "turnover_cr": 416.5,
+   "or_vol_norm": 22234.8,
+   "dma20": 12644.05,
+   "slip": 0.0005
+  },
+  {
+   "sym": "MEESHO",
+   "fo": false,
+   "close": 258.44,
+   "turnover_cr": 414.3,
+   "or_vol_norm": 1121621.95,
+   "dma20": 243.68,
+   "slip": 0.001
+  },
+  {
+   "sym": "POLICYBZR",
+   "fo": true,
+   "close": 1186.5,
+   "turnover_cr": 412.7,
+   "or_vol_norm": 274341.4,
+   "dma20": 1032.09,
+   "slip": 0.0005
+  },
+  {
+   "sym": "EICHERMOT",
+   "fo": true,
+   "close": 8003.5,
+   "turnover_cr": 408.7,
+   "or_vol_norm": 38230.35,
+   "dma20": 7716.2,
+   "slip": 0.0005
+  },
+  {
+   "sym": "LICI",
+   "fo": true,
+   "close": 405.4,
+   "turnover_cr": 407.1,
+   "or_vol_norm": 505085.8,
+   "dma20": 400.98,
+   "slip": 0.0005
+  },
+  {
+   "sym": "BAJAJ-AUTO",
+   "fo": true,
+   "close": 10485.0,
+   "turnover_cr": 405.2,
+   "or_vol_norm": 16034.75,
+   "dma20": 10709.7,
+   "slip": 0.0005
+  },
+  {
+   "sym": "INDHOTEL",
+   "fo": true,
+   "close": 884.8,
+   "turnover_cr": 401.0,
+   "or_vol_norm": 180508.75,
+   "dma20": 873.74,
+   "slip": 0.0005
+  },
+  {
+   "sym": "INDIGO",
+   "fo": true,
+   "close": 5659.6,
+   "turnover_cr": 399.7,
+   "or_vol_norm": 53956.15,
+   "dma20": 5406.05,
+   "slip": 0.0005
+  },
+  {
+   "sym": "NETWEB",
+   "fo": false,
+   "close": 4131.6,
+   "turnover_cr": 385.4,
+   "or_vol_norm": 130537.05,
+   "dma20": 4083.85,
+   "slip": 0.001
+  },
+  {
+   "sym": "BEL",
+   "fo": true,
+   "close": 411.45,
+   "turnover_cr": 380.0,
+   "or_vol_norm": 583767.3,
+   "dma20": 395.19,
+   "slip": 0.0005
+  },
+  {
+   "sym": "TECHM",
+   "fo": true,
+   "close": 1813.9,
+   "turnover_cr": 374.4,
+   "or_vol_norm": 99397.4,
+   "dma20": 1785.47,
+   "slip": 0.0005
+  },
+  {
+   "sym": "MAXHEALTH",
+   "fo": true,
+   "close": 1071.3,
+   "turnover_cr": 365.3,
+   "or_vol_norm": 271659.05,
+   "dma20": 976.25,
+   "slip": 0.0005
+  },
+  {
+   "sym": "HAL",
+   "fo": true,
+   "close": 5074.0,
+   "turnover_cr": 361.7,
+   "or_vol_norm": 37592.3,
+   "dma20": 4885.01,
+   "slip": 0.0005
+  },
+  {
+   "sym": "ADANIENT",
+   "fo": true,
+   "close": 2640.4,
+   "turnover_cr": 348.9,
+   "or_vol_norm": 111613.8,
+   "dma20": 2679.09,
+   "slip": 0.0005
+  },
+  {
+   "sym": "BHEL",
+   "fo": true,
+   "close": 421.95,
+   "turnover_cr": 336.7,
+   "or_vol_norm": 473858.85,
+   "dma20": 419.45,
+   "slip": 0.0005
+  },
+  {
+   "sym": "POLYCAB",
+   "fo": true,
+   "close": 7429.0,
+   "turnover_cr": 334.8,
+   "or_vol_norm": 25527.65,
+   "dma20": 7718.85,
+   "slip": 0.0005
+  },
+  {
+   "sym": "COALINDIA",
+   "fo": true,
+   "close": 388.85,
+   "turnover_cr": 331.7,
+   "or_vol_norm": 407390.7,
+   "dma20": 395.55,
+   "slip": 0.0005
+  },
+  {
+   "sym": "HEROMOTOCO",
+   "fo": true,
+   "close": 5701.0,
+   "turnover_cr": 330.9,
+   "or_vol_norm": 34869.35,
+   "dma20": 5424.2,
+   "slip": 0.0005
+  },
+  {
+   "sym": "ADANIPOWER",
+   "fo": true,
+   "close": 205.25,
+   "turnover_cr": 318.6,
+   "or_vol_norm": 1160171.05,
+   "dma20": 203.86,
+   "slip": 0.0005
+  },
+  {
+   "sym": "BANKBARODA",
+   "fo": true,
+   "close": 274.9,
+   "turnover_cr": 318.2,
+   "or_vol_norm": 759438.05,
+   "dma20": 264.64,
+   "slip": 0.0005
+  },
+  {
+   "sym": "MUTHOOTFIN",
+   "fo": true,
+   "close": 2609.5,
+   "turnover_cr": 311.2,
+   "or_vol_norm": 85640.4,
+   "dma20": 2677.59,
+   "slip": 0.0005
+  },
+  {
+   "sym": "HINDUNILVR",
+   "fo": true,
+   "close": 2117.2,
+   "turnover_cr": 310.6,
+   "or_vol_norm": 67667.3,
+   "dma20": 2002.99,
+   "slip": 0.0005
+  },
+  {
+   "sym": "TVSMOTOR",
+   "fo": true,
+   "close": 4526.5,
+   "turnover_cr": 310.3,
+   "or_vol_norm": 44050.45,
+   "dma20": 4450.98,
+   "slip": 0.0005
+  },
+  {
+   "sym": "CANBK",
+   "fo": true,
+   "close": 131.11,
+   "turnover_cr": 309.3,
+   "or_vol_norm": 1609144.55,
+   "dma20": 128.4,
+   "slip": 0.0005
+  },
+  {
+   "sym": "ADANIGREEN",
+   "fo": true,
+   "close": 1327.6,
+   "turnover_cr": 308.2,
+   "or_vol_norm": 145845.75,
+   "dma20": 1385.85,
+   "slip": 0.0005
+  },
+  {
+   "sym": "TMCV",
+   "fo": false,
+   "close": 424.95,
+   "turnover_cr": 305.7,
+   "or_vol_norm": 556335.5,
+   "dma20": 430.06,
+   "slip": 0.001
+  },
+  {
+   "sym": "TDPOWERSYS",
+   "fo": false,
+   "close": 617.65,
+   "turnover_cr": 303.7,
+   "or_vol_norm": 935265.1,
+   "dma20": 642.69,
+   "slip": 0.001
+  },
+  {
+   "sym": "ASHOKLEY",
+   "fo": true,
+   "close": 151.42,
+   "turnover_cr": 298.7,
+   "or_vol_norm": 2182247.6,
+   "dma20": 161.21,
+   "slip": 0.0005
+  },
+  {
+   "sym": "SWIGGY",
+   "fo": true,
+   "close": 180.0,
+   "turnover_cr": 298.2,
+   "or_vol_norm": 834686.95,
+   "dma20": 183.5,
+   "slip": 0.0005
+  },
+  {
+   "sym": "LENSKART",
+   "fo": false,
+   "close": 718.35,
+   "turnover_cr": 290.6,
+   "or_vol_norm": 534658.6,
+   "dma20": 714.35,
+   "slip": 0.001
+  },
+  {
+   "sym": "CUPID",
+   "fo": false,
+   "close": 389.5,
+   "turnover_cr": 288.6,
+   "or_vol_norm": 1588696.4,
+   "dma20": 355.57,
+   "slip": 0.001
+  },
+  {
+   "sym": "NTPC",
+   "fo": true,
+   "close": 319.75,
+   "turnover_cr": 286.7,
+   "or_vol_norm": 299727.1,
+   "dma20": 320.73,
+   "slip": 0.0005
+  },
+  {
+   "sym": "CHOLAFIN",
+   "fo": true,
+   "close": 1802.0,
+   "turnover_cr": 283.1,
+   "or_vol_norm": 104241.35,
+   "dma20": 1784.41,
+   "slip": 0.0005
+  },
+  {
+   "sym": "MOTHERSON",
+   "fo": true,
+   "close": 161.5,
+   "turnover_cr": 280.5,
+   "or_vol_norm": 775946.3,
+   "dma20": 162.92,
+   "slip": 0.0005
+  },
+  {
+   "sym": "PERSISTENT",
+   "fo": true,
+   "close": 6320.0,
+   "turnover_cr": 277.7,
+   "or_vol_norm": 26318.25,
+   "dma20": 6051.18,
+   "slip": 0.0005
+  },
+  {
+   "sym": "POWERGRID",
+   "fo": true,
+   "close": 268.2,
+   "turnover_cr": 277.7,
+   "or_vol_norm": 501255.95,
+   "dma20": 262.68,
+   "slip": 0.0005
+  },
+  {
+   "sym": "ULTRACEMCO",
+   "fo": true,
+   "close": 12578.0,
+   "turnover_cr": 275.7,
+   "or_vol_norm": 12020.8,
+   "dma20": 12207.45,
+   "slip": 0.0005
+  },
+  {
+   "sym": "CUMMINSIND",
+   "fo": true,
+   "close": 4205.5,
+   "turnover_cr": 273.8,
+   "or_vol_norm": 47133.8,
+   "dma20": 4247.36,
+   "slip": 0.0005
+  },
+  {
+   "sym": "GVT&D",
+   "fo": true,
+   "close": 4263.0,
+   "turnover_cr": 273.6,
+   "or_vol_norm": 56932.8,
+   "dma20": 4198.16,
+   "slip": 0.0005
+  },
+  {
+   "sym": "UNIONBANK",
+   "fo": true,
+   "close": 211.1,
+   "turnover_cr": 269.9,
+   "or_vol_norm": 749385.85,
+   "dma20": 200.02,
+   "slip": 0.0005
+  },
+  {
+   "sym": "JSWSTEEL",
+   "fo": true,
+   "close": 1321.2,
+   "turnover_cr": 268.2,
+   "or_vol_norm": 106744.65,
+   "dma20": 1324.12,
+   "slip": 0.0005
+  },
+  {
+   "sym": "VEDL",
+   "fo": true,
+   "close": 245.31,
+   "turnover_cr": 263.9,
+   "or_vol_norm": 818276.1,
+   "dma20": 249.05,
+   "slip": 0.0005
+  },
+  {
+   "sym": "ANGELONE",
+   "fo": true,
+   "close": 376.0,
+   "turnover_cr": 263.2,
+   "or_vol_norm": 560414.15,
+   "dma20": 332.65,
+   "slip": 0.0005
+  },
+  {
+   "sym": "JIOFIN",
+   "fo": true,
+   "close": 222.6,
+   "turnover_cr": 261.9,
+   "or_vol_norm": 741737.5,
+   "dma20": 223.24,
+   "slip": 0.0005
+  },
+  {
+   "sym": "IIFL",
+   "fo": false,
+   "close": 598.5,
+   "turnover_cr": 256.1,
+   "or_vol_norm": 889410.65,
+   "dma20": 610.77,
+   "slip": 0.001
+  },
+  {
+   "sym": "ONGC",
+   "fo": true,
+   "close": 224.31,
+   "turnover_cr": 254.1,
+   "or_vol_norm": 576033.6,
+   "dma20": 227.41,
+   "slip": 0.0005
+  },
+  {
+   "sym": "TMPV",
+   "fo": true,
+   "close": 258.0,
+   "turnover_cr": 244.3,
+   "or_vol_norm": 971241.3,
+   "dma20": 273.44,
+   "slip": 0.0005
+  },
+  {
+   "sym": "ASIANPAINT",
+   "fo": true,
+   "close": 2532.6,
+   "turnover_cr": 242.7,
+   "or_vol_norm": 65880.3,
+   "dma20": 2514.85,
+   "slip": 0.0005
+  },
+  {
+   "sym": "DLF",
+   "fo": true,
+   "close": 805.45,
+   "turnover_cr": 242.0,
+   "or_vol_norm": 114930.85,
+   "dma20": 754.0,
+   "slip": 0.0005
+  },
+  {
+   "sym": "CGPOWER",
+   "fo": true,
+   "close": 793.0,
+   "turnover_cr": 240.9,
+   "or_vol_norm": 209797.6,
+   "dma20": 805.98,
+   "slip": 0.0005
+  },
+  {
+   "sym": "TRENT",
+   "fo": true,
+   "close": 3273.0,
+   "turnover_cr": 240.9,
+   "or_vol_norm": 60398.45,
+   "dma20": 3147.87,
+   "slip": 0.0005
+  },
+  {
+   "sym": "TATAPOWER",
+   "fo": true,
+   "close": 320.05,
+   "turnover_cr": 234.6,
+   "or_vol_norm": 279046.95,
+   "dma20": 345.32,
+   "slip": 0.0005
+  },
+  {
+   "sym": "WIPRO",
+   "fo": true,
+   "close": 192.1,
+   "turnover_cr": 234.0,
+   "or_vol_norm": 735347.75,
+   "dma20": 193.24,
+   "slip": 0.0005
+  },
+  {
+   "sym": "HINDZINC",
+   "fo": true,
+   "close": 545.0,
+   "turnover_cr": 230.5,
+   "or_vol_norm": 247798.95,
+   "dma20": 541.55,
+   "slip": 0.0005
+  },
+  {
+   "sym": "INDUSINDBK",
+   "fo": true,
+   "close": 958.4,
+   "turnover_cr": 230.0,
+   "or_vol_norm": 156567.65,
+   "dma20": 913.71,
+   "slip": 0.0005
+  },
+  {
+   "sym": "NATIONALUM",
+   "fo": true,
+   "close": 304.55,
+   "turnover_cr": 230.0,
+   "or_vol_norm": 419641.7,
+   "dma20": 316.44,
+   "slip": 0.0005
+  },
+  {
+   "sym": "SAIL",
+   "fo": true,
+   "close": 163.95,
+   "turnover_cr": 227.9,
+   "or_vol_norm": 788739.1,
+   "dma20": 167.44,
+   "slip": 0.0005
+  },
+  {
+   "sym": "VAML",
+   "fo": false,
+   "close": 370.25,
+   "turnover_cr": 226.3,
+   "or_vol_norm": 297724.6,
+   "dma20": 371.31,
+   "slip": 0.001
+  },
+  {
+   "sym": "CDSL",
+   "fo": true,
+   "close": 1453.0,
+   "turnover_cr": 226.0,
+   "or_vol_norm": 137119.55,
+   "dma20": 1380.85,
+   "slip": 0.0005
+  },
+  {
+   "sym": "PFC",
+   "fo": true,
+   "close": 327.8,
+   "turnover_cr": 226.0,
+   "or_vol_norm": 369803.35,
+   "dma20": 328.66,
+   "slip": 0.0005
+  },
+  {
+   "sym": "WELCORP",
+   "fo": false,
+   "close": 2301.9,
+   "turnover_cr": 221.3,
+   "or_vol_norm": 68812.1,
+   "dma20": 2258.64,
+   "slip": 0.001
+  },
+  {
+   "sym": "NAVINFLUOR",
+   "fo": true,
+   "close": 10456.5,
+   "turnover_cr": 220.2,
+   "or_vol_norm": 12571.75,
+   "dma20": 9518.05,
+   "slip": 0.0005
+  },
+  {
+   "sym": "AUROPHARMA",
+   "fo": true,
+   "close": 1791.8,
+   "turnover_cr": 219.3,
+   "or_vol_norm": 62404.35,
+   "dma20": 1777.71,
+   "slip": 0.0005
+  },
+  {
+   "sym": "GRASIM",
+   "fo": true,
+   "close": 3124.2,
+   "turnover_cr": 216.0,
+   "or_vol_norm": 19852.45,
+   "dma20": 3104.28,
+   "slip": 0.0005
+  },
+  {
+   "sym": "ADANIENSOL",
+   "fo": true,
+   "close": 1337.0,
+   "turnover_cr": 210.8,
+   "or_vol_norm": 105778.45,
+   "dma20": 1425.36,
+   "slip": 0.0005
+  },
+  {
+   "sym": "APARINDS",
+   "fo": true,
+   "close": 14160.0,
+   "turnover_cr": 209.2,
+   "or_vol_norm": 9503.2,
+   "dma20": 14723.7,
+   "slip": 0.0005
+  },
+  {
+   "sym": "FEDERALBNK",
+   "fo": true,
+   "close": 360.0,
+   "turnover_cr": 208.6,
+   "or_vol_norm": 345857.8,
+   "dma20": 353.03,
+   "slip": 0.0005
+  },
+  {
+   "sym": "BHARATFORG",
+   "fo": true,
+   "close": 1771.0,
+   "turnover_cr": 207.7,
+   "or_vol_norm": 30200.8,
+   "dma20": 1743.65,
+   "slip": 0.0005
+  },
+  {
+   "sym": "GAIL",
+   "fo": true,
+   "close": 185.0,
+   "turnover_cr": 207.2,
+   "or_vol_norm": 505930.3,
+   "dma20": 184.86,
+   "slip": 0.0005
+  },
+  {
+   "sym": "CIPLA",
+   "fo": true,
+   "close": 1439.9,
+   "turnover_cr": 204.1,
+   "or_vol_norm": 35541.6,
+   "dma20": 1405.89,
+   "slip": 0.0005
+  },
+  {
+   "sym": "NESTLEIND",
+   "fo": true,
+   "close": 1317.0,
+   "turnover_cr": 201.2,
+   "or_vol_norm": 70070.55,
+   "dma20": 1275.02,
+   "slip": 0.0005
+  },
+  {
+   "sym": "AUBANK",
+   "fo": true,
+   "close": 984.85,
+   "turnover_cr": 200.3,
+   "or_vol_norm": 108275.8,
+   "dma20": 949.25,
+   "slip": 0.0005
+  },
+  {
+   "sym": "KAYNES",
+   "fo": true,
+   "close": 2725.0,
+   "turnover_cr": 197.9,
+   "or_vol_norm": 83795.2,
+   "dma20": 3083.72,
+   "slip": 0.0005
+  },
+  {
+   "sym": "MOTILALOFS",
+   "fo": true,
+   "close": 1222.15,
+   "turnover_cr": 194.7,
+   "or_vol_norm": 105478.75,
+   "dma20": 1142.89,
+   "slip": 0.0005
+  },
+  {
+   "sym": "DRREDDY",
+   "fo": true,
+   "close": 1381.7,
+   "turnover_cr": 193.9,
+   "or_vol_norm": 50985.6,
+   "dma20": 1377.79,
+   "slip": 0.0005
+  },
+  {
+   "sym": "APLAPOLLO",
+   "fo": true,
+   "close": 1509.5,
+   "turnover_cr": 193.5,
+   "or_vol_norm": 453964.95,
+   "dma20": 2055.95,
+   "slip": 0.0005
+  },
+  {
+   "sym": "MARICO",
+   "fo": true,
+   "close": 922.3,
+   "turnover_cr": 191.7,
+   "or_vol_norm": 158955.65,
+   "dma20": 894.0,
+   "slip": 0.0005
+  },
+  {
+   "sym": "VBL",
+   "fo": true,
+   "close": 424.9,
+   "turnover_cr": 191.6,
+   "or_vol_norm": 325799.65,
+   "dma20": 424.87,
+   "slip": 0.0005
+  },
+  {
+   "sym": "KEI",
+   "fo": true,
+   "close": 3753.9,
+   "turnover_cr": 189.7,
+   "or_vol_norm": 24192.55,
+   "dma20": 3883.53,
+   "slip": 0.0005
+  },
+  {
+   "sym": "ZYDUSLIFE",
+   "fo": true,
+   "close": 1156.9,
+   "turnover_cr": 187.6,
+   "or_vol_norm": 69700.8,
+   "dma20": 1204.45,
+   "slip": 0.0005
+  },
+  {
+   "sym": "IDFCFIRSTB",
+   "fo": true,
+   "close": 86.8,
+   "turnover_cr": 187.3,
+   "or_vol_norm": 1444973.0,
+   "dma20": 80.38,
+   "slip": 0.0005
+  },
+  {
+   "sym": "SOLARINDS",
+   "fo": true,
+   "close": 19450.0,
+   "turnover_cr": 186.5,
+   "or_vol_norm": 6841.3,
+   "dma20": 18904.1,
+   "slip": 0.0005
+  },
+  {
+   "sym": "MAHABANK",
+   "fo": true,
+   "close": 95.73,
+   "turnover_cr": 185.6,
+   "or_vol_norm": 1309922.45,
+   "dma20": 90.13,
+   "slip": 0.0005
+  },
+  {
+   "sym": "BANKINDIA",
+   "fo": true,
+   "close": 162.5,
+   "turnover_cr": 184.2,
+   "or_vol_norm": 699802.65,
+   "dma20": 149.36,
+   "slip": 0.0005
+  },
+  {
+   "sym": "HDFCAMC",
+   "fo": true,
+   "close": 2706.0,
+   "turnover_cr": 183.8,
+   "or_vol_norm": 63183.8,
+   "dma20": 2606.85,
+   "slip": 0.0005
+  },
+  {
+   "sym": "AMBER",
+   "fo": true,
+   "close": 6769.0,
+   "turnover_cr": 181.9,
+   "or_vol_norm": 25672.45,
+   "dma20": 6449.68,
+   "slip": 0.0005
+  },
+  {
+   "sym": "HINDCOPPER",
+   "fo": false,
+   "close": 418.5,
+   "turnover_cr": 180.8,
+   "or_vol_norm": 545463.65,
+   "dma20": 420.72,
+   "slip": 0.001
+  },
+  {
+   "sym": "MANAPPURAM",
+   "fo": true,
+   "close": 278.4,
+   "turnover_cr": 179.7,
+   "or_vol_norm": 667560.95,
+   "dma20": 298.27,
+   "slip": 0.0005
+  },
+  {
+   "sym": "GLENMARK",
+   "fo": true,
+   "close": 2834.9,
+   "turnover_cr": 178.9,
+   "or_vol_norm": 51135.9,
+   "dma20": 2587.73,
+   "slip": 0.0005
+  },
+  {
+   "sym": "SYRMA",
+   "fo": true,
+   "close": 1502.0,
+   "turnover_cr": 177.6,
+   "or_vol_norm": 126300.55,
+   "dma20": 1503.7,
+   "slip": 0.0005
+  },
+  {
+   "sym": "RADICO",
+   "fo": true,
+   "close": 4646.6,
+   "turnover_cr": 176.7,
+   "or_vol_norm": 21147.65,
+   "dma20": 4516.18,
+   "slip": 0.0005
+  },
+  {
+   "sym": "ACUTAAS",
+   "fo": true,
+   "close": 4075.0,
+   "turnover_cr": 175.8,
+   "or_vol_norm": 45700.55,
+   "dma20": 3933.07,
+   "slip": 0.0005
+  },
+  {
+   "sym": "CGCL",
+   "fo": false,
+   "close": 227.59,
+   "turnover_cr": 174.4,
+   "or_vol_norm": 302445.0,
+   "dma20": 238.3,
+   "slip": 0.001
+  },
+  {
+   "sym": "IOC",
+   "fo": true,
+   "close": 144.21,
+   "turnover_cr": 171.9,
+   "or_vol_norm": 869807.1,
+   "dma20": 143.26,
+   "slip": 0.0005
+  },
+  {
+   "sym": "HINDPETRO",
+   "fo": true,
+   "close": 386.0,
+   "turnover_cr": 171.2,
+   "or_vol_norm": 465833.2,
+   "dma20": 378.59,
+   "slip": 0.0005
+  },
+  {
+   "sym": "DATAPATTNS",
+   "fo": true,
+   "close": 4336.9,
+   "turnover_cr": 169.7,
+   "or_vol_norm": 42833.7,
+   "dma20": 4084.48,
+   "slip": 0.0005
+  },
+  {
+   "sym": "SBILIFE",
+   "fo": true,
+   "close": 1856.0,
+   "turnover_cr": 167.9,
+   "or_vol_norm": 38333.2,
+   "dma20": 1769.83,
+   "slip": 0.0005
+  },
+  {
+   "sym": "BAJAJFINSV",
+   "fo": true,
+   "close": 1849.0,
+   "turnover_cr": 167.7,
+   "or_vol_norm": 49134.1,
+   "dma20": 1826.38,
+   "slip": 0.0005
+  },
+  {
+   "sym": "MPHASIS",
+   "fo": true,
+   "close": 2441.2,
+   "turnover_cr": 166.6,
+   "or_vol_norm": 69344.55,
+   "dma20": 2469.88,
+   "slip": 0.0005
+  },
+  {
+   "sym": "INDIANB",
+   "fo": true,
+   "close": 929.85,
+   "turnover_cr": 166.1,
+   "or_vol_norm": 61781.1,
+   "dma20": 913.47,
+   "slip": 0.0005
+  },
+  {
+   "sym": "PINELABS",
+   "fo": false,
+   "close": 164.06,
+   "turnover_cr": 166.0,
+   "or_vol_norm": 1050474.3,
+   "dma20": 163.71,
+   "slip": 0.001
+  },
+  {
+   "sym": "TORNTPHARM",
+   "fo": true,
+   "close": 5034.0,
+   "turnover_cr": 164.6,
+   "or_vol_norm": 13031.25,
+   "dma20": 4727.93,
+   "slip": 0.0005
+  },
+  {
+   "sym": "SONACOMS",
+   "fo": true,
+   "close": 879.0,
+   "turnover_cr": 164.0,
+   "or_vol_norm": 88897.15,
+   "dma20": 899.25,
+   "slip": 0.0005
+  },
+  {
+   "sym": "OFSS",
+   "fo": true,
+   "close": 9250.0,
+   "turnover_cr": 163.4,
+   "or_vol_norm": 12376.95,
+   "dma20": 9834.5,
+   "slip": 0.0005
+  },
+  {
+   "sym": "WELSPUNLIV",
+   "fo": false,
+   "close": 285.52,
+   "turnover_cr": 159.5,
+   "or_vol_norm": 850151.7,
+   "dma20": 254.72,
+   "slip": 0.001
+  },
+  {
+   "sym": "NYKAA",
+   "fo": true,
+   "close": 350.65,
+   "turnover_cr": 156.5,
+   "or_vol_norm": 216813.15,
+   "dma20": 356.09,
+   "slip": 0.0005
+  },
+  {
+   "sym": "ABB",
+   "fo": true,
+   "close": 7060.0,
+   "turnover_cr": 156.1,
+   "or_vol_norm": 19749.75,
+   "dma20": 6831.38,
+   "slip": 0.0005
+  },
+  {
+   "sym": "BANDHANBNK",
+   "fo": true,
+   "close": 166.66,
+   "turnover_cr": 156.1,
+   "or_vol_norm": 710498.9,
+   "dma20": 167.48,
+   "slip": 0.0005
+  },
+  {
+   "sym": "LUPIN",
+   "fo": true,
+   "close": 2016.0,
+   "turnover_cr": 152.6,
+   "or_vol_norm": 31997.9,
+   "dma20": 1997.68,
+   "slip": 0.0005
+  },
+  {
+   "sym": "CHENNPETRO",
+   "fo": false,
+   "close": 1352.5,
+   "turnover_cr": 152.3,
+   "or_vol_norm": 114143.4,
+   "dma20": 1447.92,
+   "slip": 0.001
+  },
+  {
+   "sym": "PATANJALI",
+   "fo": true,
+   "close": 400.35,
+   "turnover_cr": 151.0,
+   "or_vol_norm": 264465.25,
+   "dma20": 401.87,
+   "slip": 0.0005
+  },
+  {
+   "sym": "LODHA",
+   "fo": true,
+   "close": 1251.8,
+   "turnover_cr": 150.7,
+   "or_vol_norm": 96057.05,
+   "dma20": 1169.36,
+   "slip": 0.0005
+  },
+  {
+   "sym": "NAUKRI",
+   "fo": true,
+   "close": 1203.8,
+   "turnover_cr": 150.6,
+   "or_vol_norm": 33184.7,
+   "dma20": 1187.91,
+   "slip": 0.0005
+  },
+  {
+   "sym": "HYUNDAI",
+   "fo": true,
+   "close": 2006.0,
+   "turnover_cr": 149.5,
+   "or_vol_norm": 45302.85,
+   "dma20": 2086.09,
+   "slip": 0.0005
+  },
+  {
+   "sym": "UNOMINDA",
+   "fo": true,
+   "close": 1354.0,
+   "turnover_cr": 149.4,
+   "or_vol_norm": 42205.1,
+   "dma20": 1305.94,
+   "slip": 0.0005
+  },
+  {
+   "sym": "GODREJPROP",
+   "fo": true,
+   "close": 1943.0,
+   "turnover_cr": 147.9,
+   "or_vol_norm": 35432.9,
+   "dma20": 1819.65,
+   "slip": 0.0005
+  },
+  {
+   "sym": "ENRIN",
+   "fo": true,
+   "close": 3102.0,
+   "turnover_cr": 147.5,
+   "or_vol_norm": 55932.9,
+   "dma20": 2956.99,
+   "slip": 0.0005
+  },
+  {
+   "sym": "FORCEMOT",
+   "fo": true,
+   "close": 20179.0,
+   "turnover_cr": 146.8,
+   "or_vol_norm": 5445.7,
+   "dma20": 19224.55,
+   "slip": 0.0005
+  },
+  {
+   "sym": "TATACONSUM",
+   "fo": true,
+   "close": 1155.0,
+   "turnover_cr": 145.7,
+   "or_vol_norm": 45465.65,
+   "dma20": 1101.03,
+   "slip": 0.0005
+  },
+  {
+   "sym": "HDFCLIFE",
+   "fo": true,
+   "close": 588.45,
+   "turnover_cr": 142.6,
+   "or_vol_norm": 148147.2,
+   "dma20": 568.01,
+   "slip": 0.0005
+  },
+  {
+   "sym": "LICHSGFIN",
+   "fo": true,
+   "close": 594.65,
+   "turnover_cr": 139.7,
+   "or_vol_norm": 108572.6,
+   "dma20": 566.59,
+   "slip": 0.0005
+  },
+  {
+   "sym": "UPL",
+   "fo": true,
+   "close": 564.4,
+   "turnover_cr": 139.3,
+   "or_vol_norm": 114574.9,
+   "dma20": 547.08,
+   "slip": 0.0005
+  },
+  {
+   "sym": "COCHINSHIP",
+   "fo": true,
+   "close": 1126.0,
+   "turnover_cr": 139.1,
+   "or_vol_norm": 114804.65,
+   "dma20": 1165.15,
+   "slip": 0.0005
+  },
+  {
+   "sym": "MTARTECH",
+   "fo": false,
+   "close": 5800.5,
+   "turnover_cr": 139.0,
+   "or_vol_norm": 23583.65,
+   "dma20": 5960.62,
+   "slip": 0.001
+  },
+  {
+   "sym": "BOSCHLTD",
+   "fo": true,
+   "close": 49170.0,
+   "turnover_cr": 138.8,
+   "or_vol_norm": 1852.5,
+   "dma20": 49414.0,
+   "slip": 0.0005
+  },
+  {
+   "sym": "WAAREEENER",
+   "fo": true,
+   "close": 2377.0,
+   "turnover_cr": 136.3,
+   "or_vol_norm": 59295.05,
+   "dma20": 2416.09,
+   "slip": 0.0005
+  },
+  {
+   "sym": "BRITANNIA",
+   "fo": true,
+   "close": 5065.0,
+   "turnover_cr": 135.1,
+   "or_vol_norm": 15141.7,
+   "dma20": 4839.06,
+   "slip": 0.0005
+  },
+  {
+   "sym": "RVNL",
+   "fo": true,
+   "close": 190.7,
+   "turnover_cr": 134.4,
+   "or_vol_norm": 588489.2,
+   "dma20": 192.16,
+   "slip": 0.0005
+  },
+  {
+   "sym": "MFSL",
+   "fo": true,
+   "close": 1425.0,
+   "turnover_cr": 131.1,
+   "or_vol_norm": 40677.95,
+   "dma20": 1339.03,
+   "slip": 0.0005
+  },
+  {
+   "sym": "PVRINOX",
+   "fo": false,
+   "close": 1679.1,
+   "turnover_cr": 130.5,
+   "or_vol_norm": 49405.55,
+   "dma20": 1616.1,
+   "slip": 0.001
+  },
+  {
+   "sym": "VOLTAS",
+   "fo": true,
+   "close": 1186.8,
+   "turnover_cr": 130.5,
+   "or_vol_norm": 70783.8,
+   "dma20": 1132.65,
+   "slip": 0.0005
+  },
+  {
+   "sym": "PIDILITIND",
+   "fo": true,
+   "close": 1594.8,
+   "turnover_cr": 129.0,
+   "or_vol_norm": 46081.3,
+   "dma20": 1550.72,
+   "slip": 0.0005
+  },
+  {
+   "sym": "NAM-INDIA",
+   "fo": true,
+   "close": 1047.0,
+   "turnover_cr": 128.3,
+   "or_vol_norm": 47066.25,
+   "dma20": 1037.97,
+   "slip": 0.0005
+  },
+  {
+   "sym": "CAMS",
+   "fo": true,
+   "close": 740.0,
+   "turnover_cr": 127.6,
+   "or_vol_norm": 136472.55,
+   "dma20": 713.82,
+   "slip": 0.0005
+  },
+  {
+   "sym": "GMRAIRPORT",
+   "fo": true,
+   "close": 99.26,
+   "turnover_cr": 127.1,
+   "or_vol_norm": 957322.35,
+   "dma20": 98.58,
+   "slip": 0.0005
+  },
+  {
+   "sym": "DELHIVERY",
+   "fo": true,
+   "close": 458.6,
+   "turnover_cr": 125.5,
+   "or_vol_norm": 201788.95,
+   "dma20": 436.42,
+   "slip": 0.0005
+  },
+  {
+   "sym": "INDUSTOWER",
+   "fo": true,
+   "close": 377.65,
+   "turnover_cr": 125.3,
+   "or_vol_norm": 190982.3,
+   "dma20": 386.32,
+   "slip": 0.0005
+  },
+  {
+   "sym": "WOCKPHARMA",
+   "fo": false,
+   "close": 2244.4,
+   "turnover_cr": 122.6,
+   "or_vol_norm": 55641.55,
+   "dma20": 2034.56,
+   "slip": 0.001
+  },
+  {
+   "sym": "ZEEL",
+   "fo": false,
+   "close": 67.08,
+   "turnover_cr": 121.7,
+   "or_vol_norm": 2130894.85,
+   "dma20": 68.71,
+   "slip": 0.001
+  },
+  {
+   "sym": "AMBUJACEM",
+   "fo": true,
+   "close": 385.3,
+   "turnover_cr": 121.1,
+   "or_vol_norm": 172581.45,
+   "dma20": 382.53,
+   "slip": 0.0005
+  },
+  {
+   "sym": "JINDALSTEL",
+   "fo": true,
+   "close": 1138.7,
+   "turnover_cr": 120.1,
+   "or_vol_norm": 44880.25,
+   "dma20": 1126.82,
+   "slip": 0.0005
+  },
+  {
+   "sym": "NEULANDLAB",
+   "fo": false,
+   "close": 21435.0,
+   "turnover_cr": 119.6,
+   "or_vol_norm": 3893.85,
+   "dma20": 20496.05,
+   "slip": 0.001
+  },
+  {
+   "sym": "RRKABEL",
+   "fo": false,
+   "close": 1827.4,
+   "turnover_cr": 117.1,
+   "or_vol_norm": 38591.0,
+   "dma20": 1919.7,
+   "slip": 0.001
+  },
+  {
+   "sym": "KARURVYSYA",
+   "fo": true,
+   "close": 371.1,
+   "turnover_cr": 117.0,
+   "or_vol_norm": 132352.75,
+   "dma20": 370.89,
+   "slip": 0.0005
+  },
+  {
+   "sym": "BPCL",
+   "fo": true,
+   "close": 308.55,
+   "turnover_cr": 116.1,
+   "or_vol_norm": 239131.55,
+   "dma20": 306.04,
+   "slip": 0.0005
+  },
+  {
+   "sym": "AZAD",
+   "fo": false,
+   "close": 2405.6,
+   "turnover_cr": 115.0,
+   "or_vol_norm": 276038.7,
+   "dma20": 2433.95,
+   "slip": 0.001
+  },
+  {
+   "sym": "PHOENIXLTD",
+   "fo": true,
+   "close": 2229.7,
+   "turnover_cr": 113.7,
+   "or_vol_norm": 23023.7,
+   "dma20": 2172.93,
+   "slip": 0.0005
+  },
+  {
+   "sym": "LGEINDIA",
+   "fo": false,
+   "close": 1770.9,
+   "turnover_cr": 113.4,
+   "or_vol_norm": 694378.15,
+   "dma20": 1732.72,
+   "slip": 0.001
+  },
+  {
+   "sym": "M&MFIN",
+   "fo": false,
+   "close": 283.8,
+   "turnover_cr": 112.7,
+   "or_vol_norm": 148674.15,
+   "dma20": 280.32,
+   "slip": 0.001
+  },
+  {
+   "sym": "MAZDOCK",
+   "fo": true,
+   "close": 1890.0,
+   "turnover_cr": 111.9,
+   "or_vol_norm": 58555.75,
+   "dma20": 1830.13,
+   "slip": 0.0005
+  },
+  {
+   "sym": "PFOCUS",
+   "fo": false,
+   "close": 237.65,
+   "turnover_cr": 111.8,
+   "or_vol_norm": 139517.1,
+   "dma20": 270.6,
+   "slip": 0.001
+  },
+  {
+   "sym": "MANKIND",
+   "fo": true,
+   "close": 2689.4,
+   "turnover_cr": 111.5,
+   "or_vol_norm": 27480.6,
+   "dma20": 2597.56,
+   "slip": 0.0005
+  },
+  {
+   "sym": "RBLBANK",
+   "fo": true,
+   "close": 390.0,
+   "turnover_cr": 110.8,
+   "or_vol_norm": 138675.2,
+   "dma20": 379.1,
+   "slip": 0.0005
+  },
+  {
+   "sym": "LTM",
+   "fo": true,
+   "close": 4320.0,
+   "turnover_cr": 110.3,
+   "or_vol_norm": 28933.25,
+   "dma20": 4233.23,
+   "slip": 0.0005
+  },
+  {
+   "sym": "PPLPHARMA",
+   "fo": false,
+   "close": 231.0,
+   "turnover_cr": 108.5,
+   "or_vol_norm": 953439.85,
+   "dma20": 238.99,
+   "slip": 0.001
+  },
+  {
+   "sym": "RECLTD",
+   "fo": true,
+   "close": 295.05,
+   "turnover_cr": 105.5,
+   "or_vol_norm": 203307.7,
+   "dma20": 296.12,
+   "slip": 0.0005
+  },
+  {
+   "sym": "OIL",
+   "fo": true,
+   "close": 433.45,
+   "turnover_cr": 105.2,
+   "or_vol_norm": 106843.85,
+   "dma20": 441.11,
+   "slip": 0.0005
+  },
+  {
+   "sym": "FORTIS",
+   "fo": true,
+   "close": 832.0,
+   "turnover_cr": 104.4,
+   "or_vol_norm": 67173.35,
+   "dma20": 792.47,
+   "slip": 0.0005
+  },
+  {
+   "sym": "SAILIFE",
+   "fo": false,
+   "close": 1806.1,
+   "turnover_cr": 104.3,
+   "or_vol_norm": 172484.55,
+   "dma20": 1741.24,
+   "slip": 0.001
+  },
+  {
+   "sym": "GRANULES",
+   "fo": false,
+   "close": 825.55,
+   "turnover_cr": 104.1,
+   "or_vol_norm": 87728.1,
+   "dma20": 815.47,
+   "slip": 0.001
+  },
+  {
+   "sym": "DMART",
+   "fo": true,
+   "close": 3541.3,
+   "turnover_cr": 103.8,
+   "or_vol_norm": 17358.9,
+   "dma20": 3424.93,
+   "slip": 0.0005
+  },
+  {
+   "sym": "GODREJCP",
+   "fo": true,
+   "close": 918.9,
+   "turnover_cr": 102.7,
+   "or_vol_norm": 149890.1,
+   "dma20": 880.99,
+   "slip": 0.0005
+  },
+  {
+   "sym": "ABCAPITAL",
+   "fo": true,
+   "close": 410.3,
+   "turnover_cr": 102.6,
+   "or_vol_norm": 143433.1,
+   "dma20": 401.06,
+   "slip": 0.0005
+  },
+  {
+   "sym": "NMDC",
+   "fo": true,
+   "close": 67.96,
+   "turnover_cr": 100.3,
+   "or_vol_norm": 838339.15,
+   "dma20": 68.96,
+   "slip": 0.0005
+  },
+  {
+   "sym": "BDL",
+   "fo": true,
+   "close": 1077.5,
+   "turnover_cr": 99.5,
+   "or_vol_norm": 80316.75,
+   "dma20": 1040.16,
+   "slip": 0.0005
+  },
+  {
+   "sym": "LTF",
+   "fo": true,
+   "close": 276.4,
+   "turnover_cr": 99.0,
+   "or_vol_norm": 382648.2,
+   "dma20": 271.11,
+   "slip": 0.0005
+  },
+  {
+   "sym": "BIOCON",
+   "fo": true,
+   "close": 362.0,
+   "turnover_cr": 98.8,
+   "or_vol_norm": 130393.4,
+   "dma20": 360.26,
+   "slip": 0.0005
+  },
+  {
+   "sym": "PIIND",
+   "fo": true,
+   "close": 1606.0,
+   "turnover_cr": 97.7,
+   "or_vol_norm": 70364.85,
+   "dma20": 1786.48,
+   "slip": 0.0005
+  },
+  {
+   "sym": "HAVELLS",
+   "fo": true,
+   "close": 1142.4,
+   "turnover_cr": 96.6,
+   "or_vol_norm": 32594.5,
+   "dma20": 1132.51,
+   "slip": 0.0005
+  },
+  {
+   "sym": "REDINGTON",
+   "fo": false,
+   "close": 335.25,
+   "turnover_cr": 94.7,
+   "or_vol_norm": 235563.05,
+   "dma20": 339.91,
+   "slip": 0.001
+  },
+  {
+   "sym": "AEGISLOG",
+   "fo": false,
+   "close": 1297.9,
+   "turnover_cr": 94.5,
+   "or_vol_norm": 88002.85,
+   "dma20": 1192.45,
+   "slip": 0.001
+  },
+  {
+   "sym": "GESHIP",
+   "fo": false,
+   "close": 1550.6,
+   "turnover_cr": 93.9,
+   "or_vol_norm": 50426.05,
+   "dma20": 1525.27,
+   "slip": 0.001
+  },
+  {
+   "sym": "URBANCO",
+   "fo": false,
+   "close": 174.92,
+   "turnover_cr": 93.8,
+   "or_vol_norm": 634953.2,
+   "dma20": 163.79,
+   "slip": 0.001
+  },
+  {
+   "sym": "GLAND",
+   "fo": false,
+   "close": 3362.0,
+   "turnover_cr": 93.1,
+   "or_vol_norm": 34189.15,
+   "dma20": 3247.33,
+   "slip": 0.001
+  },
+  {
+   "sym": "360ONE",
+   "fo": true,
+   "close": 1230.0,
+   "turnover_cr": 92.9,
+   "or_vol_norm": 37017.1,
+   "dma20": 1145.96,
+   "slip": 0.0005
+  },
+  {
+   "sym": "MRPL",
+   "fo": false,
+   "close": 165.65,
+   "turnover_cr": 92.6,
+   "or_vol_norm": 609385.5,
+   "dma20": 175.02,
+   "slip": 0.001
+  },
+  {
+   "sym": "IRFC",
+   "fo": true,
+   "close": 82.25,
+   "turnover_cr": 91.6,
+   "or_vol_norm": 1093667.95,
+   "dma20": 80.9,
+   "slip": 0.0005
+  },
+  {
+   "sym": "PRESTIGE",
+   "fo": true,
+   "close": 1796.7,
+   "turnover_cr": 90.8,
+   "or_vol_norm": 30946.5,
+   "dma20": 1632.54,
+   "slip": 0.0005
+  },
+  {
+   "sym": "ICICIAMC",
+   "fo": false,
+   "close": 2975.0,
+   "turnover_cr": 89.7,
+   "or_vol_norm": 9907.45,
+   "dma20": 2944.82,
+   "slip": 0.001
+  },
+  {
+   "sym": "TIINDIA",
+   "fo": true,
+   "close": 2243.2,
+   "turnover_cr": 88.3,
+   "or_vol_norm": 15593.6,
+   "dma20": 2223.78,
+   "slip": 0.0005
+  },
+  {
+   "sym": "ENGINERSIN",
+   "fo": false,
+   "close": 300.75,
+   "turnover_cr": 86.7,
+   "or_vol_norm": 584275.0,
+   "dma20": 296.35,
+   "slip": 0.001
+  },
+  {
+   "sym": "IREDA",
+   "fo": false,
+   "close": 125.59,
+   "turnover_cr": 83.6,
+   "or_vol_norm": 1127878.6,
+   "dma20": 116.75,
+   "slip": 0.001
+  },
+  {
+   "sym": "INOXWIND",
+   "fo": true,
+   "close": 53.35,
+   "turnover_cr": 83.3,
+   "or_vol_norm": 1793751.7,
+   "dma20": 59.58,
+   "slip": 0.0005
+  },
+  {
+   "sym": "CUB",
+   "fo": true,
+   "close": 233.1,
+   "turnover_cr": 82.6,
+   "or_vol_norm": 267780.0,
+   "dma20": 228.98,
+   "slip": 0.0005
+  },
+  {
+   "sym": "JSWENERGY",
+   "fo": true,
+   "close": 485.0,
+   "turnover_cr": 82.3,
+   "or_vol_norm": 111487.5,
+   "dma20": 509.08,
+   "slip": 0.0005
+  },
+  {
+   "sym": "PAGEIND",
+   "fo": true,
+   "close": 30870.0,
+   "turnover_cr": 81.6,
+   "or_vol_norm": 2147.9,
+   "dma20": 33042.75,
+   "slip": 0.0005
+  },
+  {
+   "sym": "CARTRADE",
+   "fo": false,
+   "close": 2583.5,
+   "turnover_cr": 80.6,
+   "or_vol_norm": 31435.45,
+   "dma20": 2562.08,
+   "slip": 0.001
+  },
+  {
+   "sym": "PETRONET",
+   "fo": true,
+   "close": 322.35,
+   "turnover_cr": 80.6,
+   "or_vol_norm": 113485.1,
+   "dma20": 318.91,
+   "slip": 0.0005
+  },
+  {
+   "sym": "ICICIGI",
+   "fo": true,
+   "close": 1738.5,
+   "turnover_cr": 80.5,
+   "or_vol_norm": 16858.7,
+   "dma20": 1666.63,
+   "slip": 0.0005
+  },
+  {
+   "sym": "POONAWALLA",
+   "fo": false,
+   "close": 494.9,
+   "turnover_cr": 80.4,
+   "or_vol_norm": 146033.45,
+   "dma20": 487.72,
+   "slip": 0.001
+  },
+  {
+   "sym": "SIEMENS",
+   "fo": true,
+   "close": 3595.0,
+   "turnover_cr": 79.4,
+   "or_vol_norm": 15368.5,
+   "dma20": 3541.21,
+   "slip": 0.0005
+  },
+  {
+   "sym": "KFINTECH",
+   "fo": true,
+   "close": 989.0,
+   "turnover_cr": 78.7,
+   "or_vol_norm": 66464.8,
+   "dma20": 924.16,
+   "slip": 0.0005
+  },
+  {
+   "sym": "RKFORGE",
+   "fo": false,
+   "close": 781.25,
+   "turnover_cr": 78.4,
+   "or_vol_norm": 147109.55,
+   "dma20": 739.04,
+   "slip": 0.001
+  },
+  {
+   "sym": "IFCI",
+   "fo": false,
+   "close": 58.52,
+   "turnover_cr": 77.9,
+   "or_vol_norm": 1513650.4,
+   "dma20": 59.89,
+   "slip": 0.001
+  },
+  {
+   "sym": "OBEROIRLTY",
+   "fo": true,
+   "close": 1889.2,
+   "turnover_cr": 77.6,
+   "or_vol_norm": 14902.05,
+   "dma20": 1774.73,
+   "slip": 0.0005
+  },
+  {
+   "sym": "ASTERDM",
+   "fo": false,
+   "close": 756.85,
+   "turnover_cr": 77.4,
+   "or_vol_norm": 58342.55,
+   "dma20": 730.58,
+   "slip": 0.001
+  },
+  {
+   "sym": "PNBHOUSING",
+   "fo": true,
+   "close": 1162.0,
+   "turnover_cr": 77.4,
+   "or_vol_norm": 32101.7,
+   "dma20": 1125.13,
+   "slip": 0.0005
+  },
+  {
+   "sym": "PREMIERENE",
+   "fo": true,
+   "close": 811.5,
+   "turnover_cr": 77.2,
+   "or_vol_norm": 57304.85,
+   "dma20": 857.18,
+   "slip": 0.0005
+  },
+  {
+   "sym": "SANSERA",
+   "fo": false,
+   "close": 4742.2,
+   "turnover_cr": 76.5,
+   "or_vol_norm": 11716.0,
+   "dma20": 4541.09,
+   "slip": 0.001
+  },
+  {
+   "sym": "UNITDSPR",
+   "fo": true,
+   "close": 1476.2,
+   "turnover_cr": 76.5,
+   "or_vol_norm": 30075.6,
+   "dma20": 1424.03,
+   "slip": 0.0005
+  },
+  {
+   "sym": "ITCHOTELS",
+   "fo": false,
+   "close": 184.66,
+   "turnover_cr": 76.4,
+   "or_vol_norm": 250666.3,
+   "dma20": 176.99,
+   "slip": 0.001
+  },
+  {
+   "sym": "NHPC",
+   "fo": true,
+   "close": 75.65,
+   "turnover_cr": 76.2,
+   "or_vol_norm": 1078757.15,
+   "dma20": 77.25,
+   "slip": 0.0005
+  },
+  {
+   "sym": "BLUESTARCO",
+   "fo": true,
+   "close": 1735.0,
+   "turnover_cr": 75.3,
+   "or_vol_norm": 44196.55,
+   "dma20": 1650.55,
+   "slip": 0.0005
+  },
+  {
+   "sym": "EXIDEIND",
+   "fo": false,
+   "close": 399.1,
+   "turnover_cr": 75.1,
+   "or_vol_norm": 263770.9,
+   "dma20": 375.21,
+   "slip": 0.001
+  },
+  {
+   "sym": "CPPLUS",
+   "fo": false,
+   "close": 4307.2,
+   "turnover_cr": 73.8,
+   "or_vol_norm": 24818.7,
+   "dma20": 4067.75,
+   "slip": 0.001
+  },
+  {
+   "sym": "ICICILIFE",
+   "fo": true,
+   "close": 468.0,
+   "turnover_cr": 73.8,
+   "or_vol_norm": 110341.75,
+   "dma20": 444.57,
+   "slip": 0.0005
+  },
+  {
+   "sym": "GRSE",
+   "fo": false,
+   "close": 2144.0,
+   "turnover_cr": 73.4,
+   "or_vol_norm": 58500.25,
+   "dma20": 2099.88,
+   "slip": 0.001
+  },
+  {
+   "sym": "FINCABLES",
+   "fo": false,
+   "close": 1183.5,
+   "turnover_cr": 71.9,
+   "or_vol_norm": 114387.25,
+   "dma20": 1188.55,
+   "slip": 0.001
+  },
+  {
+   "sym": "COLPAL",
+   "fo": true,
+   "close": 1770.0,
+   "turnover_cr": 69.4,
+   "or_vol_norm": 25011.0,
+   "dma20": 1707.16,
+   "slip": 0.0005
+  },
+  {
+   "sym": "HBLENGINE",
+   "fo": false,
+   "close": 757.95,
+   "turnover_cr": 67.9,
+   "or_vol_norm": 96974.65,
+   "dma20": 796.29,
+   "slip": 0.001
+  },
+  {
+   "sym": "JUBLFOOD",
+   "fo": true,
+   "close": 422.8,
+   "turnover_cr": 66.0,
+   "or_vol_norm": 58510.1,
+   "dma20": 430.24,
+   "slip": 0.0005
+  },
+  {
+   "sym": "KPITTECH",
+   "fo": true,
+   "close": 520.0,
+   "turnover_cr": 66.0,
+   "or_vol_norm": 91083.0,
+   "dma20": 531.96,
+   "slip": 0.0005
+  },
+  {
+   "sym": "BELRISE",
+   "fo": false,
+   "close": 241.04,
+   "turnover_cr": 65.9,
+   "or_vol_norm": 807956.0,
+   "dma20": 224.71,
+   "slip": 0.001
+  },
+  {
+   "sym": "PWL",
+   "fo": false,
+   "close": 131.43,
+   "turnover_cr": 65.3,
+   "or_vol_norm": 1208830.65,
+   "dma20": 131.41,
+   "slip": 0.001
+  },
+  {
+   "sym": "DABUR",
+   "fo": true,
+   "close": 412.75,
+   "turnover_cr": 64.8,
+   "or_vol_norm": 143934.7,
+   "dma20": 388.13,
+   "slip": 0.0005
+  },
+  {
+   "sym": "KIRLOSENG",
+   "fo": false,
+   "close": 1771.1,
+   "turnover_cr": 64.8,
+   "or_vol_norm": 45969.2,
+   "dma20": 1701.92,
+   "slip": 0.001
+  },
+  {
+   "sym": "THERMAX",
+   "fo": false,
+   "close": 2722.3,
+   "turnover_cr": 64.4,
+   "or_vol_norm": 23427.65,
+   "dma20": 2866.98,
+   "slip": 0.001
+  },
+  {
+   "sym": "TATAELXSI",
+   "fo": true,
+   "close": 3877.3,
+   "turnover_cr": 64.0,
+   "or_vol_norm": 13269.75,
+   "dma20": 3808.1,
+   "slip": 0.0005
+  },
+  {
+   "sym": "HONASA",
+   "fo": false,
+   "close": 512.55,
+   "turnover_cr": 63.0,
+   "or_vol_norm": 172908.75,
+   "dma20": 494.9,
+   "slip": 0.001
+  },
+  {
+   "sym": "PGEL",
+   "fo": true,
+   "close": 571.0,
+   "turnover_cr": 63.0,
+   "or_vol_norm": 109633.8,
+   "dma20": 556.18,
+   "slip": 0.0005
+  },
+  {
+   "sym": "JSWINFRA",
+   "fo": false,
+   "close": 355.5,
+   "turnover_cr": 62.9,
+   "or_vol_norm": 95837.55,
+   "dma20": 340.18,
+   "slip": 0.001
+  },
+  {
+   "sym": "ANANTRAJ",
+   "fo": false,
+   "close": 447.25,
+   "turnover_cr": 62.2,
+   "or_vol_norm": 139717.1,
+   "dma20": 455.85,
+   "slip": 0.001
+  },
+  {
+   "sym": "HSCL",
+   "fo": false,
+   "close": 549.25,
+   "turnover_cr": 60.9,
+   "or_vol_norm": 94881.2,
+   "dma20": 551.78,
+   "slip": 0.001
+  },
+  {
+   "sym": "CROMPTON",
+   "fo": true,
+   "close": 211.0,
+   "turnover_cr": 60.8,
+   "or_vol_norm": 211186.2,
+   "dma20": 210.57,
+   "slip": 0.0005
+  },
+  {
+   "sym": "ALKEM",
+   "fo": true,
+   "close": 5130.0,
+   "turnover_cr": 60.0,
+   "or_vol_norm": 5825.7,
+   "dma20": 5195.27,
+   "slip": 0.0005
+  },
+  {
+   "sym": "PIRAMALFIN",
+   "fo": false,
+   "close": 1937.6,
+   "turnover_cr": 59.5,
+   "or_vol_norm": 12793.75,
+   "dma20": 2017.54,
+   "slip": 0.001
+  },
+  {
+   "sym": "TATACHEM",
+   "fo": false,
+   "close": 662.05,
+   "turnover_cr": 59.3,
+   "or_vol_norm": 243295.25,
+   "dma20": 624.75,
+   "slip": 0.001
+  },
+  {
+   "sym": "APTUS",
+   "fo": false,
+   "close": 187.78,
+   "turnover_cr": 59.0,
+   "or_vol_norm": 331348.2,
+   "dma20": 187.61,
+   "slip": 0.001
+  },
+  {
+   "sym": "SAMMAANCAP",
+   "fo": false,
+   "close": 122.07,
+   "turnover_cr": 58.4,
+   "or_vol_norm": 543953.85,
+   "dma20": 127.98,
+   "slip": 0.001
+  },
+  {
+   "sym": "NBCC",
+   "fo": true,
+   "close": 75.51,
+   "turnover_cr": 57.6,
+   "or_vol_norm": 629084.4,
+   "dma20": 77.36,
+   "slip": 0.0005
+  },
+  {
+   "sym": "ANURAS",
+   "fo": false,
+   "close": 1322.5,
+   "turnover_cr": 57.1,
+   "or_vol_norm": 13923.05,
+   "dma20": 1242.41,
+   "slip": 0.001
+  },
+  {
+   "sym": "VMM",
+   "fo": true,
+   "close": 96.15,
+   "turnover_cr": 52.9,
+   "or_vol_norm": 325024.9,
+   "dma20": 92.74,
+   "slip": 0.0005
+  },
+  {
+   "sym": "JYOTICNC",
+   "fo": false,
+   "close": 1058.65,
+   "turnover_cr": 52.7,
+   "or_vol_norm": 41017.1,
+   "dma20": 1026.87,
+   "slip": 0.001
+  },
+  {
+   "sym": "LLOYDSME",
+   "fo": false,
+   "close": 1556.8,
+   "turnover_cr": 52.7,
+   "or_vol_norm": 20553.0,
+   "dma20": 1748.25,
+   "slip": 0.001
+  },
+  {
+   "sym": "SCI",
+   "fo": false,
+   "close": 254.87,
+   "turnover_cr": 52.3,
+   "or_vol_norm": 309068.15,
+   "dma20": 259.09,
+   "slip": 0.001
+  },
+  {
+   "sym": "LEMONTREE",
+   "fo": false,
+   "close": 123.56,
+   "turnover_cr": 52.0,
+   "or_vol_norm": 330543.45,
+   "dma20": 119.72,
+   "slip": 0.001
+  },
+  {
+   "sym": "SRF",
+   "fo": true,
+   "close": 2559.5,
+   "turnover_cr": 51.3,
+   "or_vol_norm": 7199.35,
+   "dma20": 2469.74,
+   "slip": 0.0005
+  },
+  {
+   "sym": "IEX",
+   "fo": false,
+   "close": 110.9,
+   "turnover_cr": 51.0,
+   "or_vol_norm": 277155.2,
+   "dma20": 111.48,
+   "slip": 0.001
+  },
+  {
+   "sym": "BSOFT",
+   "fo": false,
+   "close": 299.15,
+   "turnover_cr": 50.8,
+   "or_vol_norm": 435295.3,
+   "dma20": 317.2,
+   "slip": 0.001
+  },
+  {
+   "sym": "EMMVEE",
+   "fo": false,
+   "close": 268.5,
+   "turnover_cr": 50.5,
+   "or_vol_norm": 140939.45,
+   "dma20": 258.45,
+   "slip": 0.001
+  },
+  {
+   "sym": "CASTROLIND",
+   "fo": false,
+   "close": 189.65,
+   "turnover_cr": 49.9,
+   "or_vol_norm": 71251.8,
+   "dma20": 191.1,
+   "slip": 0.002
+  },
+  {
+   "sym": "TITAGARH",
+   "fo": false,
+   "close": 751.35,
+   "turnover_cr": 48.8,
+   "or_vol_norm": 104522.7,
+   "dma20": 713.99,
+   "slip": 0.002
+  },
+  {
+   "sym": "CONCOR",
+   "fo": true,
+   "close": 420.7,
+   "turnover_cr": 48.7,
+   "or_vol_norm": 49836.55,
+   "dma20": 433.07,
+   "slip": 0.0005
+  },
+  {
+   "sym": "NUVAMA",
+   "fo": false,
+   "close": 1835.0,
+   "turnover_cr": 48.0,
+   "or_vol_norm": 24006.2,
+   "dma20": 1836.32,
+   "slip": 0.002
+  },
+  {
+   "sym": "LTTS",
+   "fo": false,
+   "close": 4227.2,
+   "turnover_cr": 47.6,
+   "or_vol_norm": 9095.15,
+   "dma20": 4199.82,
+   "slip": 0.002
+  },
+  {
+   "sym": "FLUOROCHEM",
+   "fo": false,
+   "close": 4824.5,
+   "turnover_cr": 47.5,
+   "or_vol_norm": 5221.25,
+   "dma20": 4688.51,
+   "slip": 0.002
+  },
+  {
+   "sym": "TATACAP",
+   "fo": false,
+   "close": 340.1,
+   "turnover_cr": 47.5,
+   "or_vol_norm": 342586.65,
+   "dma20": 344.1,
+   "slip": 0.002
+  },
+  {
+   "sym": "SBICARD",
+   "fo": true,
+   "close": 565.8,
+   "turnover_cr": 47.0,
+   "or_vol_norm": 59915.95,
+   "dma20": 568.91,
+   "slip": 0.0005
+  },
+  {
+   "sym": "SUPREMEIND",
+   "fo": true,
+   "close": 3200.0,
+   "turnover_cr": 46.9,
+   "or_vol_norm": 5800.7,
+   "dma20": 3234.94,
+   "slip": 0.0005
+  },
+  {
+   "sym": "GODFRYPHLP",
+   "fo": true,
+   "close": 1797.0,
+   "turnover_cr": 46.6,
+   "or_vol_norm": 24063.95,
+   "dma20": 1772.47,
+   "slip": 0.0005
+  },
+  {
+   "sym": "GRAPHITE",
+   "fo": false,
+   "close": 792.0,
+   "turnover_cr": 46.5,
+   "or_vol_norm": 53625.65,
+   "dma20": 770.7,
+   "slip": 0.002
+  },
+  {
+   "sym": "ANANDRATHI",
+   "fo": true,
+   "close": 2412.2,
+   "turnover_cr": 46.2,
+   "or_vol_norm": 10196.3,
+   "dma20": 2354.44,
+   "slip": 0.0005
+  },
+  {
+   "sym": "KPRMILL",
+   "fo": false,
+   "close": 1217.3,
+   "turnover_cr": 46.1,
+   "or_vol_norm": 23832.0,
+   "dma20": 1170.57,
+   "slip": 0.002
+  },
+  {
+   "sym": "LALPATHLAB",
+   "fo": false,
+   "close": 1983.3,
+   "turnover_cr": 45.9,
+   "or_vol_norm": 12667.25,
+   "dma20": 1982.48,
+   "slip": 0.002
+  },
+  {
+   "sym": "IPCALAB",
+   "fo": false,
+   "close": 1782.9,
+   "turnover_cr": 45.6,
+   "or_vol_norm": 11534.15,
+   "dma20": 1889.34,
+   "slip": 0.002
+  },
+  {
+   "sym": "ASTRAL",
+   "fo": true,
+   "close": 1262.5,
+   "turnover_cr": 45.4,
+   "or_vol_norm": 65490.45,
+   "dma20": 1291.15,
+   "slip": 0.0005
+  },
+  {
+   "sym": "BBOX",
+   "fo": false,
+   "close": 860.7,
+   "turnover_cr": 45.0,
+   "or_vol_norm": 95158.4,
+   "dma20": 852.41,
+   "slip": 0.002
+  },
+  {
+   "sym": "CRAFTSMAN",
+   "fo": false,
+   "close": 12005.0,
+   "turnover_cr": 45.0,
+   "or_vol_norm": 1671.75,
+   "dma20": 11083.7,
+   "slip": 0.002
+  },
+  {
+   "sym": "IGIL",
+   "fo": false,
+   "close": 429.65,
+   "turnover_cr": 44.9,
+   "or_vol_norm": 100773.0,
+   "dma20": 422.75,
+   "slip": 0.002
+  },
+  {
+   "sym": "ZENTEC",
+   "fo": false,
+   "close": 1793.2,
+   "turnover_cr": 44.6,
+   "or_vol_norm": 44125.1,
+   "dma20": 1716.08,
+   "slip": 0.002
+  },
+  {
+   "sym": "KEC",
+   "fo": false,
+   "close": 292.45,
+   "turnover_cr": 44.3,
+   "or_vol_norm": 189226.4,
+   "dma20": 321.34,
+   "slip": 0.002
+  },
+  {
+   "sym": "ONESOURCE",
+   "fo": false,
+   "close": 1538.0,
+   "turnover_cr": 43.3,
+   "or_vol_norm": 13792.95,
+   "dma20": 1586.73,
+   "slip": 0.002
+  },
+  {
+   "sym": "TENNIND",
+   "fo": false,
+   "close": 449.7,
+   "turnover_cr": 43.2,
+   "or_vol_norm": 48942.8,
+   "dma20": 443.46,
+   "slip": 0.002
+  },
+  {
+   "sym": "AJANTPHARM",
+   "fo": false,
+   "close": 3360.6,
+   "turnover_cr": 42.7,
+   "or_vol_norm": 5212.35,
+   "dma20": 3340.49,
+   "slip": 0.002
+  },
+  {
+   "sym": "NATCOPHARM",
+   "fo": false,
+   "close": 799.75,
+   "turnover_cr": 42.6,
+   "or_vol_norm": 68459.25,
+   "dma20": 803.85,
+   "slip": 0.002
+  },
+  {
+   "sym": "MRF",
+   "fo": false,
+   "close": 128000.0,
+   "turnover_cr": 42.5,
+   "or_vol_norm": 371.75,
+   "dma20": 125404.5,
+   "slip": 0.002
+  },
+  {
+   "sym": "HEGAM",
+   "fo": false,
+   "close": 285.79,
+   "turnover_cr": 41.7,
+   "or_vol_norm": 486184.3,
+   "dma20": 270.35,
+   "slip": 0.002
+  },
+  {
+   "sym": "TATACOMM",
+   "fo": false,
+   "close": 1707.3,
+   "turnover_cr": 41.3,
+   "or_vol_norm": 10615.6,
+   "dma20": 1739.97,
+   "slip": 0.002
+  },
+  {
+   "sym": "PTCIL",
+   "fo": false,
+   "close": 25460.0,
+   "turnover_cr": 41.2,
+   "or_vol_norm": 1081.3,
+   "dma20": 24299.0,
+   "slip": 0.002
+  },
+  {
+   "sym": "BEML",
+   "fo": false,
+   "close": 2346.1,
+   "turnover_cr": 40.2,
+   "or_vol_norm": 26113.05,
+   "dma20": 2055.44,
+   "slip": 0.002
+  },
+  {
+   "sym": "CEMPRO",
+   "fo": false,
+   "close": 1405.6,
+   "turnover_cr": 40.1,
+   "or_vol_norm": 23156.9,
+   "dma20": 1339.16,
+   "slip": 0.002
+  },
+  {
+   "sym": "COROMANDEL",
+   "fo": true,
+   "close": 1959.8,
+   "turnover_cr": 40.1,
+   "or_vol_norm": 8452.5,
+   "dma20": 1901.44,
+   "slip": 0.0005
+  },
+  {
+   "sym": "HUDCO",
+   "fo": false,
+   "close": 155.64,
+   "turnover_cr": 40.1,
+   "or_vol_norm": 390649.9,
+   "dma20": 158.56,
+   "slip": 0.002
+  },
+  {
+   "sym": "SHREECEM",
+   "fo": true,
+   "close": 25160.0,
+   "turnover_cr": 40.1,
+   "or_vol_norm": 1003.9,
+   "dma20": 24696.0,
+   "slip": 0.0005
+  },
+  {
+   "sym": "PRIVISCL",
+   "fo": false,
+   "close": 3666.0,
+   "turnover_cr": 40.0,
+   "or_vol_norm": 10599.3,
+   "dma20": 3428.79,
+   "slip": 0.002
+  },
+  {
+   "sym": "AETHER",
+   "fo": false,
+   "close": 1761.4,
+   "turnover_cr": 38.9,
+   "or_vol_norm": 19481.25,
+   "dma20": 1623.1,
+   "slip": 0.002
+  },
+  {
+   "sym": "SHYAMMETL",
+   "fo": false,
+   "close": 1305.4,
+   "turnover_cr": 38.8,
+   "or_vol_norm": 36863.5,
+   "dma20": 1276.44,
+   "slip": 0.002
+  },
+  {
+   "sym": "ZENSARTECH",
+   "fo": false,
+   "close": 537.8,
+   "turnover_cr": 38.6,
+   "or_vol_norm": 75096.85,
+   "dma20": 541.98,
+   "slip": 0.002
+  },
+  {
+   "sym": "INTELLECT",
+   "fo": false,
+   "close": 583.9,
+   "turnover_cr": 37.9,
+   "or_vol_norm": 74821.35,
+   "dma20": 542.84,
+   "slip": 0.002
+  },
+  {
+   "sym": "CYIENT",
+   "fo": false,
+   "close": 1156.9,
+   "turnover_cr": 37.5,
+   "or_vol_norm": 24076.8,
+   "dma20": 1122.85,
+   "slip": 0.002
+  },
+  {
+   "sym": "NLCINDIA",
+   "fo": false,
+   "close": 236.51,
+   "turnover_cr": 37.5,
+   "or_vol_norm": 106963.55,
+   "dma20": 235.92,
+   "slip": 0.002
+  },
+  {
+   "sym": "EMCURE",
+   "fo": false,
+   "close": 2308.6,
+   "turnover_cr": 37.4,
+   "or_vol_norm": 21686.2,
+   "dma20": 2214.82,
+   "slip": 0.002
+  },
+  {
+   "sym": "SYNGENE",
+   "fo": false,
+   "close": 447.85,
+   "turnover_cr": 37.4,
+   "or_vol_norm": 81425.55,
+   "dma20": 431.41,
+   "slip": 0.002
+  },
+  {
+   "sym": "ABDL",
+   "fo": false,
+   "close": 838.0,
+   "turnover_cr": 37.2,
+   "or_vol_norm": 63653.55,
+   "dma20": 756.59,
+   "slip": 0.002
+  },
+  {
+   "sym": "IRCTC",
+   "fo": false,
+   "close": 458.65,
+   "turnover_cr": 35.6,
+   "or_vol_norm": 98182.85,
+   "dma20": 452.3,
+   "slip": 0.002
+  },
+  {
+   "sym": "CHOICEIN",
+   "fo": false,
+   "close": 770.45,
+   "turnover_cr": 35.4,
+   "or_vol_norm": 48494.95,
+   "dma20": 739.16,
+   "slip": 0.002
+  },
+  {
+   "sym": "BAJAJHLDNG",
+   "fo": false,
+   "close": 11703.0,
+   "turnover_cr": 34.8,
+   "or_vol_norm": 1780.7,
+   "dma20": 11080.0,
+   "slip": 0.002
+  },
+  {
+   "sym": "TATATECH",
+   "fo": false,
+   "close": 705.2,
+   "turnover_cr": 34.4,
+   "or_vol_norm": 72023.4,
+   "dma20": 675.67,
+   "slip": 0.002
+  },
+  {
+   "sym": "ANTHEM",
+   "fo": false,
+   "close": 984.15,
+   "turnover_cr": 34.3,
+   "or_vol_norm": 36675.6,
+   "dma20": 920.02,
+   "slip": 0.002
+  },
+  {
+   "sym": "TARIL",
+   "fo": false,
+   "close": 291.5,
+   "turnover_cr": 34.3,
+   "or_vol_norm": 119156.25,
+   "dma20": 305.13,
+   "slip": 0.002
+  },
+  {
+   "sym": "JSL",
+   "fo": false,
+   "close": 719.0,
+   "turnover_cr": 33.5,
+   "or_vol_norm": 16125.05,
+   "dma20": 706.67,
+   "slip": 0.002
+  },
+  {
+   "sym": "GMDCLTD",
+   "fo": false,
+   "close": 466.0,
+   "turnover_cr": 33.0,
+   "or_vol_norm": 122153.1,
+   "dma20": 461.45,
+   "slip": 0.002
+  },
+  {
+   "sym": "CREDITACC",
+   "fo": false,
+   "close": 999.0,
+   "turnover_cr": 32.6,
+   "or_vol_norm": 26299.0,
+   "dma20": 1051.34,
+   "slip": 0.002
+  },
+  {
+   "sym": "J&KBANK",
+   "fo": false,
+   "close": 166.39,
+   "turnover_cr": 32.2,
+   "or_vol_norm": 256660.35,
+   "dma20": 136.64,
+   "slip": 0.002
+  },
+  {
+   "sym": "SUNTV",
+   "fo": false,
+   "close": 640.75,
+   "turnover_cr": 31.6,
+   "or_vol_norm": 34425.05,
+   "dma20": 638.57,
+   "slip": 0.002
+  },
+  {
+   "sym": "TEJASNET",
+   "fo": false,
+   "close": 402.5,
+   "turnover_cr": 31.6,
+   "or_vol_norm": 75158.5,
+   "dma20": 411.33,
+   "slip": 0.002
+  },
+  {
+   "sym": "MEDANTA",
+   "fo": false,
+   "close": 1473.7,
+   "turnover_cr": 31.3,
+   "or_vol_norm": 34887.35,
+   "dma20": 1420.5,
+   "slip": 0.002
+  },
+  {
+   "sym": "OLECTRA",
+   "fo": false,
+   "close": 1019.6,
+   "turnover_cr": 31.3,
+   "or_vol_norm": 27078.65,
+   "dma20": 1012.63,
+   "slip": 0.002
+  },
+  {
+   "sym": "GABRIEL",
+   "fo": false,
+   "close": 1546.8,
+   "turnover_cr": 31.1,
+   "or_vol_norm": 22041.1,
+   "dma20": 1481.57,
+   "slip": 0.002
+  },
+  {
+   "sym": "KAJARIACER",
+   "fo": false,
+   "close": 1205.3,
+   "turnover_cr": 31.1,
+   "or_vol_norm": 24492.6,
+   "dma20": 1179.41,
+   "slip": 0.002
+  },
+  {
+   "sym": "AIAENG",
+   "fo": false,
+   "close": 3386.5,
+   "turnover_cr": 30.9,
+   "or_vol_norm": 6283.2,
+   "dma20": 3327.94,
+   "slip": 0.002
+  },
+  {
+   "sym": "APOLLOTYRE",
+   "fo": false,
+   "close": 426.05,
+   "turnover_cr": 30.7,
+   "or_vol_norm": 74247.65,
+   "dma20": 413.94,
+   "slip": 0.002
+  },
+  {
+   "sym": "SIGNATURE",
+   "fo": false,
+   "close": 846.25,
+   "turnover_cr": 30.7,
+   "or_vol_norm": 22156.45,
+   "dma20": 779.31,
+   "slip": 0.002
+  },
+  {
+   "sym": "AWL",
+   "fo": false,
+   "close": 169.27,
+   "turnover_cr": 30.4,
+   "or_vol_norm": 93101.9,
+   "dma20": 166.95,
+   "slip": 0.002
+  },
+  {
+   "sym": "BALRAMCHIN",
+   "fo": false,
+   "close": 675.45,
+   "turnover_cr": 30.4,
+   "or_vol_norm": 73962.2,
+   "dma20": 643.63,
+   "slip": 0.002
+  },
+  {
+   "sym": "RUBICON",
+   "fo": false,
+   "close": 1869.3,
+   "turnover_cr": 30.3,
+   "or_vol_norm": 13284.05,
+   "dma20": 1706.28,
+   "slip": 0.002
+  },
+  {
+   "sym": "THANGAMAYL",
+   "fo": false,
+   "close": 3945.3,
+   "turnover_cr": 29.8,
+   "or_vol_norm": 6726.0,
+   "dma20": 4164.49,
+   "slip": 0.002
+  },
+  {
+   "sym": "ACMESOLAR",
+   "fo": false,
+   "close": 426.35,
+   "turnover_cr": 29.4,
+   "or_vol_norm": 71844.3,
+   "dma20": 411.79,
+   "slip": 0.002
+  },
+  {
+   "sym": "TEGA",
+   "fo": false,
+   "close": 1510.0,
+   "turnover_cr": 29.3,
+   "or_vol_norm": 15417.45,
+   "dma20": 1646.42,
+   "slip": 0.002
+  },
+  {
+   "sym": "INOXINDIA",
+   "fo": false,
+   "close": 2139.3,
+   "turnover_cr": 29.2,
+   "or_vol_norm": 18867.1,
+   "dma20": 1990.75,
+   "slip": 0.002
+  },
+  {
+   "sym": "ECLERX",
+   "fo": false,
+   "close": 1548.3,
+   "turnover_cr": 28.8,
+   "or_vol_norm": 24228.35,
+   "dma20": 1543.92,
+   "slip": 0.002
+  },
+  {
+   "sym": "NH",
+   "fo": false,
+   "close": 1962.2,
+   "turnover_cr": 28.8,
+   "or_vol_norm": 19790.6,
+   "dma20": 1889.07,
+   "slip": 0.002
+  },
+  {
+   "sym": "ACE",
+   "fo": false,
+   "close": 1325.7,
+   "turnover_cr": 28.3,
+   "or_vol_norm": 42994.95,
+   "dma20": 1153.98,
+   "slip": 0.002
+  },
+  {
+   "sym": "DEEPAKFERT",
+   "fo": false,
+   "close": 1446.9,
+   "turnover_cr": 27.8,
+   "or_vol_norm": 63312.15,
+   "dma20": 1291.33,
+   "slip": 0.002
+  },
+  {
+   "sym": "BHARTIHEXA",
+   "fo": false,
+   "close": 1555.2,
+   "turnover_cr": 27.6,
+   "or_vol_norm": 5379.2,
+   "dma20": 1644.11,
+   "slip": 0.002
+  },
+  {
+   "sym": "CESC",
+   "fo": false,
+   "close": 127.39,
+   "turnover_cr": 27.6,
+   "or_vol_norm": 178717.15,
+   "dma20": 127.54,
+   "slip": 0.002
+  },
+  {
+   "sym": "BALKRISIND",
+   "fo": false,
+   "close": 2360.5,
+   "turnover_cr": 27.3,
+   "or_vol_norm": 7773.45,
+   "dma20": 2286.85,
+   "slip": 0.002
+  },
+  {
+   "sym": "FIRSTCRY",
+   "fo": false,
+   "close": 160.17,
+   "turnover_cr": 27.2,
+   "or_vol_norm": 414480.0,
+   "dma20": 165.0,
+   "slip": 0.002
+  },
+  {
+   "sym": "JWL",
+   "fo": false,
+   "close": 224.84,
+   "turnover_cr": 27.1,
+   "or_vol_norm": 1512990.95,
+   "dma20": 202.52,
+   "slip": 0.002
+  },
+  {
+   "sym": "GPIL",
+   "fo": false,
+   "close": 211.14,
+   "turnover_cr": 26.5,
+   "or_vol_norm": 92934.15,
+   "dma20": 211.73,
+   "slip": 0.002
+  },
+  {
+   "sym": "SCHAEFFLER",
+   "fo": false,
+   "close": 3658.9,
+   "turnover_cr": 26.5,
+   "or_vol_norm": 3685.75,
+   "dma20": 3579.56,
+   "slip": 0.002
+  },
+  {
+   "sym": "GICRE",
+   "fo": false,
+   "close": 335.5,
+   "turnover_cr": 26.4,
+   "or_vol_norm": 21761.7,
+   "dma20": 332.89,
+   "slip": 0.002
+  },
+  {
+   "sym": "TORNTPOWER",
+   "fo": false,
+   "close": 1152.2,
+   "turnover_cr": 26.1,
+   "or_vol_norm": 13376.2,
+   "dma20": 1212.18,
+   "slip": 0.002
+  },
+  {
+   "sym": "FIVESTAR",
+   "fo": false,
+   "close": 400.85,
+   "turnover_cr": 26.0,
+   "or_vol_norm": 59360.0,
+   "dma20": 423.16,
+   "slip": 0.002
+  },
+  {
+   "sym": "DEEPAKNTR",
+   "fo": false,
+   "close": 1539.0,
+   "turnover_cr": 25.9,
+   "or_vol_norm": 77310.5,
+   "dma20": 1547.98,
+   "slip": 0.002
+  },
+  {
+   "sym": "IDBI",
+   "fo": false,
+   "close": 77.34,
+   "turnover_cr": 25.3,
+   "or_vol_norm": 422494.8,
+   "dma20": 79.21,
+   "slip": 0.002
+  },
+  {
+   "sym": "IRCON",
+   "fo": false,
+   "close": 110.73,
+   "turnover_cr": 25.1,
+   "or_vol_norm": 336081.0,
+   "dma20": 107.15,
+   "slip": 0.002
+  },
+  {
+   "sym": "SUNDARMFIN",
+   "fo": false,
+   "close": 4173.4,
+   "turnover_cr": 24.3,
+   "or_vol_norm": 2586.0,
+   "dma20": 4217.69,
+   "slip": 0.002
+  },
+  {
+   "sym": "DALBHARAT",
+   "fo": false,
+   "close": 1487.1,
+   "turnover_cr": 24.0,
+   "or_vol_norm": 21347.85,
+   "dma20": 1481.49,
+   "slip": 0.002
+  },
+  {
+   "sym": "GLAXO",
+   "fo": false,
+   "close": 2770.4,
+   "turnover_cr": 23.9,
+   "or_vol_norm": 7112.4,
+   "dma20": 2641.13,
+   "slip": 0.002
+  },
+  {
+   "sym": "ABBOTINDIA",
+   "fo": false,
+   "close": 27145.0,
+   "turnover_cr": 23.8,
+   "or_vol_norm": 265.95,
+   "dma20": 26306.0,
+   "slip": 0.002
+  },
+  {
+   "sym": "CAPLIPOINT",
+   "fo": false,
+   "close": 2062.7,
+   "turnover_cr": 23.8,
+   "or_vol_norm": 13454.05,
+   "dma20": 2266.88,
+   "slip": 0.002
+  },
+  {
+   "sym": "AAVAS",
+   "fo": false,
+   "close": 1116.2,
+   "turnover_cr": 23.4,
+   "or_vol_norm": 5858.3,
+   "dma20": 1114.18,
+   "slip": 0.002
+  },
+  {
+   "sym": "FSL",
+   "fo": false,
+   "close": 284.4,
+   "turnover_cr": 23.3,
+   "or_vol_norm": 203492.4,
+   "dma20": 288.82,
+   "slip": 0.002
+  },
+  {
+   "sym": "KIMS",
+   "fo": false,
+   "close": 785.5,
+   "turnover_cr": 23.3,
+   "or_vol_norm": 16738.8,
+   "dma20": 747.98,
+   "slip": 0.002
+  },
+  {
+   "sym": "ARE&M",
+   "fo": false,
+   "close": 728.8,
+   "turnover_cr": 23.2,
+   "or_vol_norm": 67950.35,
+   "dma20": 733.45,
+   "slip": 0.002
+  },
+  {
+   "sym": "ESCORTS",
+   "fo": false,
+   "close": 2576.3,
+   "turnover_cr": 23.2,
+   "or_vol_norm": 6754.85,
+   "dma20": 2458.42,
+   "slip": 0.002
+  },
+  {
+   "sym": "JKCEMENT",
+   "fo": false,
+   "close": 5470.3,
+   "turnover_cr": 23.1,
+   "or_vol_norm": 1557.1,
+   "dma20": 5214.91,
+   "slip": 0.002
+  },
+  {
+   "sym": "COHANCE",
+   "fo": false,
+   "close": 497.55,
+   "turnover_cr": 23.0,
+   "or_vol_norm": 52595.0,
+   "dma20": 461.79,
+   "slip": 0.002
+  },
+  {
+   "sym": "AARTIIND",
+   "fo": false,
+   "close": 438.15,
+   "turnover_cr": 22.8,
+   "or_vol_norm": 78322.5,
+   "dma20": 453.2,
+   "slip": 0.002
+  },
+  {
+   "sym": "PARADEEP",
+   "fo": false,
+   "close": 141.5,
+   "turnover_cr": 22.8,
+   "or_vol_norm": 129163.75,
+   "dma20": 139.06,
+   "slip": 0.002
+  },
+  {
+   "sym": "ABREL",
+   "fo": false,
+   "close": 1271.7,
+   "turnover_cr": 22.7,
+   "or_vol_norm": 19713.0,
+   "dma20": 1158.26,
+   "slip": 0.002
+  },
+  {
+   "sym": "NCC",
+   "fo": false,
+   "close": 130.0,
+   "turnover_cr": 22.7,
+   "or_vol_norm": 209812.1,
+   "dma20": 127.87,
+   "slip": 0.002
+  },
+  {
+   "sym": "ASAHIINDIA",
+   "fo": false,
+   "close": 1158.2,
+   "turnover_cr": 22.6,
+   "or_vol_norm": 17821.1,
+   "dma20": 1085.59,
+   "slip": 0.002
+  },
+  {
+   "sym": "AFFLE",
+   "fo": false,
+   "close": 1644.2,
+   "turnover_cr": 22.5,
+   "or_vol_norm": 17982.85,
+   "dma20": 1575.56,
+   "slip": 0.002
+  },
+  {
+   "sym": "ENDURANCE",
+   "fo": false,
+   "close": 2587.4,
+   "turnover_cr": 22.4,
+   "or_vol_norm": 4137.55,
+   "dma20": 2504.82,
+   "slip": 0.002
+  },
+  {
+   "sym": "HDBFS",
+   "fo": false,
+   "close": 550.5,
+   "turnover_cr": 22.0,
+   "or_vol_norm": 28188.3,
+   "dma20": 543.74,
+   "slip": 0.002
+  },
+  {
+   "sym": "ATGL",
+   "fo": false,
+   "close": 547.9,
+   "turnover_cr": 21.5,
+   "or_vol_norm": 38426.65,
+   "dma20": 562.83,
+   "slip": 0.002
+  },
+  {
+   "sym": "HOMEFIRST",
+   "fo": false,
+   "close": 999.1,
+   "turnover_cr": 21.4,
+   "or_vol_norm": 6707.15,
+   "dma20": 1065.55,
+   "slip": 0.002
+  },
+  {
+   "sym": "BRIGADE",
+   "fo": false,
+   "close": 617.85,
+   "turnover_cr": 21.2,
+   "or_vol_norm": 58843.4,
+   "dma20": 560.47,
+   "slip": 0.002
+  },
+  {
+   "sym": "EMAMILTD",
+   "fo": false,
+   "close": 414.35,
+   "turnover_cr": 20.8,
+   "or_vol_norm": 25216.9,
+   "dma20": 402.51,
+   "slip": 0.002
+  },
+  {
+   "sym": "TRITURBINE",
+   "fo": false,
+   "close": 455.2,
+   "turnover_cr": 20.8,
+   "or_vol_norm": 56991.05,
+   "dma20": 482.09,
+   "slip": 0.002
+  },
+  {
+   "sym": "BAJAJHFL",
+   "fo": false,
+   "close": 80.05,
+   "turnover_cr": 20.4,
+   "or_vol_norm": 198469.05,
+   "dma20": 80.72,
+   "slip": 0.002
+  },
+  {
+   "sym": "VIJAYA",
+   "fo": false,
+   "close": 1552.5,
+   "turnover_cr": 20.2,
+   "or_vol_norm": 8620.2,
+   "dma20": 1489.22,
+   "slip": 0.002
+  },
+  {
+   "sym": "CEATLTD",
+   "fo": false,
+   "close": 3552.2,
+   "turnover_cr": 20.1,
+   "or_vol_norm": 6438.5,
+   "dma20": 3456.02,
+   "slip": 0.002
+  },
+  {
+   "sym": "HEXT",
+   "fo": false,
+   "close": 498.9,
+   "turnover_cr": 20.1,
+   "or_vol_norm": 19758.2,
+   "dma20": 496.38,
+   "slip": 0.002
+  },
+  {
+   "sym": "JKTYRE",
+   "fo": false,
+   "close": 365.3,
+   "turnover_cr": 20.0,
+   "or_vol_norm": 53014.25,
+   "dma20": 351.84,
+   "slip": 0.002
+  },
+  {
+   "sym": "GODREJIND",
+   "fo": false,
+   "close": 1047.8,
+   "turnover_cr": 19.8,
+   "or_vol_norm": 38960.7,
+   "dma20": 1023.04,
+   "slip": 0.002
+  },
+  {
+   "sym": "MINDACORP",
+   "fo": false,
+   "close": 711.55,
+   "turnover_cr": 19.6,
+   "or_vol_norm": 21633.35,
+   "dma20": 703.86,
+   "slip": 0.002
+  },
+  {
+   "sym": "JINDALSAW",
+   "fo": false,
+   "close": 239.0,
+   "turnover_cr": 19.5,
+   "or_vol_norm": 58261.0,
+   "dma20": 248.17,
+   "slip": 0.002
+  },
+  {
+   "sym": "LINDEINDIA",
+   "fo": false,
+   "close": 6983.0,
+   "turnover_cr": 19.4,
+   "or_vol_norm": 1911.6,
+   "dma20": 6583.75,
+   "slip": 0.002
+  },
+  {
+   "sym": "ABSLAMC",
+   "fo": false,
+   "close": 982.7,
+   "turnover_cr": 19.2,
+   "or_vol_norm": 12935.85,
+   "dma20": 899.77,
+   "slip": 0.002
+  },
+  {
+   "sym": "CCL",
+   "fo": false,
+   "close": 922.0,
+   "turnover_cr": 19.0,
+   "or_vol_norm": 10599.05,
+   "dma20": 956.34,
+   "slip": 0.002
+  },
+  {
+   "sym": "MGL",
+   "fo": false,
+   "close": 1077.3,
+   "turnover_cr": 18.8,
+   "or_vol_norm": 12331.9,
+   "dma20": 1097.76,
+   "slip": 0.002
+  },
+  {
+   "sym": "GRAVITA",
+   "fo": false,
+   "close": 1469.6,
+   "turnover_cr": 18.6,
+   "or_vol_norm": 10599.4,
+   "dma20": 1470.2,
+   "slip": 0.002
+  },
+  {
+   "sym": "STARHEALTH",
+   "fo": false,
+   "close": 570.45,
+   "turnover_cr": 18.5,
+   "or_vol_norm": 8907.55,
+   "dma20": 552.74,
+   "slip": 0.002
+  },
+  {
+   "sym": "CHOLAHLDNG",
+   "fo": false,
+   "close": 1368.5,
+   "turnover_cr": 18.4,
+   "or_vol_norm": 12721.05,
+   "dma20": 1405.85,
+   "slip": 0.002
+  },
+  {
+   "sym": "JAINREC",
+   "fo": false,
+   "close": 280.45,
+   "turnover_cr": 18.4,
+   "or_vol_norm": 31679.45,
+   "dma20": 282.34,
+   "slip": 0.002
+  },
+  {
+   "sym": "CLEANMAX",
+   "fo": false,
+   "close": 1251.4,
+   "turnover_cr": 18.3,
+   "or_vol_norm": 18682.1,
+   "dma20": 1260.12,
+   "slip": 0.002
+  },
+  {
+   "sym": "UBL",
+   "fo": false,
+   "close": 1275.6,
+   "turnover_cr": 18.2,
+   "or_vol_norm": 9228.4,
+   "dma20": 1221.57,
+   "slip": 0.002
+  },
+  {
+   "sym": "FRACTAL",
+   "fo": false,
+   "close": 809.35,
+   "turnover_cr": 18.1,
+   "or_vol_norm": 95044.4,
+   "dma20": 795.16,
+   "slip": 0.002
+  },
+  {
+   "sym": "ATUL",
+   "fo": false,
+   "close": 5160.0,
+   "turnover_cr": 17.9,
+   "or_vol_norm": 1929.45,
+   "dma20": 5129.95,
+   "slip": 0.002
+  },
+  {
+   "sym": "CONCORDBIO",
+   "fo": false,
+   "close": 549.4,
+   "turnover_cr": 17.8,
+   "or_vol_norm": 14709.7,
+   "dma20": 588.1,
+   "slip": 0.002
+  },
+  {
+   "sym": "CARBORUNIV",
+   "fo": false,
+   "close": 1001.2,
+   "turnover_cr": 17.7,
+   "or_vol_norm": 15316.35,
+   "dma20": 1036.85,
+   "slip": 0.002
+  },
+  {
+   "sym": "GALLANTT",
+   "fo": false,
+   "close": 539.6,
+   "turnover_cr": 17.5,
+   "or_vol_norm": 34228.35,
+   "dma20": 537.31,
+   "slip": 0.002
+  },
+  {
+   "sym": "KPIL",
+   "fo": false,
+   "close": 1324.3,
+   "turnover_cr": 17.4,
+   "or_vol_norm": 5708.5,
+   "dma20": 1339.07,
+   "slip": 0.002
+  },
+  {
+   "sym": "WHIRLPOOL",
+   "fo": false,
+   "close": 789.55,
+   "turnover_cr": 17.3,
+   "or_vol_norm": 33389.9,
+   "dma20": 819.35,
+   "slip": 0.002
+  },
+  {
+   "sym": "ELGIEQUIP",
+   "fo": false,
+   "close": 558.4,
+   "turnover_cr": 16.9,
+   "or_vol_norm": 14572.85,
+   "dma20": 554.94,
+   "slip": 0.002
+  },
+  {
+   "sym": "SJVN",
+   "fo": false,
+   "close": 55.05,
+   "turnover_cr": 16.9,
+   "or_vol_norm": 457294.05,
+   "dma20": 56.08,
+   "slip": 0.002
+  },
+  {
+   "sym": "SHRIPISTON",
+   "fo": false,
+   "close": 4064.1,
+   "turnover_cr": 16.6,
+   "or_vol_norm": 2393.95,
+   "dma20": 4281.39,
+   "slip": 0.002
+  },
+  {
+   "sym": "IKS",
+   "fo": false,
+   "close": 1586.7,
+   "turnover_cr": 16.4,
+   "or_vol_norm": 8560.1,
+   "dma20": 1658.32,
+   "slip": 0.002
+  },
+  {
+   "sym": "ELECON",
+   "fo": false,
+   "close": 440.95,
+   "turnover_cr": 16.2,
+   "or_vol_norm": 23626.6,
+   "dma20": 439.31,
+   "slip": 0.002
+  },
+  {
+   "sym": "ACC",
+   "fo": false,
+   "close": 1250.6,
+   "turnover_cr": 16.1,
+   "or_vol_norm": 10800.05,
+   "dma20": 1223.3,
+   "slip": 0.002
+  },
+  {
+   "sym": "EIDPARRY",
+   "fo": false,
+   "close": 666.9,
+   "turnover_cr": 16.0,
+   "or_vol_norm": 14969.1,
+   "dma20": 645.81,
+   "slip": 0.002
+  },
+  {
+   "sym": "NTPCGREEN",
+   "fo": false,
+   "close": 82.23,
+   "turnover_cr": 15.8,
+   "or_vol_norm": 138173.0,
+   "dma20": 82.83,
+   "slip": 0.002
+  },
+  {
+   "sym": "ITI",
+   "fo": false,
+   "close": 256.92,
+   "turnover_cr": 15.7,
+   "or_vol_norm": 669270.35,
+   "dma20": 251.37,
+   "slip": 0.002
+  },
+  {
+   "sym": "JMFINANCIL",
+   "fo": false,
+   "close": 112.93,
+   "turnover_cr": 15.5,
+   "or_vol_norm": 225247.65,
+   "dma20": 112.13,
+   "slip": 0.002
+  },
+  {
+   "sym": "SCHNEIDER",
+   "fo": false,
+   "close": 1032.0,
+   "turnover_cr": 15.4,
+   "or_vol_norm": 14761.3,
+   "dma20": 1062.02,
+   "slip": 0.002
+  },
+  {
+   "sym": "RAILTEL",
+   "fo": false,
+   "close": 246.74,
+   "turnover_cr": 15.3,
+   "or_vol_norm": 75374.15,
+   "dma20": 243.49,
+   "slip": 0.002
+  },
+  {
+   "sym": "IGL",
+   "fo": false,
+   "close": 146.8,
+   "turnover_cr": 15.1,
+   "or_vol_norm": 161120.35,
+   "dma20": 144.52,
+   "slip": 0.002
+  },
+  {
+   "sym": "INDIACEM",
+   "fo": false,
+   "close": 312.85,
+   "turnover_cr": 14.8,
+   "or_vol_norm": 37634.8,
+   "dma20": 327.37,
+   "slip": 0.002
+  },
+  {
+   "sym": "RAINBOW",
+   "fo": false,
+   "close": 1272.8,
+   "turnover_cr": 14.2,
+   "or_vol_norm": 6047.7,
+   "dma20": 1258.45,
+   "slip": 0.002
+  },
+  {
+   "sym": "TECHNOE",
+   "fo": false,
+   "close": 894.6,
+   "turnover_cr": 14.2,
+   "or_vol_norm": 18719.2,
+   "dma20": 916.35,
+   "slip": 0.002
+  },
+  {
+   "sym": "JSWCEMENT",
+   "fo": false,
+   "close": 123.9,
+   "turnover_cr": 14.1,
+   "or_vol_norm": 1241854.8,
+   "dma20": 123.21,
+   "slip": 0.002
+  },
+  {
+   "sym": "AVANTIFEED",
+   "fo": false,
+   "close": 710.8,
+   "turnover_cr": 13.9,
+   "or_vol_norm": 43582.95,
+   "dma20": 709.9,
+   "slip": 0.002
+  },
+  {
+   "sym": "LTFOODS",
+   "fo": false,
+   "close": 421.15,
+   "turnover_cr": 13.7,
+   "or_vol_norm": 171209.85,
+   "dma20": 417.24,
+   "slip": 0.002
+  },
+  {
+   "sym": "PCBL",
+   "fo": false,
+   "close": 262.5,
+   "turnover_cr": 13.7,
+   "or_vol_norm": 47219.55,
+   "dma20": 275.38,
+   "slip": 0.002
+  },
+  {
+   "sym": "CHAMBLFERT",
+   "fo": false,
+   "close": 374.25,
+   "turnover_cr": 13.6,
+   "or_vol_norm": 30037.65,
+   "dma20": 376.43,
+   "slip": 0.002
+  },
+  {
+   "sym": "SWANCORP",
+   "fo": false,
+   "close": 227.66,
+   "turnover_cr": 13.6,
+   "or_vol_norm": 172116.75,
+   "dma20": 234.98,
+   "slip": 0.002
+  },
+  {
+   "sym": "BLS",
+   "fo": false,
+   "close": 216.85,
+   "turnover_cr": 13.5,
+   "or_vol_norm": 48748.8,
+   "dma20": 221.86,
+   "slip": 0.002
+  },
+  {
+   "sym": "BERGEPAINT",
+   "fo": false,
+   "close": 466.85,
+   "turnover_cr": 13.4,
+   "or_vol_norm": 30916.6,
+   "dma20": 472.38,
+   "slip": 0.002
+  },
+  {
+   "sym": "AADHARHFC",
+   "fo": false,
+   "close": 422.65,
+   "turnover_cr": 13.2,
+   "or_vol_norm": 11263.0,
+   "dma20": 427.25,
+   "slip": 0.002
+  },
+  {
+   "sym": "CMPDI",
+   "fo": false,
+   "close": 183.84,
+   "turnover_cr": 13.0,
+   "or_vol_norm": 42721.3,
+   "dma20": 183.95,
+   "slip": 0.002
+  },
+  {
+   "sym": "USHAMART",
+   "fo": false,
+   "close": 464.7,
+   "turnover_cr": 12.9,
+   "or_vol_norm": 14934.95,
+   "dma20": 469.56,
+   "slip": 0.002
+  },
+  {
+   "sym": "JBMA",
+   "fo": false,
+   "close": 472.3,
+   "turnover_cr": 12.7,
+   "or_vol_norm": 32500.5,
+   "dma20": 487.63,
+   "slip": 0.002
+  },
+  {
+   "sym": "AEGISVOPAK",
+   "fo": false,
+   "close": 284.47,
+   "turnover_cr": 12.5,
+   "or_vol_norm": 49592.8,
+   "dma20": 262.59,
+   "slip": 0.002
+  },
+  {
+   "sym": "CRISIL",
+   "fo": false,
+   "close": 3925.8,
+   "turnover_cr": 12.3,
+   "or_vol_norm": 1826.35,
+   "dma20": 4284.7,
+   "slip": 0.002
+  },
+  {
+   "sym": "JUBLINGREA",
+   "fo": false,
+   "close": 566.65,
+   "turnover_cr": 12.2,
+   "or_vol_norm": 19145.55,
+   "dma20": 575.21,
+   "slip": 0.002
+  },
+  {
+   "sym": "SUMICHEM",
+   "fo": false,
+   "close": 331.75,
+   "turnover_cr": 12.2,
+   "or_vol_norm": 26332.45,
+   "dma20": 334.68,
+   "slip": 0.002
+  },
+  {
+   "sym": "HONAUT",
+   "fo": false,
+   "close": 29175.0,
+   "turnover_cr": 11.5,
+   "or_vol_norm": 273.7,
+   "dma20": 29926.5,
+   "slip": 0.002
+  },
+  {
+   "sym": "TATAINVEST",
+   "fo": false,
+   "close": 579.75,
+   "turnover_cr": 11.5,
+   "or_vol_norm": 63810.35,
+   "dma20": 579.74,
+   "slip": 0.002
+  },
+  {
+   "sym": "TBOTEK",
+   "fo": false,
+   "close": 1475.8,
+   "turnover_cr": 11.5,
+   "or_vol_norm": 8757.85,
+   "dma20": 1559.74,
+   "slip": 0.002
+  },
+  {
+   "sym": "CANFINHOME",
+   "fo": false,
+   "close": 795.3,
+   "turnover_cr": 11.2,
+   "or_vol_norm": 14137.55,
+   "dma20": 763.79,
+   "slip": 0.002
+  },
+  {
+   "sym": "RITES",
+   "fo": false,
+   "close": 188.35,
+   "turnover_cr": 11.2,
+   "or_vol_norm": 41220.8,
+   "dma20": 192.2,
+   "slip": 0.002
+  },
+  {
+   "sym": "SOBHA",
+   "fo": false,
+   "close": 1286.3,
+   "turnover_cr": 10.9,
+   "or_vol_norm": 6186.1,
+   "dma20": 1240.25,
+   "slip": 0.002
+  },
+  {
+   "sym": "VTL",
+   "fo": false,
+   "close": 526.9,
+   "turnover_cr": 10.9,
+   "or_vol_norm": 9495.3,
+   "dma20": 519.01,
+   "slip": 0.002
+  },
+  {
+   "sym": "ZFCVINDIA",
+   "fo": false,
+   "close": 2187.1,
+   "turnover_cr": 10.9,
+   "or_vol_norm": 2299.35,
+   "dma20": 2209.25,
+   "slip": 0.002
+  },
+  {
+   "sym": "RAMCOCEM",
+   "fo": false,
+   "close": 824.9,
+   "turnover_cr": 10.8,
+   "or_vol_norm": 14034.2,
+   "dma20": 805.2,
+   "slip": 0.002
+  },
+  {
+   "sym": "KSB",
+   "fo": false,
+   "close": 642.75,
+   "turnover_cr": 10.6,
+   "or_vol_norm": 24160.95,
+   "dma20": 652.12,
+   "slip": 0.002
+  },
+  {
+   "sym": "DEVYANI",
+   "fo": false,
+   "close": 125.93,
+   "turnover_cr": 10.4,
+   "or_vol_norm": 59386.7,
+   "dma20": 124.48,
+   "slip": 0.002
+  },
+  {
+   "sym": "GILLETTE",
+   "fo": false,
+   "close": 7243.0,
+   "turnover_cr": 10.4,
+   "or_vol_norm": 429.05,
+   "dma20": 7241.6,
+   "slip": 0.002
+  },
+  {
+   "sym": "NIACL",
+   "fo": false,
+   "close": 148.94,
+   "turnover_cr": 10.3,
+   "or_vol_norm": 97409.05,
+   "dma20": 155.58,
+   "slip": 0.002
+  },
+  {
+   "sym": "SARDAEN",
+   "fo": false,
+   "close": 469.85,
+   "turnover_cr": 10.3,
+   "or_vol_norm": 14053.1,
+   "dma20": 451.71,
+   "slip": 0.002
+  },
+  {
+   "sym": "TIMKEN",
+   "fo": false,
+   "close": 3084.5,
+   "turnover_cr": 10.2,
+   "or_vol_norm": 1261.45,
+   "dma20": 3058.07,
+   "slip": 0.002
+  }
+ ],
+ "rules": {
+  "min_price": 50.0,
+  "min_turnover_cr": 10.0,
+  "min_band_pct": 10,
+  "slip": {
+   "fo": 0.0005,
+   "mid": 0.001,
+   "small": 0.002,
+   "mid_turnover_cr": 50.0
+  }
+ }
+}
