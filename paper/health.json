@@ -1,5 +1,5 @@
 {
- "checked_utc": "2026-11-27T20:17:15+00:00",
+ "checked_utc": "2026-11-27T23:27:56+00:00",
  "categories": {
   "in-intra": {
    "name": "India intraday",
@@ -94,13 +94,16 @@
      "scanned": true,
      "replayed": false,
      "candidates": 1,
-     "settled": false,
-     "state": "not_settled"
+     "settled": true,
+     "scored": 1,
+     "twin_trades": 1,
+     "judge_trades": 0,
+     "state": "learned"
     }
    ],
    "calendar": "exchange",
-   "last_ok": "2026-11-25",
-   "last_learned": "2026-11-24"
+   "last_ok": "2026-11-27",
+   "last_learned": "2026-11-27"
   },
   "in-mid": {
    "name": "India mid-term",
