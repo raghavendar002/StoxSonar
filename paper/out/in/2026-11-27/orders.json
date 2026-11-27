@@ -1,0 +1,109 @@
+{
+ "decided": "2026-11-27T04:04:14+00:00",
+ "note": "Live paper day.",
+ "mechanical": [
+  {
+   "sym": "ADANIENT",
+   "side": "short",
+   "trigger": 2674.06,
+   "stop": 2695.6,
+   "target": 2630.99,
+   "latest_entry": "14:00",
+   "cutoff": "15:15",
+   "slip": 0.0005
+  },
+  {
+   "sym": "PRESTIGE",
+   "side": "long",
+   "trigger": 1855.03,
+   "stop": 1808.0,
+   "target": 1949.08,
+   "latest_entry": "14:00",
+   "cutoff": "15:15",
+   "slip": 0.0005
+  }
+ ],
+ "judge": [
+  {
+   "sym": "ADANIENT",
+   "side": "short",
+   "trigger": 2674.0,
+   "stop": 2687.0,
+   "target": 2648.0,
+   "conviction": 3,
+   "leverage": 1,
+   "latest_entry": "14:00",
+   "cutoff": "15:15",
+   "slip": 0.0005
+  },
+  {
+   "sym": "PRESTIGE",
+   "side": "long",
+   "trigger": 1855.1,
+   "stop": 1826.0,
+   "target": 1900.0,
+   "conviction": 2,
+   "leverage": 1,
+   "latest_entry": "14:00",
+   "cutoff": "15:15",
+   "slip": 0.0005
+  },
+  {
+   "sym": "HYUNDAI",
+   "side": "short",
+   "trigger": 2033.6,
+   "stop": 2058.0,
+   "target": 1996.0,
+   "conviction": 2,
+   "leverage": 1,
+   "latest_entry": "14:00",
+   "cutoff": "15:15",
+   "slip": 0.0005
+  }
+ ],
+ "replayed": false,
+ "pools": {
+  "f80": [
+   {
+    "sym": "ADANIPORTS",
+    "side": "short",
+    "trigger": 1919.14,
+    "stop": 1945.0,
+    "target": 1867.42,
+    "latest_entry": "14:00",
+    "cutoff": "15:15"
+   },
+   {
+    "sym": "ADANIENT",
+    "side": "short",
+    "trigger": 2669.36,
+    "stop": 2695.6,
+    "target": 2616.89,
+    "latest_entry": "14:00",
+    "cutoff": "15:15"
+   }
+  ],
+  "wide": [
+   {
+    "sym": "ADANIENT",
+    "side": "short",
+    "trigger": 2674.06,
+    "stop": 2695.6,
+    "target": 2630.99,
+    "latest_entry": "14:00",
+    "cutoff": "15:15",
+    "slip": 0.0005
+   },
+   {
+    "sym": "PRESTIGE",
+    "side": "long",
+    "trigger": 1855.03,
+    "stop": 1808.0,
+    "target": 1949.08,
+    "latest_entry": "14:00",
+    "cutoff": "15:15",
+    "slip": 0.0005
+   }
+  ]
+ }
+}
