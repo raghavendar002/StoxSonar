@@ -1,5 +1,5 @@
 {
- "checked_utc": "2026-11-28T00:33:04+00:00",
+ "checked_utc": "2026-11-28T08:00:39+00:00",
  "categories": {
   "in-intra": {
    "name": "India intraday",
@@ -36,26 +36,26 @@
      "twin_trades": 2,
      "judge_trades": 2,
      "state": "learned"
-    }
-   ],
-   "calendar": "exchange",
-   "last_ok": "2026-11-26",
-   "last_learned": "2026-11-26"
-  },
-  "us-intra": {
-   "name": "US intraday",
-   "days": [
+    },
     {
-     "date": "2026-11-20",
+     "date": "2026-11-27",
      "scanned": true,
      "replayed": false,
      "candidates": 4,
      "settled": true,
      "scored": 4,
      "twin_trades": 1,
-     "judge_trades": 0,
+     "judge_trades": 1,
      "state": "learned"
-    },
+    }
+   ],
+   "calendar": "exchange",
+   "last_ok": "2026-11-27",
+   "last_learned": "2026-11-27"
+  },
+  "us-intra": {
+   "name": "US intraday",
+   "days": [
     {
      "date": "2026-11-23",
      "scanned": true,
@@ -137,25 +137,25 @@
      "closed": 1,
      "late": false,
      "state": "no_candidates"
+    },
+    {
+     "date": "2026-11-27",
+     "ran": true,
+     "candidates": 0,
+     "debated": 0,
+     "twin": 1,
+     "closed": 1,
+     "late": false,
+     "state": "no_candidates"
     }
    ],
    "calendar": "exchange",
-   "last_ok": "2026-11-26",
+   "last_ok": "2026-11-27",
    "last_learned": null
   },
   "us-mid": {
    "name": "US mid-term",
    "days": [
-    {
-     "date": "2026-11-20",
-     "ran": true,
-     "candidates": 1,
-     "debated": 1,
-     "twin": 1,
-     "closed": 0,
-     "late": false,
-     "state": "learned"
-    },
     {
      "date": "2026-11-23",
      "ran": true,
@@ -189,7 +189,7 @@
    ],
    "calendar": "exchange",
    "last_ok": "2026-11-25",
-   "last_learned": "2026-11-20"
+   "last_learned": null
   }
  },
  "alerts": [],
