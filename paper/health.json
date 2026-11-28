@@ -1,5 +1,5 @@
 {
- "checked_utc": "2026-11-27T23:27:56+00:00",
+ "checked_utc": "2026-11-28T00:33:04+00:00",
  "categories": {
   "in-intra": {
    "name": "India intraday",
@@ -194,9 +194,6 @@
  },
  "alerts": [],
  "tries": {
-  "in-intra:2026-11-17:scan": 1,
-  "us-intra:2026-11-17:scan": 1,
-  "us-intra:2026-11-17:settle": 1,
   "in-intra:2026-11-18:scan": 1,
   "in-intra:2026-11-18:settle": 1,
   "us-intra:2026-11-18:scan": 1
